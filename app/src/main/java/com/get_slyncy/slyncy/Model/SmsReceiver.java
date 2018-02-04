@@ -65,15 +65,19 @@ public class SmsReceiver extends BroadcastReceiver
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
-
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager mNotificationManager;
+        mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification notification;
+
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
         {
             assert mNotificationManager != null;
             if (mNotificationManager.getNotificationChannel("TESTID") == null)
             {
-                mNotificationManager.createNotificationChannel(new NotificationChannel("TESTID", "SMS NOTIFY", NotificationManager.IMPORTANCE_DEFAULT));
+                mNotificationManager.createNotificationChannel(
+                        new NotificationChannel("TESTID", "SMS NOTIFY",
+                                NotificationManager.IMPORTANCE_DEFAULT));
             }
             notification = new Notification.Builder(context, "TESTID")
                     .setContentText(body)
@@ -83,6 +87,8 @@ public class SmsReceiver extends BroadcastReceiver
                     .setContentIntent(resultPendingIntent)
                     .build();
         }
+
+
         else
         {
             notification = new Notification.Builder(context)
@@ -93,6 +99,7 @@ public class SmsReceiver extends BroadcastReceiver
                     .setContentIntent(resultPendingIntent)
                     .build();
         }
+
 
         assert mNotificationManager != null;
         mNotificationManager.notify(001, notification);
