@@ -17,11 +17,13 @@
 package com.get_slyncy.slyncy.Model;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.SmsMessage;
@@ -31,26 +33,30 @@ import com.get_slyncy.slyncy.R;
 /**
  * Needed to make default sms app for testing
  */
-public class SmsReceiver extends BroadcastReceiver {
+public class SmsReceiver extends BroadcastReceiver
+{
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent)
+    {
         Object[] smsExtra = (Object[]) intent.getExtras().get("pdus");
         String sender = "";
         String body = "";
 
-        for (int i = 0; i < smsExtra.length; ++i) {
+        for (int i = 0; i < smsExtra.length; ++i)
+        {
             SmsMessage sms = SmsMessage.createFromPdu((byte[]) smsExtra[i]);
             body += sms.getMessageBody();
-            if (sms.getDisplayOriginatingAddress() != null) {
+            if (sms.getDisplayOriginatingAddress() != null)
+            {
                 sender = sms.getDisplayOriginatingAddress();
             }
-            else {
+            else
+            {
                 sender = sms.getEmailFrom();
             }
         }
 
-        // TODO: Fix incoming notifications
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
                         context,
@@ -59,14 +65,43 @@ public class SmsReceiver extends BroadcastReceiver {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
-        Notification notification = new Notification.Builder(context)
-                .setContentText(body)
-                .setContentTitle(sender)
-                .setSmallIcon(R.drawable.ic_alert)
-                .setStyle(new Notification.BigTextStyle().bigText(body))
-                .setContentIntent(resultPendingIntent)
-                .build();
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager mNotificationManager;
+        mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification notification;
+
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+        {
+            assert mNotificationManager != null;
+            if (mNotificationManager.getNotificationChannel("TESTID") == null)
+            {
+                mNotificationManager.createNotificationChannel(
+                        new NotificationChannel("TESTID", "SMS NOTIFY",
+                                NotificationManager.IMPORTANCE_DEFAULT));
+            }
+            notification = new Notification.Builder(context, "TESTID")
+                    .setContentText(body)
+                    .setContentTitle(sender)
+                    .setSmallIcon(R.drawable.ic_alert)
+                    .setStyle(new Notification.BigTextStyle().bigText(body))
+                    .setContentIntent(resultPendingIntent)
+                    .build();
+        }
+
+
+        else
+        {
+            notification = new Notification.Builder(context)
+                    .setContentText(body)
+                    .setContentTitle(sender)
+                    .setSmallIcon(R.drawable.ic_alert)
+                    .setStyle(new Notification.BigTextStyle().bigText(body))
+                    .setContentIntent(resultPendingIntent)
+                    .build();
+        }
+
+
+        assert mNotificationManager != null;
         mNotificationManager.notify(001, notification);
 
         CellMessage message = CellMessage.newIncomingMessage(body, sender);
