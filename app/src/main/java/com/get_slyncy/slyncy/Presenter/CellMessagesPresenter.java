@@ -34,6 +34,12 @@ public class CellMessagesPresenter implements IMessagesPresenter {
 
     }
 
+    @Override
+    public void sendMMS(IMessage message)
+    {
+        MessageSender.sendCellMMSMessage((CellMessage) message, mContext);
+    }
+
     public void initCellSettings() {
         Data.getInstance().updateCellSettings(mContext);
     }

@@ -29,4 +29,10 @@ public class SlyncyMessagesPresenter implements IMessagesPresenter {
     public void refreshMessages() {
 
     }
+
+    @Override
+    public void sendMMS(IMessage message)
+    {
+
+    }
 }

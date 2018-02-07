@@ -37,4 +37,9 @@ public class MessageSender {
     public static void sendSlyncyMessage(IMessage message) {
 
     }
+
+    public static void sendCellMMSMessage(CellMessage message, Context context)
+    {
+        MmsSender.sendMessage(message.getRecipient(), message.getSubject(), message.getText(), context);
+    }
 }

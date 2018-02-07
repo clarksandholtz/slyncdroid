@@ -210,4 +210,9 @@ public class MainActivity extends Activity {
         mMessageField.setText("");
     }
 
+    public void forceMMS(View view) {
+        CellMessage message = CellMessage.newOutgoingMessage(mMessageField.getText().toString(), mToField.getText().toString());
+        mPresenter.sendMMS(message);
+        mMessageField.setText("");
+    }
 }

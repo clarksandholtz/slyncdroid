@@ -52,6 +52,14 @@
             </intent-filter>
         </activity>
 
+        <provider
+            android:authorities="com.get_slyncy.slyncy.MmsFileProvider"
+            android:name=".Model.MmsProvider"
+            android:enabled="true"
+            android:writePermission="true"
+            android:readPermission="true"
+            android:grantUriPermissions="true"/>
+        
         <service android:name="com.android.mms.transaction.TransactionService" />
 
         <receiver
