@@ -104,7 +104,7 @@ public class SmsReceiver extends BroadcastReceiver
         assert mNotificationManager != null;
         mNotificationManager.notify(001, notification);
 
-        CellMessage message = CellMessage.newIncomingMessage(body, sender);
-        MessageReceiver.getInstance().addNewMessage(message);
+//        CellMessage message = CellMessage.newIncomingMessage(body, sender);
+//        MessageReceiver.getInstance().addNewMessage(message);
     }
 }
