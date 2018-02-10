@@ -40,6 +40,10 @@ import android.widget.ImageView;
 import com.get_slyncy.slyncy.Model.CellMessage;
 import com.get_slyncy.slyncy.Presenter.CellMessagesPresenter;
 import com.get_slyncy.slyncy.R;
+import com.google.android.mms.pdu_alt.EncodedStringValue;
+import com.google.android.mms.pdu_alt.PduComposer;
+import com.google.android.mms.pdu_alt.PduPart;
+import com.google.android.mms.pdu_alt.SendReq;
 import com.klinker.android.logger.Log;
 import com.klinker.android.logger.OnLogListener;
 import com.klinker.android.send_message.BroadcastUtils;
@@ -202,6 +206,21 @@ public class MainActivity extends Activity {
     }
 
     public void sendMessage() {
+
+//        SendReq sendRequest = new SendReq();
+//        EncodedStringValue[] phoneNumber = EncodedStringValue.extract(recipient);
+//        sendRequest.addTo(phoneNumber);
+//        PduPart partPdu = new PduPart();
+//        partPdu.setName(part.Name.getBytes());
+//        partPdu.setContentType(part.MimeType.getBytes());
+//        partPdu.setData(part.Data);
+//        pduBody.addPart(partPdu);
+//        sendRequest.setBody(pduBody);
+//        PduComposer composer = new PduComposer(context, sendRequest);
+//        byte[] bytesToSend = composer.make();
+//        transaction.sendPdu(bytesToSend);
+
+
         CellMessage message = CellMessage.newOutgoingMessage(mMessageField.getText().toString(), mToField.getText().toString());
         if (mHasImage) {
             message.setImage(BitmapFactory.decodeFile(mPicturePath));
