@@ -10,16 +10,6 @@ public class MessageReceiver {
 
     private MessageReceiver(){}
 
-    void addNewMessage(IMessage message) {
-        Log.d("MessageReceiver", "message received from " + message.getSender());
-        if (message.getClass() == CellMessage.class) {
-            Data.getInstance().getCellMessages().addMessage(message.getSender(), message);
-        }
-//        else if(message.getClass() == SlyncyMessage.class) {
-//
-//        }
-    }
-
     // ***************** Singleton business ********************* //
 
     private static volatile MessageReceiver instance = null;

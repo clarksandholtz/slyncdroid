@@ -1,10 +1,7 @@
 package com.get_slyncy.slyncy.Model;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
-import com.get_slyncy.slyncy.View.MainActivity;
 import com.klinker.android.send_message.Transaction;
 import com.klinker.android.send_message.Settings;
 
@@ -15,7 +12,7 @@ import com.klinker.android.send_message.Settings;
 
 public class MessageSender {
 
-    public static void sendCellMessage(final CellMessage message, final Context context) {
+    public static void sendSMSMessage(final CellMessage message, final Context context) {
 
         new Thread(new Runnable() {
             @Override
@@ -30,16 +27,15 @@ public class MessageSender {
                 transaction.sendNewMessage(message, Transaction.NO_THREAD_ID);
             }
         }).start();
-
-        Data.getInstance().getCellMessages().addMessage(message.getRecipient(), message);
     }
 
-    public static void sendSlyncyMessage(IMessage message) {
+    // Later to be used for sending files, text, etc to server
+//    public static void sendSlyncyMessage(IMessage message) {
+//
+//    }
 
-    }
-
-    public static void sendCellMMSMessage(CellMessage message, Context context)
+    public static void sendMMSMessage(CellMessage message, Context context)
     {
-        MmsSender.sendMessage(message.getRecipient(), message.getSubject(), message.getText(), context);
+        MmsSender.sendMms(message, context);
     }
 }

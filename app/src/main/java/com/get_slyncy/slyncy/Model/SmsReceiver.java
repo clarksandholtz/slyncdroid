@@ -50,7 +50,6 @@ public class SmsReceiver extends BroadcastReceiver {
             }
         }
 
-        // TODO: Fix incoming notifications
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
                         context,
@@ -69,7 +68,7 @@ public class SmsReceiver extends BroadcastReceiver {
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(001, notification);
 
-        CellMessage message = CellMessage.newIncomingMessage(body, sender);
-        MessageReceiver.getInstance().addNewMessage(message);
+//        CellMessage message = CellMessage.newIncomingMessage(body, sender);
+//        MessageReceiver.getInstance().addNewMessage(message);
     }
 }

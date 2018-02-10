@@ -207,30 +207,16 @@ public class MainActivity extends Activity {
 
     public void sendMessage() {
 
-//        SendReq sendRequest = new SendReq();
-//        EncodedStringValue[] phoneNumber = EncodedStringValue.extract(recipient);
-//        sendRequest.addTo(phoneNumber);
-//        PduPart partPdu = new PduPart();
-//        partPdu.setName(part.Name.getBytes());
-//        partPdu.setContentType(part.MimeType.getBytes());
-//        partPdu.setData(part.Data);
-//        pduBody.addPart(partPdu);
-//        sendRequest.setBody(pduBody);
-//        PduComposer composer = new PduComposer(context, sendRequest);
-//        byte[] bytesToSend = composer.make();
-//        transaction.sendPdu(bytesToSend);
-
-
-        CellMessage message = CellMessage.newOutgoingMessage(mMessageField.getText().toString(), mToField.getText().toString());
-        if (mHasImage) {
-            message.setImage(BitmapFactory.decodeFile(mPicturePath));
-        }
+        CellMessage message = CellMessage.newCellMessage(mMessageField.getText().toString(), mToField.getText().toString());
         mPresenter.sendMessage(message);
         mMessageField.setText("");
     }
 
     public void forceMMS(View view) {
-        CellMessage message = CellMessage.newOutgoingMessage(mMessageField.getText().toString(), mToField.getText().toString());
+        CellMessage message = CellMessage.newCellMessage(mMessageField.getText().toString(), mToField.getText().toString());
+        if (mHasImage) {
+            message.setImage(BitmapFactory.decodeFile(mPicturePath));
+        }
         mPresenter.sendMMS(message);
         mMessageField.setText("");
     }
