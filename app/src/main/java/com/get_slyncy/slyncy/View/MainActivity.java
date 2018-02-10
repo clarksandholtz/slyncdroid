@@ -17,9 +17,6 @@
 package com.get_slyncy.slyncy.View;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
@@ -29,7 +26,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Telephony;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -40,12 +36,6 @@ import android.widget.ImageView;
 import com.get_slyncy.slyncy.Model.CellMessage;
 import com.get_slyncy.slyncy.Presenter.CellMessagesPresenter;
 import com.get_slyncy.slyncy.R;
-import com.google.android.mms.pdu_alt.EncodedStringValue;
-import com.google.android.mms.pdu_alt.PduComposer;
-import com.google.android.mms.pdu_alt.PduPart;
-import com.google.android.mms.pdu_alt.SendReq;
-import com.klinker.android.logger.Log;
-import com.klinker.android.logger.OnLogListener;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.Utils;
 
@@ -91,7 +81,6 @@ public class MainActivity extends Activity {
         initSettings();
         initViews();
         initActions();
-        initLogging();
 
         BroadcastUtils.sendExplicitBroadcast(this, new Intent(), "test action");
     }
@@ -154,17 +143,6 @@ public class MainActivity extends Activity {
         log.setLayoutManager(new LinearLayoutManager(this));
         logAdapter = new LogAdapter(new ArrayList<String>());
         log.setAdapter(logAdapter);
-    }
-
-    private void initLogging() {
-        Log.setDebug(true);
-        Log.setPath("messenger_log.txt");
-        Log.setLogListener(new OnLogListener() {
-            @Override
-            public void onLogged(String tag, String message) {
-                //logAdapter.addItem(tag + ": " + message);
-            }
-        });
     }
 
     private void setDefaultSmsApp() {
