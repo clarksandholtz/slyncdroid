@@ -3,10 +3,10 @@ package com.get_slyncy.slyncy.Presenter;
 import android.app.Activity;
 import android.content.Context;
 
-import com.get_slyncy.slyncy.Model.CellMessage;
-import com.get_slyncy.slyncy.Model.Data;
-import com.get_slyncy.slyncy.Model.MessageSender;
-import com.get_slyncy.slyncy.View.MainActivity;
+import com.get_slyncy.slyncy.Model.DTO.CellMessage;
+import com.get_slyncy.slyncy.Model.Util.Data;
+import com.get_slyncy.slyncy.Model.CellMessaging.MessageSender;
+import com.get_slyncy.slyncy.View.Test.TestActivity;
 
 
 /**
@@ -18,7 +18,7 @@ public class CellMessagesPresenter {
     private Activity mView;
     private Context mContext;
 
-    public CellMessagesPresenter(MainActivity view) {
+    public CellMessagesPresenter(TestActivity view) {
         mView = view;
         mContext = mView.getApplicationContext();
     }

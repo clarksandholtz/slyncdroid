@@ -18,9 +18,13 @@ package com.get_slyncy.slyncy.View;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
+
+import com.get_slyncy.slyncy.View.Test.TestActivity;
 
 public class PermissionActivity extends Activity {
 
@@ -35,17 +39,41 @@ public class PermissionActivity extends Activity {
                 Manifest.permission.RECEIVE_MMS,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.READ_PHONE_STATE,
-                Manifest.permission.CHANGE_NETWORK_STATE
+                Manifest.permission.CHANGE_NETWORK_STATE,
+                Manifest.permission.RECEIVE_BOOT_COMPLETED
         }, 0);
+    }
+
+    public static boolean needPermissionRequest(Context context) {
+        int smsReadPermission = ContextCompat.checkSelfPermission(context,
+                Manifest.permission.READ_SMS);
+        int smsSendPermission = ContextCompat.checkSelfPermission(context,
+                Manifest.permission.SEND_SMS);
+        int smsReceivePermission = ContextCompat.checkSelfPermission(context,
+                Manifest.permission.RECEIVE_SMS);
+        int mmsPermission = ContextCompat.checkSelfPermission(context,
+                Manifest.permission.RECEIVE_MMS);
+        int phonePermission = ContextCompat.checkSelfPermission(context,
+                Manifest.permission.READ_PHONE_STATE);
+
+        if (smsReadPermission == -1 ||
+                smsSendPermission == -1 ||
+                smsReceivePermission == -1 ||
+                mmsPermission == -1 ||
+                phonePermission == -1)
+        {
+            return true;
+        }
+        else return false;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         PreferenceManager.getDefaultSharedPreferences(this).edit()
                 .putBoolean("request_permissions", false)
-                .commit();
+                .apply();
 
-        startActivity(new Intent(this, MainActivity.class));
+        startActivity(new Intent(this, TestActivity.class));
         finish();
     }
 

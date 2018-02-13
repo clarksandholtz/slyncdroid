@@ -17,7 +17,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.MMS_SEND_OUTBOX_MSG"/>
+    <uses-permission android:name="android.permission.MMS_SEND_OUTBOX_MSG" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -31,7 +32,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".View.MainActivity"
+            android:name=".View.Test.TestActivity"
             android:label="@string/app_name"
             android:theme="@style/Base.Theme.AppCompat.Light">
             <intent-filter>
@@ -54,24 +55,24 @@
         </activity>
 
         <provider
+            android:name=".Model.CellMessaging.MmsProvider"
             android:authorities="com.get_slyncy.slyncy.MmsFileProvider"
-            android:name=".Model.MmsProvider"
             android:enabled="true"
-            android:writePermission="true"
+            android:grantUriPermissions="true"
             android:readPermission="true"
-            android:grantUriPermissions="true"/>
-        
+            android:writePermission="true" />
+
         <service android:name="com.android.mms.transaction.TransactionService" />
 
         <receiver
-            android:name=".Model.SmsReceiver"
+            android:name=".Model.CellMessaging.SmsReceiver"
             android:permission="android.permission.BROADCAST_SMS">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_DELIVER" />
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".Model.MmsReceiver"
+            android:name=".Model.CellMessaging.MmsReceiver"
             android:permission="android.permission.BROADCAST_WAP_PUSH">
             <intent-filter>
                 <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
@@ -79,6 +80,20 @@
                 <data android:mimeType="application/vnd.wap.mms-message" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".Model.Service.Autostart">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".Model.Service.SlyncyService"
+            android:enabled="true" />
+
+        <service
+            android:name=".Model.Service.MessagesMonitoringService"
+            android:enabled="true" />
+
         <receiver
             android:name="com.klinker.android.send_message.MmsSentReceiver"
             android:taskAffinity="com.klinker.android.messaging.MMS_SENT" />
@@ -87,7 +102,7 @@
             android:taskAffinity="com.klinker.android.messaging.MMS_RECEIVED" />
 
         <service
-            android:name=".Model.HeadlessSmsSendService"
+            android:name=".Model.Service.HeadlessSmsSendService"
             android:exported="true"
             android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
             <intent-filter>
@@ -103,6 +118,7 @@
         </service>
 
         <activity android:name=".View.PermissionActivity" />
+        <activity android:name=".View.MainActivity"></activity>
     </application>
 
 </manifest>
