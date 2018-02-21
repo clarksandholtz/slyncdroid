@@ -36,8 +36,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
+                android:fontFamily="@font/regular"
                 android:text="Clark Sandholtz"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/white"
                 android:textSize="30sp"/>
 
             <TextView
@@ -46,6 +48,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:text="clark@get-slyncy.com"
+                android:fontFamily="@font/regular"
+                android:textColor="@color/white"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 />
 
@@ -55,6 +59,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:text="(801) 678-5386"
+                android:fontFamily="@font/regular"
+                android:textColor="@color/white"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 />
         </LinearLayout>
@@ -105,7 +111,9 @@
                         android:ellipsize="marquee"
                         android:fadingEdge="horizontal"
                         android:singleLine="true"
+                        android:fontFamily="@font/regular"
                         android:text="Resync Messages"
+                        android:textColor="@color/colorFontDark"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textSize="30sp"/>
 
@@ -149,7 +157,9 @@
                         android:ellipsize="marquee"
                         android:fadingEdge="horizontal"
                         android:singleLine="true"
+                        android:fontFamily="@font/regular"
                         android:text="Group Messages"
+                        android:textColor="@color/colorFontDark"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textSize="30sp"/>
 
@@ -198,10 +208,12 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="8dip"
+                        android:fontFamily="@font/regular"
                         android:layout_marginStart="8dip"
                         android:ellipsize="marquee"
                         android:fadingEdge="horizontal"
                         android:singleLine="true"
+                        android:textColor="@color/colorFontDark"
                         android:text="Notification Mirroring"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textSize="30sp"/>
@@ -230,6 +242,7 @@
                           android:gravity="center_vertical"
                           android:minHeight="?android:attr/listPreferredItemHeight"
                           android:orientation="horizontal"
+
                           android:paddingEnd="?android:attr/scrollbarSize"
                           android:paddingLeft="12dip"
                           android:paddingRight="?android:attr/scrollbarSize"
@@ -254,6 +267,8 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="8dip"
                         android:layout_marginStart="8dip"
+                        android:fontFamily="@font/regular"
+                        android:textColor="@color/colorFontDark"
                         android:ellipsize="marquee"
                         android:fadingEdge="horizontal"
                         android:singleLine="true"
