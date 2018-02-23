@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:fontFamily="@font/regular"
+        android:gravity="center_horizontal"
+        android:paddingBottom="60dp"
+        android:paddingTop="120dp"
+        android:text="just a few more things..."
+        android:textColor="@color/white"
+        android:textSize="30sp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/name_field"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="full name"/>
+
+        <EditText
+            android:id="@+id/phone_field"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:ems="10"
+            android:fontFamily="@font/regular"
+            android:inputType="phone"
+            android:text="phone number"/>
+
+        <EditText
+            android:id="@+id/email_field"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:ems="10"
+            android:inputType="textEmailAddress"
+            android:text="email"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/continue_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:text="Continue"/>
+
+</LinearLayout>
