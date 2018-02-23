@@ -23,8 +23,11 @@ import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.ApolloMutationCall;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
+import com.get_slyncy.slyncy.Model.Util.DownloadImageTask;
 import com.get_slyncy.slyncy.R;
 import apollographql.apollo.*;
+import okhttp3.HttpUrl;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -46,6 +49,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -55,8 +59,8 @@ import javax.annotation.Nonnull;
 /**
  * Demonstrate Firebase Authentication using a Google ID Token.
  */
-public class LoginActivity extends Activity implements
-        View.OnClickListener {
+public class LoginActivity extends Activity implements View.OnClickListener, DownloadImageTask.PostExecCallBack
+{
 
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -146,8 +150,23 @@ public class LoginActivity extends Activity implements
     }
     // [END onactivityresult]
 
+    public void callBack()
+    {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
+        if (user != null)
+        {
+            intent.putExtra("name", user.getDisplayName());
+            intent.putExtra("email", user.getEmail());
+            intent.putExtra("phone", user.getPhoneNumber());
+            intent.putExtra("pic", user.getPhotoUrl().toString());
+        }
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
     // [START auth_with_google]
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+    private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         // [START_EXCLUDE silent]
 //        showProgressDialog();
@@ -165,15 +184,11 @@ public class LoginActivity extends Activity implements
                             boolean success = sendToServer(user.getEmail(), user.getUid());
                             if (success)
                             {
-                                new DownloadImageTask().execute(user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
-                                Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
-                                intent.putExtra("name", user.getDisplayName());
-                                intent.putExtra("email", user.getEmail());
-                                intent.putExtra("phone", user.getPhoneNumber());
-//                                intent.putExtra("picUrl", user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-
+                                if (!new File(getCacheDir() + "/profilePic.jpg").exists())
+                                {
+                                    new DownloadImageTask(LoginActivity.this.getCacheDir().getPath(), LoginActivity.this).execute(user.getPhotoUrl().toString()
+                                            .replace("s96-c", "s960-c"));
+                                }
                             }
                             else
                             {
@@ -181,8 +196,12 @@ public class LoginActivity extends Activity implements
                                 intent.putExtra("name", user.getDisplayName());
                                 intent.putExtra("email", user.getEmail());
                                 intent.putExtra("phone", user.getPhoneNumber());
-//                                intent.putExtra("picUrl", user.getPhotoUrl());
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                intent.putExtra("acct", acct);
+                                intent.putExtra("pic", user.getPhotoUrl().toString());
+//                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                mAuth.signOut();
+
                                 startActivity(intent);
                             }
 //                            updateUI(user);
@@ -203,8 +222,17 @@ public class LoginActivity extends Activity implements
     //todo stub
     private boolean sendToServer(String email, String uid)
     {
-        ApolloClient.builder().serverUrl("127.0.0.1").build();
-        ApolloClient client = ApolloClient.builder().serverUrl("127.0.0.1").build();//todo
+//        ApolloClient.builder().serverUrl("127.0.0.1").build();
+        ApolloClient client = null;
+        try
+        {
+            HttpUrl httpUrl = HttpUrl.get(new URL("http", "127.0.0.1", 8080, "/graphql"));
+            client = ApolloClient.builder().serverUrl(httpUrl).build();
+        }
+        catch (MalformedURLException e)
+        {
+            e.printStackTrace();
+        }
         final boolean[] res = {false};
         client.mutate(LoginMutation.builder().email(email).uid(uid).build()).enqueue(
                 new ApolloCall.Callback<LoginMutation.Data>()
@@ -226,7 +254,7 @@ public class LoginActivity extends Activity implements
                     }
                 });
 
-        return true;
+        return res[0];
     }
     //end
 
@@ -289,7 +317,7 @@ public class LoginActivity extends Activity implements
             intent.putExtra("name", user.getDisplayName());
             intent.putExtra("email", user.getEmail());
             intent.putExtra("phone", user.getPhoneNumber());
-//                                intent.putExtra("picUrl", user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
+            intent.putExtra("pic", user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
             startActivity(intent);
 
@@ -312,48 +340,5 @@ public class LoginActivity extends Activity implements
         } else if (i == R.id.disconnect_button) {
             revokeAccess();
         }
-    }
-
-    private class DownloadImageTask extends AsyncTask<String, Void, Void>
-    {
-        public DownloadImageTask() {
-//            this.bmImage.set(bmImage);
-        }
-
-        protected Void doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            try
-            {
-                InputStream in = new URL(urldisplay).openStream();
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                {
-                    Files.copy(in,new File(LoginActivity.this.getCacheDir() + "/profilePic.jpg").toPath(),
-                            StandardCopyOption.REPLACE_EXISTING);
-                }
-                else
-                {
-                    File targetFile = new File(LoginActivity.this.getCacheDir() + "/profilPic.jpg");
-                    OutputStream outStream = new FileOutputStream(targetFile);
-
-                    byte[] buffer = new byte[8 * 1024];
-                    int bytesRead;
-                    while ((bytesRead = in.read(buffer)) != -1) {
-                        outStream.write(buffer, 0, bytesRead);
-                    }
-                    in.close();
-                    outStream.close();
-                }
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-//        protected void onPostExecute(Bitmap result) {
-//            bmImage.get().setImageBitmap(BitmapFactory.decodeFile());
-//        }
     }
 }

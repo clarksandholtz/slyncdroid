@@ -36,7 +36,7 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="120dp"
             android:layout_weight="0"
             android:gravity="center_vertical"
             android:orientation="vertical"
@@ -48,7 +48,6 @@
                 android:id="@+id/account_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"
                 android:fontFamily="@font/regular"
                 android:text="Full Name"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -59,7 +58,6 @@
                 android:id="@+id/account_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"
                 android:fontFamily="@font/regular"
                 android:text="email@email.com"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -70,7 +68,6 @@
                 android:id="@+id/account_phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"
                 android:fontFamily="@font/regular"
                 android:text="(555) 555-5555"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -124,7 +121,11 @@
 
         </LinearLayout>
 
-        <View style="@style/Divider"/>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_weight="0"
+            android:background="@color/colorFontLight"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -173,7 +174,11 @@
 
         </LinearLayout>
 
-        <View style="@style/Divider"/>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_weight="0"
+            android:background="@color/colorFontLight"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -227,7 +232,11 @@
 
         </LinearLayout>
 
-        <View style="@style/Divider"/>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_weight="0"
+            android:background="@color/colorFontLight"/>
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                       android:layout_width="fill_parent"
@@ -271,7 +280,11 @@
 
         </LinearLayout>
 
-        <View style="@style/Divider"/>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_weight="0"
+            android:background="@color/colorFontLight"/>
 
     </LinearLayout>
 

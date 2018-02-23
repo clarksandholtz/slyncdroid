@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.get_slyncy.slyncy.R;
+import com.get_slyncy.slyncy.View.Test.testPhoneConf;
 import com.google.firebase.FirebaseApp;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,6 +37,12 @@ public class MainActivity extends AppCompatActivity {
     {
         Intent intent = new Intent(this, LoginActivity.class);
 //        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(intent);
+    }
+
+    public void launchPhoneConf(View view)
+    {
+        Intent intent = new Intent(this, testPhoneConf.class);
         startActivity(intent);
     }
 }

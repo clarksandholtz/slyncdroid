@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.get_slyncy.slyncy.Model.Util.DownloadImageTask;
 import com.get_slyncy.slyncy.Model.Util.SettingsDb;
 import com.get_slyncy.slyncy.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -38,7 +39,7 @@ import java.util.Scanner;
  * Created by nsshurtz on 2/15/18.
  */
 
-public class SettingsActivity extends Activity
+public class SettingsActivity extends Activity implements DownloadImageTask.PostExecCallBack
 {
     private TextView accountName;
     private TextView accountEmail;
@@ -47,6 +48,7 @@ public class SettingsActivity extends Activity
     private TextView groupMessageEntry;
     private TextView notifEntry;
     private TextView logoutEntry;
+    private String picUrl;
 
     private ImageView accountProfile;
     private ImageView syncIcon;
@@ -82,9 +84,10 @@ public class SettingsActivity extends Activity
             accountName.setText(bundle.getString("name"));
             accountEmail.setText(bundle.getString("email"));
             accountPhone.setText(bundle.getString("phone") == null ? "" : bundle.getString("phone"));
+            picUrl = bundle.getString("pic");
         }
 
-        accountProfile.setImageDrawable(getDrawable(R.drawable.ic_account_circle_black_24dp));
+//        accountProfile.setImageDrawable(getDrawable(R.drawable.ic_account_circle_black_24dp));
         syncIcon.setImageDrawable(getDrawable(R.drawable.ic_sync_black_24dp));
         groupIcon.setImageDrawable(getDrawable(R.drawable.ic_group_black_24dp));
         notifIcon.setImageDrawable(getDrawable(R.drawable.ic_notifications_black_24dp));
@@ -104,7 +107,8 @@ public class SettingsActivity extends Activity
         }
         else
         {
-            accountProfile.setColorFilter(getColor(R.color.white));
+            DownloadImageTask task = new DownloadImageTask(getCacheDir().getPath(), this);
+            task.execute(picUrl);
         }
         boolean groupMMSEnabled = SettingsDb.initGroupMessageSettings(getFilesDir());
         groupMessageSwitch.setChecked(groupMMSEnabled);
@@ -129,29 +133,17 @@ public class SettingsActivity extends Activity
         groupMessageSwitch.setChecked(!groupMessageSwitch.isChecked());
     }
 
-    private static  class DownloadImageTask extends AsyncTask<String, Void, Bitmap>
+    public void callBack()
     {
-        final ThreadLocal<ImageView> bmImage = new ThreadLocal<>();
-
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage.set(bmImage);
+        File file = new File(getCacheDir() + "/profilePic.jpg");
+        if (file.exists())
+        {
+            accountProfile.setImageBitmap(BitmapFactory.decodeFile(file.getPath()));
         }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.get().setImageBitmap(result);
+        else
+        {
+            accountProfile.setImageDrawable(getDrawable(R.drawable.ic_account_circle_black_24dp));
+            accountProfile.setColorFilter(getColor(R.color.white));
         }
     }
 

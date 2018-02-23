@@ -4,7 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
+    android:gravity="center_horizontal"
     android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="5">
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/textView"
@@ -13,54 +21,114 @@
         android:layout_weight="0"
         android:fontFamily="@font/regular"
         android:gravity="center_horizontal"
-        android:paddingBottom="60dp"
-        android:paddingTop="120dp"
         android:text="just a few more things..."
         android:textColor="@color/white"
-        android:textSize="30sp"/>
+        android:textSize="30dp"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="5">
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
         <EditText
             android:id="@+id/name_field"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
+            android:layout_width="275dp"
+            android:layout_height="35dp"
             android:layout_weight="0"
+            android:background="@drawable/edit_text_no_text"
             android:ems="10"
+            android:hint="@string/hint_full_name"
             android:inputType="textPersonName"
-            android:text="full name"/>
+            android:paddingEnd="20dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingStart="20dp"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textColorHint="@color/white"
+            />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+        </FrameLayout>
 
         <EditText
             android:id="@+id/phone_field"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
+            android:layout_width="275dp"
+            android:layout_height="35dp"
             android:layout_weight="0"
+            android:background="@drawable/edit_text_no_text"
             android:ems="10"
             android:fontFamily="@font/regular"
+            android:hint="@string/hint_phone_number"
             android:inputType="phone"
-            android:text="phone number"/>
+            android:paddingEnd="20dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingStart="20dp"
+            android:textColorHint="@color/white"
+            />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+        </FrameLayout>
 
         <EditText
             android:id="@+id/email_field"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
+            android:layout_width="275dp"
+            android:layout_height="35dp"
             android:layout_weight="0"
+            android:background="@drawable/edit_text_no_text"
             android:ems="10"
+            android:fontFamily="@font/regular"
+            android:hint="@string/hint_email"
             android:inputType="textEmailAddress"
-            android:text="email"/>
+            android:paddingEnd="20dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingStart="20dp"
+            android:textColorHint="@color/white"/>
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/continue_button"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="5">
+
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/continue_button"
+        android:layout_width="275dp"
+        android:layout_height="35dp"
         android:layout_weight="0"
-        android:text="Continue"/>
+        android:background="@drawable/edit_text_text"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="Let's Go!"
+        android:enabled="false"
+        android:onClick="confirmInfo"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="5">
+
+    </FrameLayout>
 
 </LinearLayout>
