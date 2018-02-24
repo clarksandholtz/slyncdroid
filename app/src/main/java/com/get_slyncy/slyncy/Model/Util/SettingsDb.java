@@ -6,7 +6,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashSet;
+import java.util.Scanner;
+
 /**
  * Created by nsshurtz on 2/15/18.
  */
@@ -16,7 +21,7 @@ public class SettingsDb
     static final private HashSet<String> disabledByDefault = new HashSet<>();
 
     static {
-        disabledByDefault.add("com.android.messaging"); //We already have sms notifications in the telephony plugin
+        disabledByDefault.add("com.android.messages"); //We already have sms notifications in the telephony plugin
         disabledByDefault.add("com.google.android.googlequicksearchbox"); //Google Now notifications re-spawn every few minutes
     }
 
@@ -97,4 +102,60 @@ public class SettingsDb
         return !disabledByDefault.contains(packageName);
     }
 
+    public static boolean initGroupMessageSettings(File fileDir)
+    {
+        File groupSettings = new File(fileDir, "groupSettings");
+        boolean newVal = true;
+        if (groupSettings.exists())
+        {
+            try (Scanner scanner = new Scanner(groupSettings))
+            {
+                newVal = Boolean.parseBoolean(scanner.nextLine());
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            try(FileWriter writer = new FileWriter(groupSettings))
+            {
+                writer.write(String.valueOf(newVal));
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        return newVal;
+    }
+
+    public static boolean getGroupMessageSettings(File fileDir)
+    {
+        boolean newVal = true;
+        File groupSettings = new File(fileDir, "groupSettings");
+        try (Scanner scanner = new Scanner(groupSettings))
+        {
+            newVal = Boolean.parseBoolean(scanner.nextLine());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return newVal;
+    }
+
+    public static void setGroupMessageSettings(File fileDir, boolean newVal)
+    {
+        File groupSettings = new File(fileDir, "groupSettings");
+        try(FileWriter writer = new FileWriter(groupSettings))
+        {
+            writer.write(String.valueOf(newVal));
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

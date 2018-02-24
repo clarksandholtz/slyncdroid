@@ -20,4 +20,11 @@
         android:onClick="launchSettings"
         android:text="Settings"/>
 
+    <Button
+        android:id="@+id/oauth_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="O Auth"
+        android:onClick="launchLogin"/>
+
 </LinearLayout>
