@@ -16,6 +16,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.apollographql.apollo.ApolloCall;
+import com.apollographql.apollo.ApolloClient;
+import com.apollographql.apollo.api.Response;
+import com.apollographql.apollo.exception.ApolloException;
 import com.get_slyncy.slyncy.Model.Util.DownloadImageTask;
 import com.get_slyncy.slyncy.R;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -35,6 +39,10 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nonnull;
+
+import apollographql.apollo.SignupMutation;
 
 import static android.content.ContentValues.TAG;
 
@@ -72,8 +80,6 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
             email = bundle.getString("email");
             acct = (GoogleSignInAccount) bundle.get("acct");
         }
-
-
 
         confirmButton = findViewById(R.id.continue_button);
         nameField = findViewById(R.id.name_field);
@@ -144,45 +150,36 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
     {
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         final FirebaseAuth auth = FirebaseAuth.getInstance();
-        auth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
+        auth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
+        {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task)
+            {
+                if (task.isSuccessful())
                 {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task)
-                    {
-                        if (task.isSuccessful())
-                        {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("signin", "signInWithCredential:success");
-                            FirebaseUser user = auth.getCurrentUser();
-//                            user.updatePhoneNumber()
-                            mCallbacks = new MyPhoneVerificationCallBacks(user);
-                            startPhoneNumberVerification(phoneField.getText().toString());
-//                            updateUI(user);
-                        }
-                        else
-                        {
-                            // If sign in fails, display a message to the user.
-                            Log.w("signin", "signInWithCredential:failure", task.getException());
-                        }
-
-                        // [START_EXCLUDE]
-//                        hideProgressDialog();
-                        // [END_EXCLUDE]
-                    }
-                });
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d("signin", "signInWithCredential:success");
+                    FirebaseUser user = auth.getCurrentUser();
+                    mCallbacks = new MyPhoneVerificationCallBacks(user);
+                    startPhoneNumberVerification(phoneField.getText().toString());
+                }
+                else
+                {
+                    // If sign in fails, display a message to the user.
+                    Log.w("signin", "signInWithCredential:failure", task.getException());
+                }
+            }
+        });
     }
 
     private void startPhoneNumberVerification(String phoneNumber)
     {
-        // [START start_phone_auth]
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 phoneNumber,        // Phone number to verify
                 60,                 // Timeout duration
                 TimeUnit.SECONDS,   // Unit of timeout
                 this,               // Activity (for callback binding)
                 mCallbacks);        // OnVerificationStateChangedCallbacks
-        // [END start_phone_auth]
 
         mVerificationInProgress = true;
     }
@@ -223,14 +220,10 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
             //     detect the incoming verification SMS and perform verification without
             //     user action.
             Log.d(TAG, "onVerificationCompleted:" + credential);
-            // [START_EXCLUDE silent]
-            mVerificationInProgress = false;
-            // [END_EXCLUDE]
 
-            // [START_EXCLUDE silent]
-            // Update the UI and attempt sign in with the phone credential
-//                updateUI(STATE_VERIFY_SUCCESS, credential);
-            // [END_EXCLUDE]
+            mVerificationInProgress = false;
+
+            user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(nameField.getText().toString()).build());
             user.updatePhoneNumber(credential).addOnCompleteListener(new OnCompleteListener<Void>()
             {
                 @Override
@@ -239,17 +232,36 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                     if (task.isSuccessful())
                     {
                         Log.d(TAG, "onComplete: Phone number update successful");
+                        ApolloClient client = ApolloClient.builder().serverUrl("http://fac85b84.ngrok.io").build();
+
+
+                        client.mutate(SignupMutation.builder().email(user.getEmail()).name(user.getDisplayName())
+                                .phone(user.getPhoneNumber()).uid(user.getUid()).build())
+                                .enqueue(new ApolloCall.Callback<SignupMutation.Data>()
+                                {
+                                    @Override
+                                    public void onResponse(@Nonnull Response<SignupMutation.Data> response)
+                                    {
+                                        if (!response.hasErrors())
+                                        {
+                                            if (!new File(getCacheDir() + "/profilePic.jpg").exists())
+                                            {
+                                                new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(),
+                                                        ConfirmationActivity.this).execute(user.getPhotoUrl().toString()
+                                                        .replace("s96-c", "s960-c"));
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(@Nonnull ApolloException e)
+                                    {
+
+                                    }
+                                });
                     }
                 }
             });
-
-            user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(nameField.getText().toString()).build());
-            if (!new File(getCacheDir() + "/profilePic.jpg").exists())
-            {
-                new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(), ConfirmationActivity.this).execute(user.getPhotoUrl().toString()
-                        .replace("s96-c", "s960-c"));
-            }
-//                signInWithPhoneAuthCredential(credential);
         }
 
         @Override
@@ -258,30 +270,21 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
             // This callback is invoked in an invalid request for verification is made,
             // for instance if the the phone number format is not valid.
             Log.w(TAG, "onVerificationFailed", e);
-            // [START_EXCLUDE silent]
+
             mVerificationInProgress = false;
-            // [END_EXCLUDE]
 
             if (e instanceof FirebaseAuthInvalidCredentialsException)
             {
                 // Invalid request
-                // [START_EXCLUDE]
                 phoneField.setError("Invalid phone number!");
-                // [END_EXCLUDE]
             }
             else if (e instanceof FirebaseTooManyRequestsException)
             {
                 // The SMS quota for the project has been exceeded
-                // [START_EXCLUDE]
                 Snackbar.make(findViewById(android.R.id.content), "Quota exceeded.",
                         Snackbar.LENGTH_SHORT).show();
-                // [END_EXCLUDE]
-            }
 
-            // Show a message and update the UI
-            // [START_EXCLUDE]
-//                updateUI(STATE_VERIFY_FAILED);
-            // [END_EXCLUDE]
+            }
         }
 
         @Override
@@ -296,11 +299,6 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
             // Save verification ID and resending token so we can use them later
             mVerificationId = verificationId;
             mResendToken = token;
-
-            // [START_EXCLUDE]
-            // Update UI
-//                updateUI(STATE_CODE_SENT);
-            // [END_EXCLUDE]
         }
     }
 

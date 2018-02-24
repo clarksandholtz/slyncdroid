@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.get_slyncy.slyncy.R;
-import com.get_slyncy.slyncy.View.Test.testPhoneConf;
 import com.google.firebase.FirebaseApp;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,9 +19,9 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(getApplicationContext());
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
         {
-            NotificationChannel channel = new NotificationChannel(getPackageName() + "notif", "Basic Notifications", NotificationManager.IMPORTANCE_DEFAULT);
-            NotificationManager notificationManager = (NotificationManager) getSystemService(
-                    NOTIFICATION_SERVICE);
+            NotificationChannel channel = new NotificationChannel(getPackageName() + "notif"
+                    ,"Basic Notifications", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(channel);
         }
     }
@@ -36,14 +35,8 @@ public class MainActivity extends AppCompatActivity {
     public void launchLogin(View view)
     {
         Intent intent = new Intent(this, LoginActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(intent);
     }
 
-    public void launchPhoneConf(View view)
-    {
-        Intent intent = new Intent(this, testPhoneConf.class);
-        startActivity(intent);
-    }
 }
 
