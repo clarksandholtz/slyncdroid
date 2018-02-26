@@ -24,6 +24,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -33,6 +34,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.shobhitpuri.custombuttons.GoogleSignInButton;
 
 import javax.annotation.Nonnull;
 
@@ -55,6 +57,16 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         FirebaseApp.initializeApp(this);
+
+        SignInButton button = findViewById(R.id.sign_in_button);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                signIn(v);
+            }
+        });
 
         FrameLayout view = findViewById(R.id.sign_in_button);
         for (int i = 0; i < view.getChildCount(); i++)
@@ -201,12 +213,15 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                     public void onFailure(@Nonnull ApolloException e)
                     {
                         Log.e("Apollo eror:", e.getMessage());
+                        Snackbar.make(findViewById(R.id.main_layout), "Unable to reach Slyncy Servers.",
+                                Snackbar.LENGTH_SHORT).show();
                     }
                 });
     }
 
     public void signIn(View v)
     {
+        Log.d("TEST", "signIn: TEST");
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         signInIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NO_USER_ACTION);
         startActivityForResult(signInIntent, RC_SIGN_IN);
