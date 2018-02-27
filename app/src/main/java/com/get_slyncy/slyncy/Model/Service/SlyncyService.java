@@ -8,7 +8,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
-import com.get_slyncy.slyncy.Model.Util.RecipientIdCache;
 
 /**
  * Created by tylerbowers on 2/12/18.
@@ -34,13 +33,16 @@ public class SlyncyService extends Service {
 //        Intent intents = new Intent(getBaseContext(),hello.class);
 //        intents.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //        startActivity(intents);
-//        initializeSlyncy();
+        initializeSlyncy();
         Toast.makeText(this, "SlyncyService Started", Toast.LENGTH_LONG).show();
         Log.d(TAG, "onStart");
     }
 
+
+
     private void initializeSlyncy() {
-        RecipientIdCache.init(this);
-        MessageDbUtility.queryAllThreads(this);
+//        RecipientIdCache.init(this);
+//        MessageDbUtility.queryAllThreads(this);
+        MessageDbUtility.init(this);
     }
 }

@@ -1,163 +1,381 @@
 package com.get_slyncy.slyncy.Model.CellMessaging;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.provider.Telephony;
+import android.provider.ContactsContract;
 import android.util.Log;
 
-import com.android.mms.logs.LogTag;
-import com.get_slyncy.slyncy.Model.DTO.ContactList;
-import com.get_slyncy.slyncy.Model.DTO.MsgThread;
-import com.get_slyncy.slyncy.Model.Util.MsgsCache;
+import com.get_slyncy.slyncy.Model.DTO.Contact;
+import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
+import com.get_slyncy.slyncy.Model.DTO.SlyncyMessageThread;
+import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
+import com.get_slyncy.slyncy.Model.Util.Data;
 
-import java.util.HashSet;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
- * Created by tylerbowers on 2/12/18.
+ * Created by tylerbowers on 2/26/18.
  */
 
 public class MessageDbUtility {
+
     private static final String TAG = "MessageDbUtility";
-    private static final boolean DEBUG = false;
 
-    private static boolean sLoadingThreads;
+    private static MessageDbUtility instance;
 
-    public static final Uri MMS_SMS_CONTENT_PROVIDER = Uri.parse("content://mms-sms/conversations/");
-    public static final Uri sAllThreadsUri = Telephony.Threads.CONTENT_URI.buildUpon().appendQueryParameter("simple", "true").build();
-    public static final String[] ALL_THREADS_PROJECTION = {
-            Telephony.Threads._ID, Telephony.Threads.DATE, Telephony.Threads.MESSAGE_COUNT, Telephony.Threads.RECIPIENT_IDS,
-            Telephony.Threads.SNIPPET, Telephony.Threads.SNIPPET_CHARSET, Telephony.Threads.READ, Telephony.Threads.ERROR,
-            Telephony.Threads.HAS_ATTACHMENT
-    };
+    private Context mContext;
+    private static boolean isGettingMessages;
+    private Map<Integer, SlyncyMessageThread> mThreadList;
 
-    public static final int ID = 0;
-    public static final int DATE = 1;
-    public static final int MESSAGE_COUNT = 2;
-    public static final int RECIPIENT_IDS = 3;
-    public static final int SNIPPET = 4;
-    public static final int SNIPPET_CS = 5;
-    public static final int READ = 6;
-    public static final int ERROR = 7;
-    public static final int HAS_ATTACHMENT = 8;
+    private static final int MAX_MESSAGES_PER_THREAD = 30;
+    private static final int MAX_THREADS = 35;
+    private static final int ADDTL_MMS_THREADS = 10;
+    private static final int MAX_IMGS_PER_THREAD = 5;
 
-    public static void queryAllThreads(Context context) {
-        if (Log.isLoggable(LogTag.THREAD_CACHE, Log.VERBOSE)) {
-            LogTag.debug("[Conversation] queryAllThreads: begin");
-        }
+    private static final String MSG_ID = "_id";
+    private static final String THREAD_ID = "thread_id";
+    private static final String DATE = "date";
+    private static final String MMS_TYPE = "ct";
+    private static final String TYPE = "type";
+    private static final String READ = "read";
+    private static final String TEXT = "text";
+    private static final String ADDRESS = "address";
+    private static final String BODY = "body";
 
-        // check if threads are already being loaded
-        synchronized (MsgsCache.getInstance()) {
-            if (sLoadingThreads) {
-                return;
+    private static final int SENDER = 137;
+
+    private MessageDbUtility(){
+        mThreadList = new HashMap<>();
+    }
+
+    public static void init(Context context) {
+        instance = getInstance();
+
+        instance.mContext = context;
+
+        new Thread(new Runnable() {
+            public void run() {
+                instance.getMessagesBulk();
+                instance.mThreadList = new HashMap<>();
             }
-            sLoadingThreads = true;
+        }, "MessageDbUtility.init").start();
+    }
+
+    public static void getMessagesBulk(Context context) {
+        instance = getInstance();
+
+        instance.mContext = context;
+
+        new Thread(new Runnable() {
+            public void run() {
+                instance.getMessagesBulk();
+                instance.mThreadList = new HashMap<>();
+
+                new ClientCommunicator().bulkMessageUpload();
+            }
+        }, "MessageDbUtility.init").start();
+    }
+
+    private static MessageDbUtility getInstance() {
+        if (instance == null) {
+            instance = new MessageDbUtility();
         }
 
-        // Keep track of what threads are now on disk so we
-        // can discard anything removed from the cache.
-        HashSet<Long> threadsOnDisk = new HashSet<>();
+        return instance;
+    }
 
-        // Query for all conversations.
-        Cursor c = context.getContentResolver().query(sAllThreadsUri,
-                ALL_THREADS_PROJECTION, null, null, null);
-        try {
-            if (c != null) {
-                while (c.moveToNext()) {
-                    long threadId = c.getLong(ID);
-                    threadsOnDisk.add(threadId);
+    private void getMessagesBulk() {
+        // TODO: Do we need to prevent against multiple concurrent requests?
+//        if (isGettingMessages) {
+//            Log.d(TAG, "Already loading messages.");
+//            return;
+//        }
+        isGettingMessages = true;
+        Log.i(TAG, "Loading messages...");
+        long startTime = System.nanoTime();
+        getSMS();
+        getMMS();
+        long endTime = System.nanoTime();
+        double elapsedTime = (endTime - startTime) / 1000000000.0;
+        Log.i(TAG, "Done loading messages. Took " + elapsedTime + " seconds");
 
-                    // Try to find this thread ID in the cache.
-                    MsgThread conv;
-                    synchronized (MsgsCache.getInstance()) {
-                        conv = MsgsCache.get(threadId);
-                    }
+        Log.i(TAG, "Attaching contacts to messages...");
+        startTime = System.nanoTime();
+        getContacts();
+        endTime = System.nanoTime();
+        elapsedTime = (endTime - startTime) / 1000000000.0;
+        Log.i(TAG, "Done attaching contacts. Took " + elapsedTime + " seconds");
 
-                    if (conv == null) {
-                        // Make a new Conversation and put it in
-                        // the cache if necessary.
-                        conv = new MsgThread(context, threadId);
-                        fillFromCursor(context, conv, c, true);
-                        try {
-                            synchronized (MsgsCache.getInstance()) {
-                                MsgsCache.put(conv);
-                            }
-                        } catch (IllegalStateException e) {
-                            LogTag.error("Tried to add duplicate Conversation to MsgsCache" +
-                                    " for threadId: " + threadId + " new conv: " + conv);
-                            if (!MsgsCache.replace(conv)) {
-                                LogTag.error("queryAllThreads cache.replace failed on " + conv);
-                            }
-                        }
-                    } else {
-                        // Or update in place so people with references
-                        // to conversations get updated too.
-                        fillFromCursor(context, conv, c, true);
-                    }
+        Data.getInstance().setmMessages(mThreadList);
+        isGettingMessages = false;
+    }
+
+    private void getMMS() {
+        Uri uri = Uri.parse("content://mms");
+        String[] proj = {"*"};
+        ContentResolver cr = mContext.getContentResolver();
+
+        Cursor c = cr.query(uri, proj, null, null, null);
+
+        if(c != null && c.moveToFirst()) {
+            do {
+
+                boolean makeMessage = false;
+                int threadId = c.getInt(c.getColumnIndex(THREAD_ID));
+                if (mThreadList.get(threadId) == null && mThreadList.size() < MAX_THREADS + ADDTL_MMS_THREADS) {
+                    SlyncyMessageThread thread = new SlyncyMessageThread();
+                    thread.setThreadId(threadId);
+                    mThreadList.put(threadId, thread);
+
+                    makeMessage = true;
+                }
+                else if (mThreadList.get(threadId) != null && mThreadList.get(threadId).getMessageCount() < MAX_MESSAGES_PER_THREAD + ADDTL_MMS_THREADS) {
+                    makeMessage = true;
+                }
+
+                if(makeMessage) {
+                    SlyncyMessage message = new SlyncyMessage();
+                    message.setId(c.getString(c.getColumnIndex(MSG_ID)));
+                    message.setThreadId(threadId);
+                    message.setDate(c.getString(c.getColumnIndex(DATE)));
+                    int readStatus = c.getInt(c.getColumnIndex(READ));
+                    if (readStatus == 1) message.setRead(true);
+                    else message.setRead(false);
+                    List<String> numbers = getMmsAddresses(message);
+                    message.setNumbers(numbers);
+                    mThreadList.get(threadId).addMessage(message);
+                    mThreadList.get(threadId).setNumbers(numbers);
+                    parseMmsParts(message);
+                }
+
+            } while (c.moveToNext());
+        }
+
+        c.close();
+
+    }
+
+    private void parseMmsParts(SlyncyMessage message) {
+        Uri uri = Uri.parse("content://mms/part");
+        String mmsId = "mid = " + message.getId();
+        Cursor c = mContext.getContentResolver().query(uri, null, mmsId, null, null);
+        StringBuilder body = new StringBuilder();
+        if (c == null) {
+            return;
+        }
+        while(c.moveToNext()) {
+
+            String pid = c.getString(c.getColumnIndex(MSG_ID));
+            String type = c.getString(c.getColumnIndex(MMS_TYPE));
+            if ("text/plain".equals(type)) {
+                body.append((c.getString(c.getColumnIndex(TEXT))));
+            } else if (type.contains("image")) {
+                if (mThreadList.get(message.getThreadId()).getImageCount() < MAX_IMGS_PER_THREAD) {
+                    message.addImage(getMmsImg(pid));
+                    mThreadList.get(message.getThreadId()).incrementImageCount();
+                }
+                else {
+                    Log.d(TAG, "Skipping image, thread full");
                 }
             }
-        } finally {
-            if (c != null) {
-                c.close();
+        }
+        c.close();
+        message.setBody(body.toString());
+    }
+
+    private Bitmap getMmsImg(String id) {
+        Uri uri = Uri.parse("content://mms/part/" + id);
+        InputStream in = null;
+        Bitmap bitmap = null;
+
+        try {
+            in = mContext.getContentResolver().openInputStream(uri);
+            bitmap = BitmapFactory.decodeStream(in);
+            if(in != null)
+                in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
+    private List<String> getMmsAddresses(SlyncyMessage message) {
+        String id = message.getId();
+        String sel = new String("msg_id=" + id);
+        String uriString = "content://mms/" + id + "/addr";
+        Uri uri = Uri.parse(uriString);
+        Cursor c = mContext.getContentResolver().query(uri, null, sel, null, null);
+        List<String> numberList = new ArrayList<>();
+        while (c.moveToNext()) {
+
+            String number = c.getString(c.getColumnIndex(ADDRESS));
+            if(!(number.contains("insert"))) {
+                numberList.add(number);
             }
-            synchronized (MsgsCache.getInstance()) {
-                sLoadingThreads = false;
+
+            int type = c.getInt(c.getColumnIndex(TYPE));
+            if (type == SENDER) {
+                message.setSender(number);
             }
         }
+        c.close();
+        return numberList;
+    }
 
-        // Purge the cache of threads that no longer exist on disk.
-        MsgsCache.keepOnly(threadsOnDisk);
+    private void getSMS() {
+        Uri uri = Uri.parse("content://sms");
+        String[] proj = {"*"};
+        ContentResolver cr = mContext.getContentResolver();
 
-        if (Log.isLoggable(LogTag.THREAD_CACHE, Log.VERBOSE)) {
-            LogTag.debug("[Conversation] queryAllThreads: finished");
-            MsgsCache.dumpCache();
+        Cursor c = cr.query(uri,proj,null,null,null);
+
+        if(c.moveToFirst()) {
+            do {
+
+                boolean makeMessage = false;
+                int threadId = c.getInt(c.getColumnIndex(THREAD_ID));
+                if (mThreadList.get(threadId) == null && mThreadList.size() < MAX_THREADS) {
+                    SlyncyMessageThread thread = new SlyncyMessageThread();
+                    thread.setThreadId(threadId);
+                    mThreadList.put(threadId, thread);
+
+                    makeMessage = true;
+                }
+                else if (mThreadList.get(threadId) != null && mThreadList.get(threadId).getMessageCount() < MAX_MESSAGES_PER_THREAD) {
+                    makeMessage = true;
+                }
+
+                if (makeMessage) {
+                    SlyncyMessage message = new SlyncyMessage();
+                    message.setId(c.getString(c.getColumnIndex(MSG_ID)));
+                    message.setThreadId(threadId);
+                    message.setDate(c.getString(c.getColumnIndex(DATE)));
+                    message.setBody(c.getString(c.getColumnIndex(BODY)));
+                    int readStatus = c.getInt(c.getColumnIndex("read"));
+                    if (readStatus == 1) message.setRead(true);
+                    else message.setRead(false);
+                    ArrayList<String> numbers = new ArrayList<>();
+                    String number = c.getString(c.getColumnIndex(ADDRESS));
+                    numbers.add(number);
+                    message.setNumbers(numbers);
+                    int type = c.getInt(c.getColumnIndex(TYPE));
+                    if (type == 2) message.setSender(Data.getInstance().getSettings().getmMyPhoneNumber());
+                    if (type == 1) message.setSender(number);
+                    mThreadList.get(threadId).addMessage(message);
+                    mThreadList.get(threadId).setNumbers(numbers);
+                }
+
+            } while (c.moveToNext());
+        }
+        c.close();
+    }
+    
+    private void getContacts() {
+
+        Map<String, String> contactMap = fetchPhoneContacts();
+
+        for (Map.Entry<Integer, SlyncyMessageThread> threadIter : mThreadList.entrySet()) {
+
+            for (String number : threadIter.getValue().getNumbers()) {
+
+                // don't add your own phone number
+                if (number.substring(2).equals(Data.getInstance().getSettings().getmMyPhoneNumber())
+                    || number.equals(Data.getInstance().getSettings().getmMyPhoneNumber())) {
+                    continue;
+                }
+
+                Contact contact = new Contact(number);
+
+                if(contactMap.containsKey(number)) {
+                    contact.setmName(contactMap.get(number));
+                }
+                else {
+                    contact.setmName(fetchContactNameByNumber(number));
+                }
+
+                threadIter.getValue().addContact(contact);
+            }
+            threadIter.getValue().setNumbers(null);
         }
     }
 
-    /**
-     * Fill the specified conversation with the values from the specified
-     * cursor, possibly setting recipients to empty if value allowQuery
-     * is false and the recipient IDs are not in cache.  The cursor should
-     * be one made via startQueryForAll.
-     */
-    private static void fillFromCursor(Context context, MsgThread conv,
-                                       Cursor c, boolean allowQuery) {
-        synchronized (conv) {
-            conv.setmID(c.getLong(ID));
-            conv.setmDate(c.getLong(DATE));
-            conv.setmMessageCount(c.getInt(MESSAGE_COUNT));
+    private Map<String, String> fetchPhoneContacts() {
+        Map<String, String> contactMap = new HashMap<>();
 
-            // Replace the snippet with a default value if it's empty.
-//            String snippet = SmsHelper.cleanseMmsSubject(context,
-//                    SmsHelper.extractEncStrFromCursor(c, SNIPPET, SNIPPET_CS));
-//            if (TextUtils.isEmpty(snippet)) {
-//                snippet = context.getString(R.string.no_subject_view);
-//            }
-//            conv.mSnippet = snippet;
+        ContentResolver cr = mContext.getContentResolver();
+        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                null, null, null, null);
 
-            conv.setmHasUnreadMsgs(c.getInt(READ) == 0);
-            conv.setmHasError((c.getInt(ERROR) != 0));
-//            conv.mHasAttachment = (c.getInt(HAS_ATTACHMENT) != 0);
+        if ((cur != null ? cur.getCount() : 0) > 0) {
+            while (cur != null && cur.moveToNext()) {
+                String id = cur.getString(
+                        cur.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cur.getString(cur.getColumnIndex(
+                        ContactsContract.Contacts.DISPLAY_NAME));
+
+                if (cur.getInt(cur.getColumnIndex(
+                        ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
+                    Cursor pCur = cr.query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                            new String[]{id}, null);
+                    while (pCur.moveToNext()) {
+                        String phoneNo = pCur.getString(pCur.getColumnIndex(
+                                ContactsContract.CommonDataKinds.Phone.NUMBER));
+//                        Log.i(TAG, "Name: " + name);
+//                        Log.i(TAG, "Phone Number: " + phoneNo);
+                        contactMap.put(phoneNo, name);
+                    }
+                    pCur.close();
+                }
+            }
         }
-        // Fill in as much of the conversation as we can before doing the slow stuff of looking
-        // up the contacts associated with this conversation.
-        String recipientIds = c.getString(RECIPIENT_IDS);
-        ContactList recipients = ContactList.getByIds(recipientIds, context);
-        synchronized (conv) {
-            conv.setmRecipients(recipients);
+        if(cur!=null){
+            cur.close();
         }
 
-        if (Log.isLoggable(LogTag.THREAD_CACHE, Log.DEBUG)) {
-            Log.d(LogTag.THREAD_CACHE, "fillFromCursor: conv=" + conv + ", recipientIds=" + recipientIds);
-        }
+        return contactMap;
     }
 
-    public static void queryForThread() {
+    private String fetchContactNameByNumber(String number) {
+        String name = null;
 
+        // define the columns I want the query to return
+        String[] projection = new String[] {
+                ContactsContract.PhoneLookup.DISPLAY_NAME,
+                ContactsContract.PhoneLookup._ID};
+
+        // encode the phone number and build the filter URI
+        Uri contactUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+
+        // query time
+        Cursor cursor = mContext.getContentResolver().query(contactUri, projection, null, null, null);
+
+        if(cursor != null) {
+            if (cursor.moveToFirst()) {
+                name = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                Log.v(TAG, "Contact found for " + number + ". Contact name: " + name);
+            } else {
+                Log.v(TAG, "No Contact found for " + number);
+                name = number;
+            }
+            cursor.close();
+        }
+
+        return name;
     }
-
-    /**
-     * Private cache for the use of the various forms of Conversation.get.
-     */
 
 }

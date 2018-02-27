@@ -46,6 +46,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
 
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
+    private static final String SERVER_URL = "10.0.0.100:4000";
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
@@ -180,7 +181,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
 
     private void tryLogin(final FirebaseUser user, final GoogleSignInAccount acct)
     {
-        ApolloClient client = ApolloClient.builder().serverUrl("http://fac85b84.ngrok.io").build();
+        ApolloClient client = ApolloClient.builder().serverUrl("10.0.0.100:4000").build();
 
         client.mutate(LoginMutation.builder().email(user.getEmail()).uid(user.getUid()).build())
                 .enqueue(new ApolloCall.Callback<LoginMutation.Data>()

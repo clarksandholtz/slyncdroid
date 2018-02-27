@@ -28,43 +28,41 @@ import com.get_slyncy.slyncy.View.Test.TestActivity;
 
 public class PermissionActivity extends Activity {
 
+    private static final String[] PERMISSIONS_TO_REQUEST = new String[]{
+
+            Manifest.permission.READ_SMS,
+            Manifest.permission.SEND_SMS,
+            Manifest.permission.RECEIVE_SMS,
+            Manifest.permission.RECEIVE_MMS,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.CHANGE_NETWORK_STATE,
+            Manifest.permission.RECEIVE_BOOT_COMPLETED,
+            Manifest.permission.READ_CONTACTS
+
+    };
+
+    private static final int NOT_GRANTED = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestPermissions(new String[]{
-                Manifest.permission.READ_SMS,
-                Manifest.permission.SEND_SMS,
-                Manifest.permission.RECEIVE_SMS,
-                Manifest.permission.RECEIVE_MMS,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_PHONE_STATE,
-                Manifest.permission.CHANGE_NETWORK_STATE,
-                Manifest.permission.RECEIVE_BOOT_COMPLETED
-        }, 0);
+        requestPermissions(PERMISSIONS_TO_REQUEST, 0);
     }
 
     public static boolean needPermissionRequest(Context context) {
-        int smsReadPermission = ContextCompat.checkSelfPermission(context,
-                Manifest.permission.READ_SMS);
-        int smsSendPermission = ContextCompat.checkSelfPermission(context,
-                Manifest.permission.SEND_SMS);
-        int smsReceivePermission = ContextCompat.checkSelfPermission(context,
-                Manifest.permission.RECEIVE_SMS);
-        int mmsPermission = ContextCompat.checkSelfPermission(context,
-                Manifest.permission.RECEIVE_MMS);
-        int phonePermission = ContextCompat.checkSelfPermission(context,
-                Manifest.permission.READ_PHONE_STATE);
 
-        if (smsReadPermission == -1 ||
-                smsSendPermission == -1 ||
-                smsReceivePermission == -1 ||
-                mmsPermission == -1 ||
-                phonePermission == -1)
-        {
-            return true;
+        // iterate through all the needed permissions.
+        // if one needs to be requested, return true.
+        for (String permissionNeeded : PERMISSIONS_TO_REQUEST) {
+            int permissionStatus = ContextCompat.checkSelfPermission(context, permissionNeeded);
+            if (permissionStatus == NOT_GRANTED) {
+                return true;
+            }
         }
-        else return false;
+
+        return false;
     }
 
     @Override

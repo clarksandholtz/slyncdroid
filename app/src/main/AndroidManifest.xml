@@ -137,8 +137,6 @@
             android:label="@string/title_activity_login">
         </activity>
         <activity android:name=".View.ConfirmationActivity"/>
-        <activity android:name=".View.Test.testPhoneConf">
-        </activity>
     </application>
 
 </manifest>

@@ -33,7 +33,6 @@ import android.widget.ImageView;
 
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.DTO.CellMessage;
-import com.get_slyncy.slyncy.Model.Util.RecipientIdCache;
 import com.get_slyncy.slyncy.Presenter.CellMessagesPresenter;
 import com.get_slyncy.slyncy.R;
 import com.get_slyncy.slyncy.View.LogAdapter;
@@ -85,12 +84,11 @@ public class TestActivity extends Activity {
         initActions();
         initMessaging();
 
-        BroadcastUtils.sendExplicitBroadcast(this, new Intent(), "test action");
+//        BroadcastUtils.sendExplicitBroadcast(this, new Intent(), "test action");
     }
 
     private void initMessaging() {
-        RecipientIdCache.init(this);
-        MessageDbUtility.queryAllThreads(this);
+        MessageDbUtility.init(this);
     }
 
     private void initSettings() {

@@ -11,7 +11,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.get_slyncy.slyncy.BuildConfig;
-import com.get_slyncy.slyncy.Model.Util.ContactUtility;
 
 /**
  * Created by tylerbowers on 2/12/18.
@@ -90,7 +89,8 @@ public class MessagesMonitoringService extends Service {
             super.onChange(selfChange);
             // Cursor c = context.getContentResolver().query(SMS_CONTENT_URI,
             // null, "read = 0", null, null);
-            int count = ContactUtility.getUnreadMessagesCount(context);
+//            int count = ContactUtility.getUnreadMessagesCount(context);
+            int count = -1;
             if (BuildConfig.DEBUG) Log.v(TAG, "getUnreadCount = " + count);
             if (count == 0) {
 //                ManageNotification.clearAll(context);

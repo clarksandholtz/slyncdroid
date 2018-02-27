@@ -4,8 +4,14 @@ import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
 
+import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
+import com.get_slyncy.slyncy.Model.DTO.SlyncyMessageThread;
 import com.klinker.android.send_message.ApnUtils;
+import com.klinker.android.send_message.Utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 
 /**
@@ -16,12 +22,11 @@ public class Data extends Observable {
 
     // Do not change from private
     private Data() {
-        // TODO: Pull persistent data from storage
-//        mCellMessages = new MsgThread();
-//        mSlyncyMessages = new MsgThread();
+        mMessages = new HashMap<>();
     }
 
     private Settings mSettings;
+    private Map<Integer, SlyncyMessageThread> mMessages;
 
     public Settings getSettings() {
         return mSettings;
@@ -31,6 +36,8 @@ public class Data extends Observable {
         if (mSettings == null) {
             mSettings = Settings.get(context);
         }
+
+        this.mSettings.setmMyPhoneNumber(Utils.getMyPhoneNumber(context));
 
         if (TextUtils.isEmpty(mSettings.getMmsc()) &&
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -43,8 +50,12 @@ public class Data extends Observable {
         }
     }
 
-    public MsgsCache getmMessageCache() {
-        return MsgsCache.getInstance();
+    public Map<Integer, SlyncyMessageThread> getmMessages() {
+        return mMessages;
+    }
+
+    public void setmMessages(Map<Integer, SlyncyMessageThread> mMessages) {
+        this.mMessages = mMessages;
     }
 
     // ***************** Singleton business ********************* //

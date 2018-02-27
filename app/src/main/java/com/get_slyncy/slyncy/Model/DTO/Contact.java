@@ -1,6 +1,12 @@
 package com.get_slyncy.slyncy.Model.DTO;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.Contacts;
+import android.provider.ContactsContract;
+import android.util.Log;
 
 /**
  * Created by tylerbowers on 2/12/18.
@@ -8,14 +14,17 @@ import android.graphics.Bitmap;
 
 public class Contact {
 
+    private static final String TAG = "Contact";
+
     private String mNumber;
     private String mName;
     private Bitmap mAvatar;
-    private long mRecipientId;
 
-    public Contact(String number, String name) {
-        mName = name;
+    public Contact(String number) {
         mNumber = number;
+        if (number == null || number.length() < 1) {
+            return;
+        }
     }
 
     public String getmNumber() {
@@ -42,14 +51,6 @@ public class Contact {
         this.mAvatar = mAvatar;
     }
 
-    public long getmRecipientId() {
-        return mRecipientId;
-    }
-
-    public void setmRecipientId(long mRecipientId) {
-        this.mRecipientId = mRecipientId;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj.getClass() != this.getClass()) {
@@ -59,10 +60,6 @@ public class Contact {
         Contact c = (Contact) obj;
 
         if (!this.getmName().equalsIgnoreCase(c.getmName())) {
-            return false;
-        }
-
-        if (!this.getmNumber().equals(c.getmNumber())) {
             return false;
         }
 
