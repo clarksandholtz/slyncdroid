@@ -8,3 +8,19 @@ mutation Signup($name: String!, $phone: String!, $email: String!, $uid: String!)
         token
     }
 }
+
+
+mutation CreateMessage($address: String!, $creator: String!, $body: String!, $read: Boolean!, $threadId: Int!, $date: DateTime!, $error: Boolean!, $files: [FileCreateInput!]) {
+  createMessage(address: $address creator: $creator body: $body read: $read threadId: $threadId date: $date error: $error files: $files){
+    id
+    body
+  }
+}
+
+mutation UploadMessages($messages: [MessageCreateInput]){
+  createMessages(messages: $messages){
+    success
+    status
+  }
+}
+

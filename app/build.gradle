@@ -42,6 +42,13 @@ dependencies {
     implementation project(':messaging_library')
 }
 
+
+
 apply plugin: 'com.google.gms.google-services'
 
 apply plugin: 'com.apollographql.android'
+apollo {
+    customTypeMapping['Int'] = "java.lang.Integer"
+    customTypeMapping['DateTime'] = "java.util.Date"
+    customTypeMapping['Boolean'] = "java.lang.Boolean"
+}

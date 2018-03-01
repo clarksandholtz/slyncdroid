@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="artifacts:messaging_library">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-release.aar/6f8cd386493b7824f09cb1e66d96cdce/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-release.aar/6f8cd386493b7824f09cb1e66d96cdce/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-release.aar/fe85ba806f4a1e7df828d34befba1df6/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-release.aar/fe85ba806f4a1e7df828d34befba1df6/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

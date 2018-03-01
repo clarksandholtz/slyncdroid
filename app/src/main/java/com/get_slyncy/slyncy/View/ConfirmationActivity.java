@@ -72,6 +72,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
         setContentView(R.layout.activity_confirmation);
         Bundle bundle = getIntent().getExtras();
 
+        Integer bool;
 
         if (bundle != null)
         {
