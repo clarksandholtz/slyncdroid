@@ -141,7 +141,7 @@
     <string name="resend_phone_auth">Resend</string>
     <string name="hint_phone_number">phone number</string>
     <string name="hint_full_name">full name</string>
-    <string name="hint_verification_code">Verification Code</string>
+    <string name="hint_verification_code">verification code</string>
     <string name="status_code_sent">Code Sent</string>
     <string name="status_verification_failed">Verification failed</string>
     <string name="status_verification_succeeded">Verification succeeded</string>

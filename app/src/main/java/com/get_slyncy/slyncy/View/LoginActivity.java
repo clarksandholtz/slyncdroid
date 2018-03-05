@@ -46,7 +46,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
 
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
-    private static final String SERVER_URL = "10.0.0.100:4000";
+    public static final String SERVER_URL = "http://10.24.67.23:4000/";
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
@@ -65,7 +65,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
             @Override
             public void onClick(View v)
             {
-                signIn(v);
+                signIn();
             }
         });
 
@@ -181,7 +181,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
 
     private void tryLogin(final FirebaseUser user, final GoogleSignInAccount acct)
     {
-        ApolloClient client = ApolloClient.builder().serverUrl("10.0.0.100:4000").build();
+        ApolloClient client = ApolloClient.builder().serverUrl(SERVER_URL).build();
 
         client.mutate(LoginMutation.builder().email(user.getEmail()).uid(user.getUid()).build())
                 .enqueue(new ApolloCall.Callback<LoginMutation.Data>()
@@ -216,11 +216,15 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                         Log.e("Apollo eror:", e.getMessage());
                         Snackbar.make(findViewById(R.id.main_layout), "Unable to reach Slyncy Servers.",
                                 Snackbar.LENGTH_SHORT).show();
+/**     code below will allow you into settings without connecting to slyncy's server */
+                        new DownloadImageTask(LoginActivity.this.getCacheDir().getPath(),
+                                LoginActivity.this).execute(user.getPhotoUrl().toString()
+                                .replace("s96-c", "s960-c"));
                     }
                 });
     }
 
-    public void signIn(View v)
+    public void signIn()
     {
         Log.d("TEST", "signIn: TEST");
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();

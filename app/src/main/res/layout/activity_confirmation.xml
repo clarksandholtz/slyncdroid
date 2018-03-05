@@ -48,13 +48,13 @@
             android:ems="10"
             android:hint="@string/hint_full_name"
             android:inputType="textPersonName"
-            android:paddingEnd="20dp"
+            android:paddingEnd="5dp"
             android:paddingLeft="20dp"
-            android:paddingRight="20dp"
+            android:paddingRight="5dp"
             android:paddingStart="20dp"
             android:textAppearance="@android:style/TextAppearance.Material.Medium"
-            android:textColorHint="@color/white"
-            />
+            android:textColor="@color/colorFontDark"
+            android:textColorHint="@color/white"/>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -73,12 +73,12 @@
             android:fontFamily="@font/regular"
             android:hint="@string/hint_phone_number"
             android:inputType="phone"
-            android:paddingEnd="20dp"
+            android:paddingEnd="5dp"
             android:paddingLeft="20dp"
-            android:paddingRight="20dp"
+            android:paddingRight="5dp"
             android:paddingStart="20dp"
-            android:textColorHint="@color/white"
-            />
+            android:textColor="@color/colorFontDark"
+            android:textColorHint="@color/white"/>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -97,10 +97,11 @@
             android:fontFamily="@font/regular"
             android:hint="@string/hint_email"
             android:inputType="textEmailAddress"
-            android:paddingEnd="20dp"
+            android:paddingEnd="5dp"
             android:paddingLeft="20dp"
-            android:paddingRight="20dp"
+            android:paddingRight="5dp"
             android:paddingStart="20dp"
+            android:textColor="@color/colorFontDark"
             android:textColorHint="@color/white"/>
 
     </LinearLayout>

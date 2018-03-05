@@ -17,13 +17,13 @@ public class SlyncyMessage {
 
     private String id;
     private int threadId;
-    private String date;
+    private long date;
     private String dispDate;
     private List<String> numbers;
     private List<Contact> contacts;
     private String sender;
     private String body;
-    private List<Bitmap> images;
+    private List<String> images;
     private boolean isRead;
 
     public SlyncyMessage() {
@@ -48,11 +48,11 @@ public class SlyncyMessage {
         this.threadId = threadId;
     }
 
-    public String getDate() {
+    public long getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(long date) {
         this.date = date;
         this.dispDate = msToDate(this.date);
     }
@@ -99,15 +99,15 @@ public class SlyncyMessage {
         this.sender = sender;
     }
 
-    public List<Bitmap> getImages() {
+    public List<String> getImages() {
         return images;
     }
 
-    public void setImages(List<Bitmap> images) {
+    public void setImages(List<String> images) {
         this.images = images;
     }
 
-    public boolean addImage(Bitmap image) {
+    public boolean addImage(String image) {
 
         if (image == null)
             return false;
@@ -123,9 +123,9 @@ public class SlyncyMessage {
         isRead = read;
     }
 
-    public String msToDate(String mss) {
+    public String msToDate(long mss) {
 
-        long time = Long.parseLong(mss,10);
+        long time = mss;
 
         long sec = ( time / 1000 ) % 60;
         time = time / 60000;
@@ -145,9 +145,7 @@ public class SlyncyMessage {
         long mo = getMonth(day);
         day = getDay(day);
 
-        mss = String.valueOf(yr) + "/" + String.valueOf(mo) + "/" + String.valueOf(day) + " " + String.valueOf(hour) + ":" + String.valueOf(min) + ":" + String.valueOf(sec);
-
-        return mss;
+        return String.valueOf(yr) + "/" + String.valueOf(mo) + "/" + String.valueOf(day) + " " + String.valueOf(hour) + ":" + String.valueOf(min) + ":" + String.valueOf(sec);
     }
     public long getMonth(long day) {
         long[] calendar = {31,28,31,30,31,30,31,31,30,31,30,31};

@@ -26,5 +26,11 @@
         android:layout_height="wrap_content"
         android:text="O Auth"
         android:onClick="launchLogin"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SMS Radar"
+        android:onClick="launchSmsRadar"/>
+
 
 </LinearLayout>

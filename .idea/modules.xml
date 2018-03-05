@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/messaging_library/messaging_library.iml" filepath="$PROJECT_DIR$/messaging_library/messaging_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/slyncdroid.iml" filepath="$PROJECT_DIR$/slyncdroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/smsmonitor/smsmonitor.iml" filepath="$PROJECT_DIR$/smsmonitor/smsmonitor.iml" />
     </modules>
   </component>
 </project>

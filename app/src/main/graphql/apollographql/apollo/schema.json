@@ -613,157 +613,21 @@
               "defaultValue": null
             },
             {
-              "name": "creator",
+              "name": "userSent",
               "description": "",
               "type": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "Boolean",
                 "ofType": null
               },
               "defaultValue": null
             },
             {
-              "name": "creator_not",
+              "name": "userSent_not",
               "description": "All values that are not equal to given value.",
               "type": {
                 "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "creator_in",
-              "description": "All values that are contained in given list.",
-              "type": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                }
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "creator_not_in",
-              "description": "All values that are not contained in given list.",
-              "type": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                }
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "creator_lt",
-              "description": "All values less than the given value.",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "creator_lte",
-              "description": "All values less than or equal the given value.",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "creator_gt",
-              "description": "All values greater than the given value.",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "creator_gte",
-              "description": "All values greater than or equal the given value.",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "creator_contains",
-              "description": "All values containing the given string.",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "creator_not_contains",
-              "description": "All values not containing the given string.",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "creator_starts_with",
-              "description": "All values starting with the given string.",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "creator_not_starts_with",
-              "description": "All values not starting with the given string.",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "creator_ends_with",
-              "description": "All values ending with the given string.",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "defaultValue": null
-            },
-            {
-              "name": "creator_not_ends_with",
-              "description": "All values not ending with the given string.",
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
+                "name": "Boolean",
                 "ofType": null
               },
               "defaultValue": null
@@ -1521,8 +1385,8 @@
         },
         {
           "kind": "SCALAR",
-          "name": "String",
-          "description": "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.",
+          "name": "Boolean",
+          "description": "The `Boolean` scalar type represents `true` or `false`.",
           "fields": null,
           "inputFields": null,
           "interfaces": null,
@@ -1531,8 +1395,8 @@
         },
         {
           "kind": "SCALAR",
-          "name": "Boolean",
-          "description": "The `Boolean` scalar type represents `true` or `false`.",
+          "name": "String",
+          "description": "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.",
           "fields": null,
           "inputFields": null,
           "interfaces": null,
@@ -3393,13 +3257,13 @@
               "deprecationReason": null
             },
             {
-              "name": "creator_ASC",
+              "name": "userSent_ASC",
               "description": "",
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "creator_DESC",
+              "name": "userSent_DESC",
               "description": "",
               "isDeprecated": false,
               "deprecationReason": null
@@ -3525,7 +3389,7 @@
               "deprecationReason": null
             },
             {
-              "name": "creator",
+              "name": "userSent",
               "description": "",
               "args": [],
               "type": {
@@ -3533,7 +3397,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "String",
+                  "name": "Boolean",
                   "ofType": null
                 }
               },
@@ -4233,14 +4097,14 @@
                   "defaultValue": null
                 },
                 {
-                  "name": "creator",
+                  "name": "userSent",
                   "description": "",
                   "type": {
                     "kind": "NON_NULL",
                     "name": null,
                     "ofType": {
                       "kind": "SCALAR",
-                      "name": "String",
+                      "name": "Boolean",
                       "ofType": null
                     }
                   },
@@ -4292,9 +4156,13 @@
                   "name": "date",
                   "description": "",
                   "type": {
-                    "kind": "SCALAR",
-                    "name": "DateTime",
-                    "ofType": null
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Float",
+                      "ofType": null
+                    }
                   },
                   "defaultValue": null
                 },
@@ -4549,6 +4417,16 @@
           "possibleTypes": null
         },
         {
+          "kind": "SCALAR",
+          "name": "Float",
+          "description": "The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point). ",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "INPUT_OBJECT",
           "name": "FileCreateInput",
           "description": "",
@@ -4673,14 +4551,14 @@
           "fields": null,
           "inputFields": [
             {
-              "name": "creator",
+              "name": "userSent",
               "description": "",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "String",
+                  "name": "Boolean",
                   "ofType": null
                 }
               },
@@ -7706,7 +7584,7 @@
               "deprecationReason": null
             },
             {
-              "name": "creator",
+              "name": "userSent",
               "description": "",
               "args": [],
               "type": {
@@ -7714,7 +7592,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "String",
+                  "name": "Boolean",
                   "ofType": null
                 }
               },

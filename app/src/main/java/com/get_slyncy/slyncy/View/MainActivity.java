@@ -13,6 +13,7 @@ import com.get_slyncy.slyncy.Model.Service.Autostart;
 import com.get_slyncy.slyncy.Model.Service.SlyncyService;
 import com.get_slyncy.slyncy.Model.Util.Data;
 import com.get_slyncy.slyncy.R;
+import com.get_slyncy.slyncy.View.Test.SmsRadar;
 import com.google.firebase.FirebaseApp;
 
 public class MainActivity extends AppCompatActivity {
@@ -61,5 +62,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void launchSmsRadar(View view)
+    {
+        Intent intent = new Intent(this, SmsRadar.class);
+        startActivity(intent);
+    }
 }
 

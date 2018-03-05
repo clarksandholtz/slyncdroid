@@ -121,6 +121,11 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name="com.tuenti.smsradar.SmsRadarService"
+            android:exported="false"
+            android:label="@string/app_name"/>
+
         <activity android:name=".View.PermissionActivity"/>
         <activity android:name=".View.MainActivity">
             <intent-filter>
@@ -137,6 +142,7 @@
             android:label="@string/title_activity_login">
         </activity>
         <activity android:name=".View.ConfirmationActivity"/>
+        <activity android:name=".View.Test.SmsRadar"/>
     </application>
 
 </manifest>

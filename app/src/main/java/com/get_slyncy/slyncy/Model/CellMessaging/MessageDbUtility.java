@@ -15,9 +15,13 @@ import com.get_slyncy.slyncy.Model.DTO.SlyncyMessageThread;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.Model.Util.Data;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -148,7 +152,7 @@ public class MessageDbUtility {
                     SlyncyMessage message = new SlyncyMessage();
                     message.setId(c.getString(c.getColumnIndex(MSG_ID)));
                     message.setThreadId(threadId);
-                    message.setDate(c.getString(c.getColumnIndex(DATE)));
+                    message.setDate(c.getLong(c.getColumnIndex(DATE)));
                     int readStatus = c.getInt(c.getColumnIndex(READ));
                     if (readStatus == 1) message.setRead(true);
                     else message.setRead(false);
@@ -182,7 +186,7 @@ public class MessageDbUtility {
                 body.append((c.getString(c.getColumnIndex(TEXT))));
             } else if (type.contains("image")) {
                 if (mThreadList.get(message.getThreadId()).getImageCount() < MAX_IMGS_PER_THREAD) {
-                    message.addImage(getMmsImg(pid));
+                    message.addImage(android.util.Base64.encodeToString(getMmsImg(pid), android.util.Base64.DEFAULT));
                     mThreadList.get(message.getThreadId()).incrementImageCount();
                 }
                 else {
@@ -194,21 +198,28 @@ public class MessageDbUtility {
         message.setBody(body.toString());
     }
 
-    private Bitmap getMmsImg(String id) {
+    private byte[] getMmsImg(String id) {
         Uri uri = Uri.parse("content://mms/part/" + id);
         InputStream in = null;
         Bitmap bitmap = null;
+        byte[] bytes = null;
 
         try {
             in = mContext.getContentResolver().openInputStream(uri);
-            bitmap = BitmapFactory.decodeStream(in);
+            byte[] buf = new byte[1024];
+            int len = 0;
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            while ((len = in.read(buf)) != -1)
+            {
+                os.write(buf, 0, len);
+            }
+            bytes = os.toByteArray();
             if(in != null)
                 in.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return bitmap;
+        return bytes;
     }
 
     private List<String> getMmsAddresses(SlyncyMessage message) {
@@ -261,7 +272,7 @@ public class MessageDbUtility {
                     SlyncyMessage message = new SlyncyMessage();
                     message.setId(c.getString(c.getColumnIndex(MSG_ID)));
                     message.setThreadId(threadId);
-                    message.setDate(c.getString(c.getColumnIndex(DATE)));
+                    message.setDate(c.getLong(c.getColumnIndex(DATE)));
                     message.setBody(c.getString(c.getColumnIndex(BODY)));
                     int readStatus = c.getInt(c.getColumnIndex("read"));
                     if (readStatus == 1) message.setRead(true);
@@ -312,9 +323,13 @@ public class MessageDbUtility {
     }
 
     private Map<String, String> fetchPhoneContacts() {
+        return fetchPhoneContacts(mContext.getContentResolver());
+    }
+
+    public static Map<String, String> fetchPhoneContacts(ContentResolver cr)
+    {
         Map<String, String> contactMap = new HashMap<>();
 
-        ContentResolver cr = mContext.getContentResolver();
         Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
                 null, null, null, null);
 
@@ -351,6 +366,11 @@ public class MessageDbUtility {
     }
 
     private String fetchContactNameByNumber(String number) {
+        return fetchContactNameByNumber(number, mContext.getContentResolver());
+    }
+
+    public static String fetchContactNameByNumber(String number, ContentResolver rs)
+    {
         String name = null;
 
         // define the columns I want the query to return
@@ -362,7 +382,7 @@ public class MessageDbUtility {
         Uri contactUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
 
         // query time
-        Cursor cursor = mContext.getContentResolver().query(contactUri, projection, null, null, null);
+        Cursor cursor = rs.query(contactUri, projection, null, null, null);
 
         if(cursor != null) {
             if (cursor.moveToFirst()) {
