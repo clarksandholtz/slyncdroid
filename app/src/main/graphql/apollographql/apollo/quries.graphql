@@ -10,14 +10,14 @@ mutation Signup($name: String!, $phone: String!, $email: String!, $uid: String!)
 }
 
 
-mutation CreateMessage($address: String!, $userSent: Boolean!, $body: String!, $read: Boolean!, $threadId: Int!, $date: Float!, $error: Boolean!, $files: [FileCreateInput!]) {
-  createMessage(address: $address userSent: $userSent body: $body read: $read threadId: $threadId date: $date error: $error files: $files){
+mutation CreateMessage($address: String!, $sender: String!, $userSent: Boolean!, $body: String!, $read: Boolean!, $threadId: Int!, $androidId : String! $date: Float!, $error: Boolean!, $files: [FileCreateInput!]) {
+  createMessage(address: $address sender: $sender userSent: $userSent androidMsgId: $androidId body: $body read: $read threadId: $threadId date: $date error: $error files: $files){
     id
     body
   }
 }
 
-mutation UploadMessages($messages: [MessageCreateInput]){
+mutation UploadMessages($messages: [MessageWithFileCreateInput!]){
   createMessages(messages: $messages){
     success
     status
