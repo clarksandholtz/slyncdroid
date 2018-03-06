@@ -27,6 +27,7 @@ public class Data extends Observable {
 
     private Settings mSettings;
     private Map<Integer, SlyncyMessageThread> mMessages;
+    private String mMyPhoneNumber;
 
     public Settings getSettings() {
         return mSettings;
@@ -38,6 +39,7 @@ public class Data extends Observable {
         }
 
         this.mSettings.setmMyPhoneNumber(Utils.getMyPhoneNumber(context));
+        this.mMyPhoneNumber = Utils.getMyPhoneNumber(context);
 
         if (TextUtils.isEmpty(mSettings.getMmsc()) &&
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -56,6 +58,10 @@ public class Data extends Observable {
 
     public void setmMessages(Map<Integer, SlyncyMessageThread> mMessages) {
         this.mMessages = mMessages;
+    }
+
+    public String getMyPhoneNumber() {
+        return mMyPhoneNumber;
     }
 
     // ***************** Singleton business ********************* //
