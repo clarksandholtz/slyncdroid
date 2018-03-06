@@ -23,9 +23,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import apollographql.apollo.CreateMessageMutation;
-import apollographql.apollo.UploadMessagesMutation;
-import apollographql.apollo.type.CustomType;
-import apollographql.apollo.type.MessageCreateInput;
+//import apollographql.apollo.UploadMessagesMutation;
+//import apollographql.apollo.type.CustomType;
+//import apollographql.apollo.type.MessageCreateInput;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

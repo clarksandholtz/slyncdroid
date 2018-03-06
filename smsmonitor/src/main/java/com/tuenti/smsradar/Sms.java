@@ -15,6 +15,11 @@
  */
 package com.tuenti.smsradar;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * Represents a sms stored in Android sms Content Provider.
  * <p/>
@@ -46,8 +51,9 @@ public class Sms {
 		return address;
 	}
 
-	public long getDate() {
-		return date;
+	public String getDate() {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.US);
+		return df.format(new Date(date));
 	}
 
 	public String getMsg() {
@@ -66,7 +72,7 @@ public class Sms {
 
 		Sms sms = (Sms) o;
 
-		return (address != null ? address.equals(sms.address) : sms.address == null) && (date == sms.getDate()) && (msg != null ? msg
+		return (address != null ? address.equals(sms.address) : sms.address == null) && (date == sms.date) && (msg != null ? msg
 				.equals(sms.msg) : sms.msg == null) && threadId == sms.threadId && type == sms.type;
 	}
 

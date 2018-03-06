@@ -1,11 +1,30 @@
 package com.get_slyncy.slyncy.Model.Util;
 
+import android.util.Log;
+
 import com.apollographql.apollo.ApolloClient;
 import com.get_slyncy.slyncy.Model.DTO.Contact;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessageThread;
+import com.get_slyncy.slyncy.View.LoginActivity;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
+
+import apollographql.apollo.UploadMessagesMutation;
+import apollographql.apollo.type.ClientMessageCreateInput;
+import apollographql.apollo.type.FileCreateInput;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by tylerbowers on 2/27/18.
@@ -18,9 +37,22 @@ public class ClientCommunicator {
 
     public boolean bulkMessageUpload() {
 
-//        ApolloClient client = ApolloClient.builder().serverUrl("10.37.80.161:4000").build();
 
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
+        {
+            @Override
+            public Response intercept(Chain chain) throws IOException
+            {
+                Request orig = chain.request();
+                Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
+                builder.header("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVleDA0YW4wMDBoMDEzMGpodjhma3RyIiwiaWF0IjoxNTIwMjk4MzQ5fQ.95UYNvydLOzA1loIuhPzkQaJDIvQEwF2YMb3a9ndHQ8");
+                return chain.proceed(builder.build());
+            }
+        }).build();
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL).build();
         Map<Integer, SlyncyMessageThread> messages = Data.getInstance().getmMessages();
+        List<ClientMessageCreateInput> messagesToGo = new ArrayList<>();
+        List<FileCreateInput> files = null;
         for (Map.Entry<Integer, SlyncyMessageThread> iter : messages.entrySet()) {
             for (SlyncyMessage message : iter.getValue().getMessages()) {
 
@@ -44,15 +76,25 @@ public class ClientCommunicator {
                 int threadId = message.getThreadId();
                 boolean error = false;
                 String msgId = message.getId();
-                String image;
-                if (message.getImages().size() > 0) {
-                    image = message.getImages().get(0);
+
+                if (message.getImages().size() > 0)
+                {
+                    files = new ArrayList<>();
+                    for (String s : message.getImages())
+                    {
+                        files.add(FileCreateInput.builder().content(s).contentType("jpg").build());
+                    }
                 }
-                long date = message.getDate();
+                String date = message.getDate();
+
+                messagesToGo.add(ClientMessageCreateInput.builder().address(address).androidMsgId(msgId).body(body)
+                        .read(read).threadId(threadId).date(date).error(error).sender(sender)
+                        .userSent(userSent).build());
             }
 
         }
-
+        UploadMessagesMutation mutation = UploadMessagesMutation.builder().messages(messagesToGo).build();
+        client.mutate(mutation).enqueue(null);
         return true;
     }
 }

@@ -44,5 +44,6 @@ public class SlyncyService extends Service {
 //        RecipientIdCache.init(this);
 //        MessageDbUtility.queryAllThreads(this);
         MessageDbUtility.init(this);
+        MessageDbUtility.getMessagesBulk(this);
     }
 }

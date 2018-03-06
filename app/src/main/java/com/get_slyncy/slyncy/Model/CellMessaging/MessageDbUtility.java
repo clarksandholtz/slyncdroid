@@ -42,10 +42,10 @@ public class MessageDbUtility {
     private static boolean isGettingMessages;
     private Map<Integer, SlyncyMessageThread> mThreadList;
 
-    private static final int MAX_MESSAGES_PER_THREAD = 30;
-    private static final int MAX_THREADS = 35;
-    private static final int ADDTL_MMS_THREADS = 10;
-    private static final int MAX_IMGS_PER_THREAD = 5;
+    private static final int MAX_MESSAGES_PER_THREAD = 250;
+    private static final int MAX_THREADS = 1;
+    private static final int ADDTL_MMS_THREADS = 0;
+    private static final int MAX_IMGS_PER_THREAD = 0;
 
     private static final String MSG_ID = "_id";
     private static final String THREAD_ID = "thread_id";

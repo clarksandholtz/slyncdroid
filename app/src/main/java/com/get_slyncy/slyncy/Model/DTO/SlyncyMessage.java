@@ -6,8 +6,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by tylerbowers on 2/26/18.
@@ -48,8 +52,9 @@ public class SlyncyMessage {
         this.threadId = threadId;
     }
 
-    public long getDate() {
-        return date;
+    public String getDate() {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.US);
+        return df.format(new Date(date));
     }
 
     public void setDate(long date) {

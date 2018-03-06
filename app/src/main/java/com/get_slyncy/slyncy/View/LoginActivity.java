@@ -46,7 +46,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
 
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
-    public static final String SERVER_URL = "http://10.24.67.23:4000/";
+    public static final String SERVER_URL = "http://10.24.209.96:4000/";
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
