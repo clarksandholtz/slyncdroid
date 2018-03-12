@@ -32,10 +32,11 @@ import okhttp3.Response;
 
 public class ClientCommunicator {
 
-    public ClientCommunicator() {
+    // Private because only static functions need be here
+    private ClientCommunicator() {
     }
 
-    public boolean bulkMessageUpload() {
+    public static boolean bulkMessageUpload() {
 
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
@@ -95,6 +96,27 @@ public class ClientCommunicator {
         }
         UploadMessagesMutation mutation = UploadMessagesMutation.builder().messages(messagesToGo).build();
         client.mutate(mutation).enqueue(null);
+        return true;
+    }
+
+    public static boolean markThreadAsRead(String threadId) {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
+        {
+            @Override
+            public Response intercept(Chain chain) throws IOException
+            {
+                Request orig = chain.request();
+                Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
+                builder.header("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVleDA0YW4wMDBoMDEzMGpodjhma3RyIiwiaWF0IjoxNTIwMjk4MzQ5fQ.95UYNvydLOzA1loIuhPzkQaJDIvQEwF2YMb3a9ndHQ8");
+                return chain.proceed(builder.build());
+            }
+        }).build();
+
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL).build();
+
+
+//        MarkThreadAsRead mutation = UploadMessagesMutation.builder().messages(messagesToGo).build();
+//        client.mutate(mutation).enqueue(null);
         return true;
     }
 }
