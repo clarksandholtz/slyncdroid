@@ -113,7 +113,7 @@ public class MessagesMonitoringService extends Service {
     private void updateReadStatus(Cursor c) {
         if (c.getInt(c.getColumnIndex(READ)) == 1) {
             String messageId = c.getString(c.getColumnIndex(MSG_ID));
-            String threadId = c.getString(c.getColumnIndex(THREAD_ID));
+            int threadId = c.getInt(c.getColumnIndex(THREAD_ID));
             String body = c.getString(c.getColumnIndex(BODY));
             Log.d(TAG, "Message: " + messageId + ", ThreadId: " + threadId + " with body \'" + body + "\' marked as read");
             ClientCommunicator.markThreadAsRead(threadId);

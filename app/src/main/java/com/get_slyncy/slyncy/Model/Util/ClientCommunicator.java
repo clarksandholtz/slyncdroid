@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import apollographql.apollo.MarkThreadAsReadMutation;
 import apollographql.apollo.UploadMessagesMutation;
 import apollographql.apollo.type.ClientMessageCreateInput;
 import apollographql.apollo.type.FileCreateInput;
@@ -99,7 +100,7 @@ public class ClientCommunicator {
         return true;
     }
 
-    public static boolean markThreadAsRead(String threadId) {
+    public static boolean markThreadAsRead(int threadId) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
         {
             @Override
@@ -114,9 +115,8 @@ public class ClientCommunicator {
 
         ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL).build();
 
-
-//        MarkThreadAsRead mutation = UploadMessagesMutation.builder().messages(messagesToGo).build();
-//        client.mutate(mutation).enqueue(null);
+        MarkThreadAsReadMutation mutation = MarkThreadAsReadMutation.builder().threadId(threadId).build();
+        client.mutate(mutation).enqueue(null);
         return true;
     }
 }
