@@ -3,23 +3,22 @@ package com.get_slyncy.slyncy.View;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
-import android.os.Build;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.get_slyncy.slyncy.Model.Service.Autostart;
 import com.get_slyncy.slyncy.Model.Service.SlyncyService;
 import com.get_slyncy.slyncy.Model.Util.Data;
 import com.get_slyncy.slyncy.R;
 import com.get_slyncy.slyncy.View.Test.SmsRadar;
 import com.google.firebase.FirebaseApp;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -27,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(getApplicationContext());
 
         // Check if permissions are needed
-        if (PermissionActivity.needPermissionRequest(this)) {
+        if (PermissionActivity.needPermissionRequest(this))
+        {
             startActivity(new Intent(this, PermissionActivity.class));
             finish();
             return;
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
         {
             NotificationChannel channel = new NotificationChannel(getPackageName() + "notif"
-                    ,"Basic Notifications", NotificationManager.IMPORTANCE_DEFAULT);
+                    , "Basic Notifications", NotificationManager.IMPORTANCE_DEFAULT);
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(channel);
         }

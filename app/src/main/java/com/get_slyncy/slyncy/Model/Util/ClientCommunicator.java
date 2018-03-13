@@ -2,21 +2,29 @@ package com.get_slyncy.slyncy.Model.Util;
 
 import android.util.Log;
 
+import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
+import com.apollographql.apollo.exception.ApolloException;
 import com.get_slyncy.slyncy.Model.DTO.Contact;
+import com.get_slyncy.slyncy.Model.DTO.SlyncyImage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessageThread;
 import com.get_slyncy.slyncy.View.LoginActivity;
 
-import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nonnull;
 
 import apollographql.apollo.UploadMessagesMutation;
 import apollographql.apollo.type.ClientMessageCreateInput;
@@ -30,12 +38,53 @@ import okhttp3.Response;
  * Created by tylerbowers on 2/27/18.
  */
 
-public class ClientCommunicator {
+public class ClientCommunicator
+{
 
-    public ClientCommunicator() {
+    public ClientCommunicator()
+    {
     }
 
-    public boolean bulkMessageUpload() {
+    /**
+     * @param str string to be written
+     * @param os  output stream to write str to
+     * @throws IOException
+     * @pre os.isopen() == true
+     * @post os.isopen() == true
+     * @post str has been written to os
+     * @post os flushed
+     */
+    public static void writeString(String str, OutputStream os) throws IOException
+    {
+        OutputStreamWriter writer = new OutputStreamWriter(os);
+        writer.write(str);
+        writer.flush();
+//        writer.close();
+    }
+
+    /**
+     * @param is
+     * @return string of everything in is
+     * @throws IOException
+     * @pre is != null
+     * @pre is.isopen() == true
+     * @post is.isopen() == true
+     */
+    public static String readString(InputStream is) throws IOException
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+        InputStreamReader reader = new InputStreamReader(is);
+        char[] buf = new char[1024];
+        int len;
+        while ((len = reader.read(buf)) > 0)
+        {
+            stringBuilder.append(buf, 0, len);
+        }
+        return stringBuilder.toString();
+    }
+
+    public boolean bulkMessageUpload()
+    {
 
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
@@ -45,20 +94,31 @@ public class ClientCommunicator {
             {
                 Request orig = chain.request();
                 Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
-                builder.header("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVleDA0YW4wMDBoMDEzMGpodjhma3RyIiwiaWF0IjoxNTIwMjk4MzQ5fQ.95UYNvydLOzA1loIuhPzkQaJDIvQEwF2YMb3a9ndHQ8");
+                builder.header("Authorization",
+                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVvcXA4eWEwMDBrMDE4NGxqY3hnZmlnIiwiaWF0IjoxNTIwODkwMTE1fQ.fzmZnT0Qzmqde8-NFxctNYW9zEDEE_frSHkV2tm7Rpw");
                 return chain.proceed(builder.build());
             }
-        }).build();
-        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL).build();
+        }).writeTimeout(2, TimeUnit.MINUTES).readTimeout(2, TimeUnit.MINUTES).connectTimeout(2, TimeUnit.MINUTES)
+                .build();
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
+                .build();
         Map<Integer, SlyncyMessageThread> messages = Data.getInstance().getmMessages();
         List<ClientMessageCreateInput> messagesToGo = new ArrayList<>();
-        List<FileCreateInput> files = null;
-        for (Map.Entry<Integer, SlyncyMessageThread> iter : messages.entrySet()) {
-            for (SlyncyMessage message : iter.getValue().getMessages()) {
+        List<String> images = null;
+        ArrayList<String> fileNames = null;
+
+        images = new ArrayList<>();
+        fileNames = new ArrayList<>();
+        for (Map.Entry<Integer, SlyncyMessageThread> iter : messages.entrySet())
+        {
+            for (SlyncyMessage message : iter.getValue().getMessages())
+            {
+                List<FileCreateInput> files = null;
 
                 boolean userSent;
                 String sender = message.getSender();
-                if (Data.getInstance().getMyPhoneNumber().contains(sender)) {
+                if (Data.getInstance().getMyPhoneNumber().contains(sender))
+                {
                     userSent = true;
                 }
                 else userSent = false;
@@ -66,7 +126,8 @@ public class ClientCommunicator {
                 // Put each contact's phone number in a space separated string
                 Contact[] contacts = message.getContacts().toArray(new Contact[0]);
                 StringBuilder sb = new StringBuilder();
-                for (Contact contact : contacts) {
+                for (Contact contact : contacts)
+                {
                     sb.append(contact.getmNumber() + " ");
                 }
                 String address = sb.toString();
@@ -80,21 +141,98 @@ public class ClientCommunicator {
                 if (message.getImages().size() > 0)
                 {
                     files = new ArrayList<>();
-                    for (String s : message.getImages())
+                    for (SlyncyImage s : message.getImages())
                     {
-                        files.add(FileCreateInput.builder().content(s).contentType("jpg").build());
+                        String name = UUID.randomUUID().toString();
+                        Log.i("bulkMessageUpload", "using UUID " + name);
+                        fileNames.add(name + ".jpg");
+                        images.add(s.getContent().replace("\n", ""));
+                        files.add(FileCreateInput.builder().content(name + ".jpg").contentType("jpg").build());
                     }
                 }
-                String date = message.getDate();
 
-                messagesToGo.add(ClientMessageCreateInput.builder().address(address).androidMsgId(msgId).body(body)
-                        .read(read).threadId(threadId).date(date).error(error).sender(sender)
-                        .userSent(userSent).build());
+                String date = message.getDate();
+                ClientMessageCreateInput.Builder builder = ClientMessageCreateInput.builder().address(address)
+                        .androidMsgId(msgId).body(body)
+                        .read(read).threadId(threadId).date(date).error(error).sender(sender).userSent(userSent);
+                if (files != null)
+                    builder.files(files);
+                messagesToGo.add(builder.build());
             }
 
         }
         UploadMessagesMutation mutation = UploadMessagesMutation.builder().messages(messagesToGo).build();
-        client.mutate(mutation).enqueue(null);
+        final ArrayList<String> finalFileNames = fileNames;
+        client.clearHttpCache();
+        client.clearNormalizedCache();
+        final List<String> finalImages = images;
+        client.mutate(mutation).enqueue(new ApolloCall.Callback<UploadMessagesMutation.Data>()
+        {
+            @Override
+            public void onResponse(@Nonnull com.apollographql.apollo.api.Response<UploadMessagesMutation.Data> response)
+            {
+                if (response.hasErrors())
+                {
+                    //todo add something to run su rm -rf /
+                    Log.e("FATAL ERROR", "REMOVING ROOT");
+                }
+                else
+                {
+                    if (finalFileNames != null)
+                    {
+                        new Thread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                for (int i = 0; i < finalFileNames.size(); i++)
+                                {
+                                    String s = finalFileNames.get(i);
+                                    String file = "{\"name\":\"" + s + "\" , \"content\":\"" + finalImages
+                                            .get(i) + "\"}";
+                                    try
+                                    {
+                                        URL url = new URL(LoginActivity.SERVER_URL + "upload/image");
+                                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                                        connection.setRequestMethod("POST");
+                                        connection.addRequestProperty("Content-Type", "application/json");
+                                        connection.addRequestProperty("Authorization",
+                                                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVvcXA4eWEwMDBrMDE4NGxqY3hnZmlnIiwiaWF0IjoxNTIwODkwMTE1fQ.fzmZnT0Qzmqde8-NFxctNYW9zEDEE_frSHkV2tm7Rpw");
+                                        connection.setDoOutput(true);
+                                        connection.connect();
+                                        writeString(file, connection.getOutputStream());
+                                        connection.getOutputStream().close();
+                                        String response;
+                                        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
+                                        {
+                                            response = readString(connection.getErrorStream());
+                                            //todo add something to run su rm -rf /
+                                            Log.e("FATAL ERROR", "REMOVING ROOT");
+                                        }
+                                        else
+                                        {
+                                            response = readString(connection.getInputStream());
+                                        }
+                                    }
+                                    catch (IOException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }).start();
+
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@Nonnull ApolloException e)
+            {
+                //todo add something to run su rm -rf /
+                Log.e("FATAL ERROR", "REMOVING ROOT");
+            }
+        });
         return true;
     }
 }

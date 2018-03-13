@@ -35,6 +35,7 @@ class SharedPreferencesSmsStorage implements SmsStorage {
 		if (preferences == null) {
 			throw new IllegalArgumentException("SharedPreferences param can't be null");
 		}
+
 		this.preferences = preferences;
 	}
 

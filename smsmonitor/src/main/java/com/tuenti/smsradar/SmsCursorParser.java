@@ -91,6 +91,7 @@ class SmsCursorParser {
 		return now.getTime() - smsDate.getTime() > SMS_MAX_AGE_MILLIS;
 	}
 
+
 	private boolean shouldParseSmsId(int smsId) {
 		if (smsStorage.isFirstSmsIntercepted()) {
 			return false;

@@ -56,6 +56,7 @@ public class Sms {
 		return df.format(new Date(date));
 	}
 
+
 	public String getMsg() {
 		return msg;
 	}

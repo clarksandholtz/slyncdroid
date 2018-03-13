@@ -56,6 +56,7 @@ class SmsObserver extends ContentObserver {
 		this.smsCursorParser = smsCursorParser;
 	}
 
+
 	@Override
 	public boolean deliverSelfNotifications() {
 		return true;

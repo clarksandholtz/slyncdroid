@@ -4,49 +4,39 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.get_slyncy.slyncy.Model.DTO.Contact;
+import com.get_slyncy.slyncy.Model.DTO.SlyncyImage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessageThread;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.Model.Util.Data;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.UUID;
 
 /**
  * Created by tylerbowers on 2/26/18.
  */
 
-public class MessageDbUtility {
+public class MessageDbUtility
+{
 
     private static final String TAG = "MessageDbUtility";
-
-    private static MessageDbUtility instance;
-
-    private Context mContext;
-    private static boolean isGettingMessages;
-    private Map<Integer, SlyncyMessageThread> mThreadList;
-
-    private static final int MAX_MESSAGES_PER_THREAD = 250;
-    private static final int MAX_THREADS = 1;
-    private static final int ADDTL_MMS_THREADS = 0;
-    private static final int MAX_IMGS_PER_THREAD = 0;
-
+    private static final int MAX_MESSAGES_PER_THREAD = 100;
+    private static final int MAX_THREADS = 30;
+    private static final int ADDTL_MMS_THREADS = 10;
+    private static final int MAX_IMGS_PER_THREAD = 5;
     private static final String MSG_ID = "_id";
     private static final String THREAD_ID = "thread_id";
     private static final String DATE = "date";
@@ -56,33 +46,43 @@ public class MessageDbUtility {
     private static final String TEXT = "text";
     private static final String ADDRESS = "address";
     private static final String BODY = "body";
-
     private static final int SENDER = 137;
+    private static MessageDbUtility instance;
+    private static boolean isGettingMessages;
+    private Context mContext;
+    private Map<Integer, SlyncyMessageThread> mThreadList;
 
-    private MessageDbUtility(){
+    private MessageDbUtility()
+    {
         mThreadList = new HashMap<>();
     }
 
-    public static void init(Context context) {
+    public static void init(Context context)
+    {
         instance = getInstance();
 
         instance.mContext = context;
 
-        new Thread(new Runnable() {
-            public void run() {
+        new Thread(new Runnable()
+        {
+            public void run()
+            {
                 instance.getMessagesBulk();
                 instance.mThreadList = new HashMap<>();
             }
         }, "MessageDbUtility.init").start();
     }
 
-    public static void getMessagesBulk(Context context) {
+    public static void getMessagesBulk(Context context)
+    {
         instance = getInstance();
 
         instance.mContext = context;
 
-        new Thread(new Runnable() {
-            public void run() {
+        new Thread(new Runnable()
+        {
+            public void run()
+            {
                 instance.getMessagesBulk();
                 instance.mThreadList = new HashMap<>();
 
@@ -91,15 +91,213 @@ public class MessageDbUtility {
         }, "MessageDbUtility.init").start();
     }
 
-    private static MessageDbUtility getInstance() {
-        if (instance == null) {
+    private static MessageDbUtility getInstance()
+    {
+        if (instance == null)
+        {
             instance = new MessageDbUtility();
         }
 
         return instance;
     }
 
-    private void getMessagesBulk() {
+    public static void parseMmsParts(SlyncyMessage message, ContentResolver resolver,
+                                     Map<Integer, SlyncyMessageThread> threadList)
+    {
+        if (threadList == null)
+        {
+            threadList = new HashMap<>();
+            SlyncyMessageThread thread = new SlyncyMessageThread();
+            thread.addMessage(message);
+            threadList.put(message.getThreadId(), thread);
+        }
+        Uri uri = Uri.parse("content://mms/part");
+        String mmsId = "mid = " + message.getId();
+        Cursor c = resolver.query(uri, null, mmsId, null, null);
+        StringBuilder body = new StringBuilder();
+        if (c == null)
+        {
+            return;
+        }
+        while (c.moveToNext())
+        {
+
+            String pid = c.getString(c.getColumnIndex(MSG_ID));
+            String type = c.getString(c.getColumnIndex(MMS_TYPE));
+            if ("text/plain".equals(type))
+            {
+                body.append((c.getString(c.getColumnIndex(TEXT))));
+            }
+            else if (type.contains("image"))
+            {
+                if (threadList.get(message.getThreadId()).getImageCount() < MAX_IMGS_PER_THREAD)
+                {
+                    SlyncyImage image = getMmsImg(pid, resolver);
+                    if (image != null)
+                        message.addImage(image);
+                    threadList.get(message.getThreadId()).incrementImageCount();
+                }
+                else
+                {
+                    Log.d(TAG, "Skipping image, thread full");
+                }
+            }
+        }
+        c.close();
+        message.setBody(body.toString());
+    }
+
+    public static SlyncyImage getMmsImg(String id, ContentResolver resolver)
+    {
+        Uri uri = Uri.parse("content://mms/part/" + id);
+        InputStream in = null;
+        Bitmap bitmap = null;
+        byte[] bytes = null;
+
+        try
+        {
+            in = resolver.openInputStream(uri);
+            byte[] buf = new byte[1024];
+            int len = 0;
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            while ((len = in.read(buf)) != -1)
+            {
+                os.write(buf, 0, len);
+            }
+            bytes = os.toByteArray();
+            if (in != null)
+                in.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+        Cursor cursor = resolver.query(Uri.parse("content://mms/part/" + id), null, null, null, null);
+        cursor.moveToFirst(); //todo breaks here
+        String fullName = cursor.getString(cursor.getColumnIndex("name"));
+        String type;
+        if (fullName == null)
+        {
+            String[] temp = cursor.getString(cursor.getColumnIndex("ct")).split("/");
+            type = "." + temp[temp.length - 1];
+        }
+        else
+        {
+            type = "." + fullName.split("\\.")[1];
+        }
+        cursor.close();
+        return new SlyncyImage(UUID.randomUUID().toString() + type,
+                android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT).replace("\n", ""));
+
+    }
+
+    public static List<String> getMmsAddresses(SlyncyMessage message, ContentResolver resolver)
+    {
+        String id = message.getId();
+        String sel = new String("msg_id=" + id);
+        String uriString = "content://mms/" + id + "/addr";
+        Uri uri = Uri.parse(uriString);
+        Cursor c = resolver.query(uri, null, sel, null, null);
+        List<String> numberList = new ArrayList<>();
+        while (c.moveToNext())
+        {
+
+            String number = c.getString(c.getColumnIndex(ADDRESS));
+            if (!(number.contains("insert")))
+            {
+                numberList.add(number);
+            }
+
+            int type = c.getInt(c.getColumnIndex(TYPE));
+            if (type == SENDER)
+            {
+                message.setSender(number);
+            }
+        }
+        c.close();
+        return numberList;
+    }
+
+    public static Map<String, String> fetchPhoneContacts(ContentResolver cr)
+    {
+        Map<String, String> contactMap = new HashMap<>();
+
+        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
+                null, null, null, null);
+
+        if ((cur != null ? cur.getCount() : 0) > 0)
+        {
+            while (cur != null && cur.moveToNext())
+            {
+                String id = cur.getString(
+                        cur.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cur.getString(cur.getColumnIndex(
+                        ContactsContract.Contacts.DISPLAY_NAME));
+
+                if (cur.getInt(cur.getColumnIndex(
+                        ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0)
+                {
+                    Cursor pCur = cr.query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                            new String[]{id}, null);
+                    while (pCur.moveToNext())
+                    {
+                        String phoneNo = pCur.getString(pCur.getColumnIndex(
+                                ContactsContract.CommonDataKinds.Phone.NUMBER));
+//                        Log.i(TAG, "Name: " + name);
+//                        Log.i(TAG, "Phone Number: " + phoneNo);
+                        contactMap.put(phoneNo, name);
+                    }
+                    pCur.close();
+                }
+            }
+        }
+        if (cur != null)
+        {
+            cur.close();
+        }
+
+        return contactMap;
+    }
+
+    public static String fetchContactNameByNumber(String number, ContentResolver rs)
+    {
+        String name = null;
+
+        // define the columns I want the query to return
+        String[] projection = new String[]{
+                ContactsContract.PhoneLookup.DISPLAY_NAME,
+                ContactsContract.PhoneLookup._ID};
+
+        // encode the phone number and build the filter URI
+        Uri contactUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+
+        // query time
+        Cursor cursor = rs.query(contactUri, projection, null, null, null);
+
+        if (cursor != null)
+        {
+            if (cursor.moveToFirst())
+            {
+                name = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                Log.v(TAG, "Contact found for " + number + ". Contact name: " + name);
+            }
+            else
+            {
+                Log.v(TAG, "No Contact found for " + number);
+                name = number;
+            }
+            cursor.close();
+        }
+
+        return name;
+    }
+
+    private void getMessagesBulk()
+    {
         // TODO: Do we need to prevent against multiple concurrent requests?
 //        if (isGettingMessages) {
 //            Log.d(TAG, "Already loading messages.");
@@ -125,30 +323,37 @@ public class MessageDbUtility {
         isGettingMessages = false;
     }
 
-    private void getMMS() {
+    private void getMMS()
+    {
         Uri uri = Uri.parse("content://mms");
         String[] proj = {"*"};
         ContentResolver cr = mContext.getContentResolver();
 
         Cursor c = cr.query(uri, proj, null, null, null);
 
-        if(c != null && c.moveToFirst()) {
-            do {
+        if (c != null && c.moveToFirst())
+        {
+            do
+            {
 
                 boolean makeMessage = false;
                 int threadId = c.getInt(c.getColumnIndex(THREAD_ID));
-                if (mThreadList.get(threadId) == null && mThreadList.size() < MAX_THREADS + ADDTL_MMS_THREADS) {
+                if (mThreadList.get(threadId) == null && mThreadList.size() < MAX_THREADS + ADDTL_MMS_THREADS)
+                {
                     SlyncyMessageThread thread = new SlyncyMessageThread();
                     thread.setThreadId(threadId);
                     mThreadList.put(threadId, thread);
 
                     makeMessage = true;
                 }
-                else if (mThreadList.get(threadId) != null && mThreadList.get(threadId).getMessageCount() < MAX_MESSAGES_PER_THREAD + ADDTL_MMS_THREADS) {
+                else if (mThreadList.get(threadId) != null && mThreadList.get(threadId)
+                                                                      .getMessageCount() < MAX_MESSAGES_PER_THREAD + ADDTL_MMS_THREADS)
+                {
                     makeMessage = true;
                 }
 
-                if(makeMessage) {
+                if (makeMessage)
+                {
                     SlyncyMessage message = new SlyncyMessage();
                     message.setId(c.getString(c.getColumnIndex(MSG_ID)));
                     message.setThreadId(threadId);
@@ -170,105 +375,52 @@ public class MessageDbUtility {
 
     }
 
-    private void parseMmsParts(SlyncyMessage message) {
-        Uri uri = Uri.parse("content://mms/part");
-        String mmsId = "mid = " + message.getId();
-        Cursor c = mContext.getContentResolver().query(uri, null, mmsId, null, null);
-        StringBuilder body = new StringBuilder();
-        if (c == null) {
-            return;
-        }
-        while(c.moveToNext()) {
-
-            String pid = c.getString(c.getColumnIndex(MSG_ID));
-            String type = c.getString(c.getColumnIndex(MMS_TYPE));
-            if ("text/plain".equals(type)) {
-                body.append((c.getString(c.getColumnIndex(TEXT))));
-            } else if (type.contains("image")) {
-                if (mThreadList.get(message.getThreadId()).getImageCount() < MAX_IMGS_PER_THREAD) {
-                    message.addImage(android.util.Base64.encodeToString(getMmsImg(pid), android.util.Base64.DEFAULT));
-                    mThreadList.get(message.getThreadId()).incrementImageCount();
-                }
-                else {
-                    Log.d(TAG, "Skipping image, thread full");
-                }
-            }
-        }
-        c.close();
-        message.setBody(body.toString());
+    private void parseMmsParts(SlyncyMessage message)
+    {
+        parseMmsParts(message, mContext.getContentResolver(), mThreadList);
     }
 
-    private byte[] getMmsImg(String id) {
-        Uri uri = Uri.parse("content://mms/part/" + id);
-        InputStream in = null;
-        Bitmap bitmap = null;
-        byte[] bytes = null;
-
-        try {
-            in = mContext.getContentResolver().openInputStream(uri);
-            byte[] buf = new byte[1024];
-            int len = 0;
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            while ((len = in.read(buf)) != -1)
-            {
-                os.write(buf, 0, len);
-            }
-            bytes = os.toByteArray();
-            if(in != null)
-                in.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return bytes;
+    private SlyncyImage getMmsImg(String id)
+    {
+        return getMmsImg(id, mContext.getContentResolver());
     }
 
-    private List<String> getMmsAddresses(SlyncyMessage message) {
-        String id = message.getId();
-        String sel = new String("msg_id=" + id);
-        String uriString = "content://mms/" + id + "/addr";
-        Uri uri = Uri.parse(uriString);
-        Cursor c = mContext.getContentResolver().query(uri, null, sel, null, null);
-        List<String> numberList = new ArrayList<>();
-        while (c.moveToNext()) {
-
-            String number = c.getString(c.getColumnIndex(ADDRESS));
-            if(!(number.contains("insert"))) {
-                numberList.add(number);
-            }
-
-            int type = c.getInt(c.getColumnIndex(TYPE));
-            if (type == SENDER) {
-                message.setSender(number);
-            }
-        }
-        c.close();
-        return numberList;
+    private List<String> getMmsAddresses(SlyncyMessage message)
+    {
+        return getMmsAddresses(message, mContext.getContentResolver());
     }
 
-    private void getSMS() {
+    private void getSMS()
+    {
         Uri uri = Uri.parse("content://sms");
         String[] proj = {"*"};
         ContentResolver cr = mContext.getContentResolver();
 
-        Cursor c = cr.query(uri,proj,null,null,null);
+        Cursor c = cr.query(uri, proj, null, null, null);
 
-        if(c.moveToFirst()) {
-            do {
+        if (c.moveToFirst())
+        {
+            do
+            {
 
                 boolean makeMessage = false;
                 int threadId = c.getInt(c.getColumnIndex(THREAD_ID));
-                if (mThreadList.get(threadId) == null && mThreadList.size() < MAX_THREADS) {
+                if (mThreadList.get(threadId) == null && mThreadList.size() < MAX_THREADS)
+                {
                     SlyncyMessageThread thread = new SlyncyMessageThread();
                     thread.setThreadId(threadId);
                     mThreadList.put(threadId, thread);
 
                     makeMessage = true;
                 }
-                else if (mThreadList.get(threadId) != null && mThreadList.get(threadId).getMessageCount() < MAX_MESSAGES_PER_THREAD) {
+                else if (mThreadList.get(threadId) != null && mThreadList.get(threadId)
+                                                                      .getMessageCount() < MAX_MESSAGES_PER_THREAD)
+                {
                     makeMessage = true;
                 }
 
-                if (makeMessage) {
+                if (makeMessage)
+                {
                     SlyncyMessage message = new SlyncyMessage();
                     message.setId(c.getString(c.getColumnIndex(MSG_ID)));
                     message.setThreadId(threadId);
@@ -292,27 +444,33 @@ public class MessageDbUtility {
         }
         c.close();
     }
-    
-    private void getContacts() {
+
+    private void getContacts()
+    {
 
         Map<String, String> contactMap = fetchPhoneContacts();
 
-        for (Map.Entry<Integer, SlyncyMessageThread> threadIter : mThreadList.entrySet()) {
+        for (Map.Entry<Integer, SlyncyMessageThread> threadIter : mThreadList.entrySet())
+        {
 
-            for (String number : threadIter.getValue().getNumbers()) {
+            for (String number : threadIter.getValue().getNumbers())
+            {
 
                 // don't add your own phone number
                 if (number.substring(2).equals(Data.getInstance().getSettings().getmMyPhoneNumber())
-                    || number.equals(Data.getInstance().getSettings().getmMyPhoneNumber())) {
+                    || number.equals(Data.getInstance().getSettings().getmMyPhoneNumber()))
+                {
                     continue;
                 }
 
                 Contact contact = new Contact(number);
 
-                if(contactMap.containsKey(number)) {
+                if (contactMap.containsKey(number))
+                {
                     contact.setmName(contactMap.get(number));
                 }
-                else {
+                else
+                {
                     contact.setmName(fetchContactNameByNumber(number));
                 }
 
@@ -322,80 +480,14 @@ public class MessageDbUtility {
         }
     }
 
-    private Map<String, String> fetchPhoneContacts() {
+    private Map<String, String> fetchPhoneContacts()
+    {
         return fetchPhoneContacts(mContext.getContentResolver());
     }
 
-    public static Map<String, String> fetchPhoneContacts(ContentResolver cr)
+    private String fetchContactNameByNumber(String number)
     {
-        Map<String, String> contactMap = new HashMap<>();
-
-        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
-                null, null, null, null);
-
-        if ((cur != null ? cur.getCount() : 0) > 0) {
-            while (cur != null && cur.moveToNext()) {
-                String id = cur.getString(
-                        cur.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cur.getString(cur.getColumnIndex(
-                        ContactsContract.Contacts.DISPLAY_NAME));
-
-                if (cur.getInt(cur.getColumnIndex(
-                        ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
-                    Cursor pCur = cr.query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null,
-                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                            new String[]{id}, null);
-                    while (pCur.moveToNext()) {
-                        String phoneNo = pCur.getString(pCur.getColumnIndex(
-                                ContactsContract.CommonDataKinds.Phone.NUMBER));
-//                        Log.i(TAG, "Name: " + name);
-//                        Log.i(TAG, "Phone Number: " + phoneNo);
-                        contactMap.put(phoneNo, name);
-                    }
-                    pCur.close();
-                }
-            }
-        }
-        if(cur!=null){
-            cur.close();
-        }
-
-        return contactMap;
-    }
-
-    private String fetchContactNameByNumber(String number) {
         return fetchContactNameByNumber(number, mContext.getContentResolver());
-    }
-
-    public static String fetchContactNameByNumber(String number, ContentResolver rs)
-    {
-        String name = null;
-
-        // define the columns I want the query to return
-        String[] projection = new String[] {
-                ContactsContract.PhoneLookup.DISPLAY_NAME,
-                ContactsContract.PhoneLookup._ID};
-
-        // encode the phone number and build the filter URI
-        Uri contactUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
-
-        // query time
-        Cursor cursor = rs.query(contactUri, projection, null, null, null);
-
-        if(cursor != null) {
-            if (cursor.moveToFirst()) {
-                name = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
-                Log.v(TAG, "Contact found for " + number + ". Contact name: " + name);
-            } else {
-                Log.v(TAG, "No Contact found for " + number);
-                name = number;
-            }
-            cursor.close();
-        }
-
-        return name;
     }
 
 }

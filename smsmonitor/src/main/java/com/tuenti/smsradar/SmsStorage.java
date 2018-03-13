@@ -24,6 +24,7 @@ package com.tuenti.smsradar;
 interface SmsStorage {
 
 
+
 	void updateLastSmsIntercepted(int smsId);
 
 	int getLastSmsIntercepted();

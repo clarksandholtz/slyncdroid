@@ -16,7 +16,8 @@ import com.get_slyncy.slyncy.BuildConfig;
  * Created by tylerbowers on 2/12/18.
  */
 
-public class MessagesMonitoringService extends Service {
+public class MessagesMonitoringService extends Service
+{
 
     private static final String TAG = "MessagesMonService";
 
@@ -29,8 +30,28 @@ public class MessagesMonitoringService extends Service {
     private MsgContentObserver observerMsg = null;
     private Context context;
 
+    /**
+     * Start the service to process that will run the content observerMsg
+     */
+    public static void beginStartingService(Context context)
+    {
+        if (BuildConfig.DEBUG) Log.v(TAG, "beginStartingService()");
+        context.startService(new Intent(context, MessagesMonitoringService.class));
+    }
+
+    /**
+     * Called back by the service when it has finished processing notifications,
+     * releasing the wake lock if the service is now stopping.
+     */
+    public static void finishStartingService(Service service)
+    {
+        if (BuildConfig.DEBUG) Log.v(TAG, "SmsMonitorService: finishStartingService()");
+        service.stopSelf();
+    }
+
     @Override
-    public void onCreate() {
+    public void onCreate()
+    {
         super.onCreate();
         context = this.getApplicationContext();
         if (BuildConfig.DEBUG) Log.v(TAG, "SmsMonitorService created");
@@ -38,27 +59,32 @@ public class MessagesMonitoringService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent intent, int flags, int startId)
+    {
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy()
+    {
         unregisterMsgsObserver();
         super.onDestroy();
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(Intent intent)
+    {
         return null;
     }
 
     /*
      * Registers the observerMsg for SMS changes
      */
-    private void registerMsgsObserver() {
-        if (observerMsg == null) {
+    private void registerMsgsObserver()
+    {
+        if (observerMsg == null)
+        {
             observerMsg = new MsgContentObserver(new Handler());
             crMsg = getContentResolver();
             crMsg.registerContentObserver(uriSMS, true, observerMsg);
@@ -69,54 +95,46 @@ public class MessagesMonitoringService extends Service {
     /**
      * Unregisters the observerMsg for call log changes
      */
-    private void unregisterMsgsObserver() {
-        if (crMsg != null) {
+    private void unregisterMsgsObserver()
+    {
+        if (crMsg != null)
+        {
             crMsg.unregisterContentObserver(observerMsg);
         }
-        if (observerMsg != null) {
+        if (observerMsg != null)
+        {
             observerMsg = null;
         }
-        if (BuildConfig.DEBUG) Log.v(TAG,"Unregistered SMS Observer");
+        if (BuildConfig.DEBUG) Log.v(TAG, "Unregistered SMS Observer");
     }
 
-    private class MsgContentObserver extends ContentObserver {
-        public MsgContentObserver(Handler handler) {
+    private class MsgContentObserver extends ContentObserver
+    {
+        public MsgContentObserver(Handler handler)
+        {
             super(handler);
         }
 
         @Override
-        public void onChange(boolean selfChange) {
+        public void onChange(boolean selfChange)
+        {
             super.onChange(selfChange);
             // Cursor c = context.getContentResolver().query(SMS_CONTENT_URI,
             // null, "read = 0", null, null);
 //            int count = ContactUtility.getUnreadMessagesCount(context);
             int count = -1;
             if (BuildConfig.DEBUG) Log.v(TAG, "getUnreadCount = " + count);
-            if (count == 0) {
+            if (count == 0)
+            {
 //                ManageNotification.clearAll(context);
                 finishStartingService(MessagesMonitoringService.this);
-            } else {
+            }
+            else
+            {
                 // TODO: do something with count>0, maybe refresh the
                 // notification
             }
         }
-    }
-
-    /**
-     * Start the service to process that will run the content observerMsg
-     */
-    public static void beginStartingService(Context context) {
-        if (BuildConfig.DEBUG) Log.v(TAG, "beginStartingService()");
-        context.startService(new Intent(context, MessagesMonitoringService.class));
-    }
-
-    /**
-     * Called back by the service when it has finished processing notifications,
-     * releasing the wake lock if the service is now stopping.
-     */
-    public static void finishStartingService(Service service) {
-        if (BuildConfig.DEBUG) Log.v(TAG, "SmsMonitorService: finishStartingService()");
-        service.stopSelf();
     }
 
 }

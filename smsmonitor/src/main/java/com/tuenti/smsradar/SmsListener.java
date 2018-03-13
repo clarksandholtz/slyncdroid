@@ -35,6 +35,7 @@ public interface SmsListener {
 	 *
 	 * @param sms
 	 */
+
 	public void onSmsReceived(Sms sms);
 
 }

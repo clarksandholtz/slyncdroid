@@ -42,6 +42,7 @@ public class SmsRadar {
 		context.startService(intent);
 	}
 
+
 	/**
 	 * Stops the service and remove the SmsListener added when the SmsRadar was initialized
 	 *

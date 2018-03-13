@@ -40,125 +40,131 @@ import android.os.IBinder;
  */
 public class SmsRadarService extends Service {
 
-	private static final String CONTENT_SMS_URI = "content://sms";
-	private static final int ONE_SECOND = 1000;
+    private static final String CONTENT_SMS_URI = "content://sms";
+    private static final int ONE_SECOND = 1000;
 
 
-	private ContentResolver contentResolver;
-	private SmsObserver smsObserver;
-	private AlarmManager alarmManager;
-	private TimeProvider timeProvider;
-	private boolean initialized;
+    private ContentResolver contentResolver;
+    private SmsObserver smsObserver;
+    private MmsObserver mmsObserver;
+    private AlarmManager alarmManager;
+    private TimeProvider timeProvider;
+    private boolean initialized;
 
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 
 
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		if (!initialized) {
-			initializeService();
-		}
-		return START_STICKY;
-	}
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (!initialized) {
+            initializeService();
+        }
+        return START_STICKY;
+    }
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		finishService();
-	}
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        finishService();
+    }
 
-	@Override
-	public void onTaskRemoved(Intent rootIntent) {
-		super.onTaskRemoved(rootIntent);
-		restartService();
-	}
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        restartService();
+    }
 
-	private void initializeService() {
-		initialized = true;
-		initializeDependencies();
-		registerSmsContentObserver();
-	}
+    private void initializeService() {
+        initialized = true;
+        initializeDependencies();
+        registerSmsContentObserver();
+    }
 
-	private void initializeDependencies() {
-		if (!areDependenciesInitialized()) {
-			initializeContentResolver();
-			initializeSmsObserver();
-		}
-	}
+    private void initializeDependencies() {
+        if (!areDependenciesInitialized()) {
+            initializeContentResolver();
+            initializeSmsObserver();
+        }
+    }
 
-	private boolean areDependenciesInitialized() {
-		return contentResolver != null && smsObserver != null;
-	}
+    private boolean areDependenciesInitialized() {
+        return contentResolver != null && smsObserver != null;
+    }
 
-	private void initializeSmsObserver() {
-		Handler handler = new Handler();
-		SmsCursorParser smsCursorParser = initializeSmsCursorParser();
-		this.smsObserver = new SmsObserver(contentResolver, handler, smsCursorParser);
-	}
+    private void initializeSmsObserver() {
+        Handler handler = new Handler();
+        Handler handler1 = new Handler();
+        SmsCursorParser smsCursorParser = initializeSmsCursorParser();
+//        MmsCursorParser MmsCursorParser = initializeMmsCursorParser();
+        this.smsObserver = new SmsObserver(contentResolver, handler, smsCursorParser);
+//        this.mmsObserver = new MmsObserver(handler1, )
 
-	private SmsCursorParser initializeSmsCursorParser() {
-		SharedPreferences preferences = getSharedPreferences("sms_preferences", MODE_PRIVATE);
-		SmsStorage smsStorage = new SharedPreferencesSmsStorage(preferences);
-		return new SmsCursorParser(smsStorage, getTimeProvider());
-	}
+    }
 
-	private void initializeContentResolver() {
-		this.contentResolver = getContentResolver();
-	}
-
-	private void finishService() {
-		initialized = false;
-		unregisterSmsContentObserver();
-	}
+    private SmsCursorParser initializeSmsCursorParser() {
+        SharedPreferences preferences = getSharedPreferences("sms_preferences", MODE_PRIVATE);
+        SmsStorage smsStorage = new SharedPreferencesSmsStorage(preferences);
+        return new SmsCursorParser(smsStorage, getTimeProvider());
+    }
 
 
-	private void registerSmsContentObserver() {
-		Uri smsUri = Uri.parse(CONTENT_SMS_URI);
-		boolean notifyForDescendents = true;
-		contentResolver.registerContentObserver(smsUri, notifyForDescendents, smsObserver);
-	}
+    private void initializeContentResolver() {
+        this.contentResolver = getContentResolver();
+    }
 
-	private void unregisterSmsContentObserver() {
-		contentResolver.unregisterContentObserver(smsObserver);
-	}
+    private void finishService() {
+        initialized = false;
+        unregisterSmsContentObserver();
+    }
 
-	private void restartService() {
-		Intent intent = new Intent(this, SmsRadarService.class);
-		PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
-		long now = getTimeProvider().getDate().getTime();
-		getAlarmManager().set(AlarmManager.RTC_WAKEUP, now + ONE_SECOND, pendingIntent);
-	}
 
-	private TimeProvider getTimeProvider() {
-		return timeProvider != null ? timeProvider : new TimeProvider();
-	}
+    private void registerSmsContentObserver() {
+        Uri smsUri = Uri.parse(CONTENT_SMS_URI);
+        boolean notifyForDescendents = true;
+        contentResolver.registerContentObserver(smsUri, notifyForDescendents, smsObserver);
+    }
 
-	private AlarmManager getAlarmManager() {
-		return alarmManager != null ? alarmManager : (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-	}
+    private void unregisterSmsContentObserver() {
+        contentResolver.unregisterContentObserver(smsObserver);
+    }
 
-	/*
-	 * Test methods. This methods has been created to modify the service dependencies in test runtime because
-	 * without dependency injection we can't provide this entities.
-	 */
+    private void restartService() {
+        Intent intent = new Intent(this, SmsRadarService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
+        long now = getTimeProvider().getDate().getTime();
+        getAlarmManager().set(AlarmManager.RTC_WAKEUP, now + ONE_SECOND, pendingIntent);
+    }
 
-	void setSmsObserver(SmsObserver smsObserver) {
-		this.smsObserver = smsObserver;
-	}
+    private TimeProvider getTimeProvider() {
+        return timeProvider != null ? timeProvider : new TimeProvider();
+    }
 
-	void setContentResolver(ContentResolver contentResolver) {
-		this.contentResolver = contentResolver;
-	}
+    private AlarmManager getAlarmManager() {
+        return alarmManager != null ? alarmManager : (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+    }
 
-	void setAlarmManager(AlarmManager alarmManager) {
-		this.alarmManager = alarmManager;
-	}
+    /*
+     * Test methods. This methods has been created to modify the service dependencies in test runtime because
+     * without dependency injection we can't provide this entities.
+     */
 
-	void setTimeProvider(TimeProvider timeProvider) {
-		this.timeProvider = timeProvider;
-	}
+    void setSmsObserver(SmsObserver smsObserver) {
+        this.smsObserver = smsObserver;
+    }
+
+    void setContentResolver(ContentResolver contentResolver) {
+        this.contentResolver = contentResolver;
+    }
+
+    void setAlarmManager(AlarmManager alarmManager) {
+        this.alarmManager = alarmManager;
+    }
+
+    void setTimeProvider(TimeProvider timeProvider) {
+        this.timeProvider = timeProvider;
+    }
 }

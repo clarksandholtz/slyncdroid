@@ -7,29 +7,31 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
-
 /**
  * Created by tylerbowers on 2/12/18.
  */
 
-public class SlyncyService extends Service {
+public class SlyncyService extends Service
+{
 
     private static final String TAG = "SlyncyService";
 
     @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(Intent intent)
+    {
         return null;
     }
 
-    public void onDestroy() {
+    public void onDestroy()
+    {
         Toast.makeText(this, "SlyncyService Stopped", Toast.LENGTH_LONG).show();
         Log.d(TAG, "onDestroy");
     }
 
     @Override
-    public void onStart(Intent intent, int startid) {
+    public void onStart(Intent intent, int startid)
+    {
 //        Intent intents = new Intent(getBaseContext(),hello.class);
 //        intents.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //        startActivity(intents);
@@ -39,11 +41,11 @@ public class SlyncyService extends Service {
     }
 
 
-
-    private void initializeSlyncy() {
+    private void initializeSlyncy()
+    {
 //        RecipientIdCache.init(this);
 //        MessageDbUtility.queryAllThreads(this);
-        MessageDbUtility.init(this);
-        MessageDbUtility.getMessagesBulk(this);
+//        MessageDbUtility.init(this);
+//        MessageDbUtility.getMessagesBulk(this);
     }
 }

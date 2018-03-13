@@ -28,6 +28,7 @@ package com.tuenti.smsradar;
  */
 public enum SmsType {
 
+
 	UNKNOWN(-1),
 	RECEIVED(1),
 	SENT(2),;

@@ -4,21 +4,25 @@ import android.content.Context;
 
 import com.get_slyncy.slyncy.Model.DTO.CellMessage;
 import com.get_slyncy.slyncy.Model.Util.Data;
-import com.klinker.android.send_message.Transaction;
 import com.klinker.android.send_message.Settings;
+import com.klinker.android.send_message.Transaction;
 
 
 /**
  * Created by tylerbowers on 1/27/18.
  */
 
-public class MessageSender {
+public class MessageSender
+{
 
-    public static void sendSMSMessage(final CellMessage message, final Context context) {
+    public static void sendSMSMessage(final CellMessage message, final Context context)
+    {
 
-        new Thread(new Runnable() {
+        new Thread(new Runnable()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 Settings sendSettings = new com.klinker.android.send_message.Settings();
                 sendSettings.setMmsc(Data.getInstance().getSettings().getMmsc());
                 sendSettings.setProxy(Data.getInstance().getSettings().getMmsProxy());

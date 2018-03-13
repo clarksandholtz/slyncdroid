@@ -2,14 +2,10 @@ package com.get_slyncy.slyncy.View;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -24,15 +20,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Scanner;
 
 
 /**
@@ -57,6 +47,7 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
     private ImageView logoutIcon;
     private ImageView notifArrow;
     private Switch groupMessageSwitch;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
@@ -147,7 +138,8 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
         }
     }
 
-    public void signOut(View v) {
+    public void signOut(View v)
+    {
         // Firebase sign out
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -164,11 +156,13 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this,gso);
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         mGoogleSignInClient.signOut().addOnCompleteListener(this,
-                new OnCompleteListener<Void>() {
+                new OnCompleteListener<Void>()
+                {
                     @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+                    public void onComplete(@NonNull Task<Void> task)
+                    {
                         Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);

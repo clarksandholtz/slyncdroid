@@ -1,13 +1,11 @@
 package com.get_slyncy.slyncy.View;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -99,21 +97,21 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
         }
         else
         {
-            TelephonyManager tMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            try
-            {
-                String num = tMgr.getLine1Number();
-                if (verifyPhone(num))
-                {
-                    phone = num;
-                    phoneField.setText(num);
-                    phoneField.setBackground(getDrawable(R.drawable.edit_text_text));
-                }
-            }
-            catch (SecurityException e)
-            {
-                Log.e("error", "onCreate: " + e.toString());
-            }
+//            TelephonyManager tMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+//            try
+//            {
+//                String num = tMgr.getLine1Number();
+//                if (verifyPhone(num))
+//                {
+//                    phone = num;
+//                    phoneField.setText(num);
+//                    phoneField.setBackground(getDrawable(R.drawable.edit_text_text));
+//                }
+//            }
+//            catch (SecurityException e)
+//            {
+//                Log.e("error", "onCreate: " + e.toString());
+//            }
         }
         if (email != null && !email.isEmpty())
         {
@@ -224,7 +222,8 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
 
             mVerificationInProgress = false;
 
-            user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(nameField.getText().toString()).build());
+            user.updateProfile(
+                    new UserProfileChangeRequest.Builder().setDisplayName(nameField.getText().toString()).build());
             user.updatePhoneNumber(credential).addOnCompleteListener(new OnCompleteListener<Void>()
             {
                 @Override

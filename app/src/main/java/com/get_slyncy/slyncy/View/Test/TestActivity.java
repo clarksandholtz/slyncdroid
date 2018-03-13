@@ -37,12 +37,12 @@ import com.get_slyncy.slyncy.Presenter.CellMessagesPresenter;
 import com.get_slyncy.slyncy.R;
 import com.get_slyncy.slyncy.View.LogAdapter;
 import com.get_slyncy.slyncy.View.PermissionActivity;
-import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.Utils;
 
 import java.util.ArrayList;
 
-public class TestActivity extends Activity {
+public class TestActivity extends Activity
+{
 
     private static final int RESULT_LOADED_IMAGE = 464;
 
@@ -64,7 +64,8 @@ public class TestActivity extends Activity {
     private boolean mHasImage;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         // Check if permissions are needed
@@ -87,16 +88,19 @@ public class TestActivity extends Activity {
 //        BroadcastUtils.sendExplicitBroadcast(this, new Intent(), "test action");
     }
 
-    private void initMessaging() {
+    private void initMessaging()
+    {
         MessageDbUtility.init(this);
     }
 
-    private void initSettings() {
+    private void initSettings()
+    {
         mHasImage = false;
         mPresenter.initCellSettings();
     }
 
-    private void initViews() {
+    private void initViews()
+    {
         mSetDefaultAppButton = (Button) findViewById(R.id.set_as_default);
 //        mSelectApnsButtons = (Button) findViewById(R.id.apns);
         mFromField = (EditText) findViewById(R.id.from);
@@ -109,13 +113,19 @@ public class TestActivity extends Activity {
         mRemoveImageButton = (Button) findViewById(R.id.button_remove_image);
     }
 
-    private void initActions() {
-        if (Utils.isDefaultSmsApp(this)) {
+    private void initActions()
+    {
+        if (Utils.isDefaultSmsApp(this))
+        {
             mSetDefaultAppButton.setVisibility(View.GONE);
-        } else {
-            mSetDefaultAppButton.setOnClickListener(new View.OnClickListener() {
+        }
+        else
+        {
+            mSetDefaultAppButton.setOnClickListener(new View.OnClickListener()
+            {
                 @Override
-                public void onClick(View v) {
+                public void onClick(View v)
+                {
                     setDefaultSmsApp();
                 }
             });
@@ -124,23 +134,29 @@ public class TestActivity extends Activity {
         mFromField.setText(Utils.getMyPhoneNumber(this));
         mToField.setText(Utils.getMyPhoneNumber(this));
 
-        mSelectImageButton.setOnClickListener(new View.OnClickListener() {
+        mSelectImageButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 selectImageToSend();
             }
         });
 
-        mRemoveImageButton.setOnClickListener(new View.OnClickListener() {
+        mRemoveImageButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 removeImage();
             }
         });
 
-        mSendButton.setOnClickListener(new View.OnClickListener() {
+        mSendButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 sendMessage();
             }
         });
@@ -151,7 +167,8 @@ public class TestActivity extends Activity {
         log.setAdapter(logAdapter);
     }
 
-    private void setDefaultSmsApp() {
+    private void setDefaultSmsApp()
+    {
         mSetDefaultAppButton.setVisibility(View.GONE);
         Intent intent =
                 new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
@@ -161,13 +178,15 @@ public class TestActivity extends Activity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RESULT_LOADED_IMAGE && resultCode == RESULT_OK && null != data) {
+        if (requestCode == RESULT_LOADED_IMAGE && resultCode == RESULT_OK && null != data)
+        {
             Uri selectedImage = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-            Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
             cursor.moveToFirst();
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             mPicturePath = cursor.getString(columnIndex);
@@ -178,27 +197,34 @@ public class TestActivity extends Activity {
         }
     }
 
-    private void selectImageToSend() {
-        Intent i = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+    private void selectImageToSend()
+    {
+        Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(i, RESULT_LOADED_IMAGE);
     }
 
-    private void removeImage() {
+    private void removeImage()
+    {
         mHasImage = false;
         mImageToSend.setImageAlpha(0);
         mPicturePath = null;
     }
 
-    public void sendMessage() {
+    public void sendMessage()
+    {
 
-        CellMessage message = CellMessage.newCellMessage(mMessageField.getText().toString(), mToField.getText().toString());
+        CellMessage message = CellMessage
+                .newCellMessage(mMessageField.getText().toString(), mToField.getText().toString());
         mPresenter.sendMessage(message);
         mMessageField.setText("");
     }
 
-    public void forceMMS(View view) {
-        CellMessage message = CellMessage.newCellMessage(mMessageField.getText().toString(), mToField.getText().toString());
-        if (mHasImage) {
+    public void forceMMS(View view)
+    {
+        CellMessage message = CellMessage
+                .newCellMessage(mMessageField.getText().toString(), mToField.getText().toString());
+        if (mHasImage)
+        {
             message.setImage(BitmapFactory.decodeFile(mPicturePath));
         }
         mPresenter.sendMMS(message);

@@ -3,9 +3,6 @@ package com.get_slyncy.slyncy.Model.Util;
 import android.os.AsyncTask;
 import android.os.Build;
 
-import com.get_slyncy.slyncy.View.ConfirmationActivity;
-import com.get_slyncy.slyncy.View.LoginActivity;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,7 +27,8 @@ public class DownloadImageTask extends AsyncTask<String, Void, Void>
         this.callBack = callBack;
     }
 
-    protected Void doInBackground(String... urls) {
+    protected Void doInBackground(String... urls)
+    {
         String urldisplay = urls[0];
         try
         {
@@ -38,7 +36,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Void>
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             {
-                Files.copy(in,new File(cachePath + "/profilePic.jpg").toPath(),
+                Files.copy(in, new File(cachePath + "/profilePic.jpg").toPath(),
                         StandardCopyOption.REPLACE_EXISTING);
             }
             else
@@ -48,7 +46,8 @@ public class DownloadImageTask extends AsyncTask<String, Void, Void>
 
                 byte[] buffer = new byte[8 * 1024];
                 int bytesRead;
-                while ((bytesRead = in.read(buffer)) != -1) {
+                while ((bytesRead = in.read(buffer)) != -1)
+                {
                     outStream.write(buffer, 0, bytesRead);
                 }
                 in.close();
@@ -67,6 +66,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Void>
     {
         callBack.callBack();
     }
+
     public interface PostExecCallBack
     {
         void callBack();
