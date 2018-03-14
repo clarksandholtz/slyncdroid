@@ -31,4 +31,8 @@ interface SmsStorage
 	int getLastSmsIntercepted();
 
 	boolean isFirstSmsIntercepted();
+
+	void addSms(int smsId);
+
+	boolean isUnread(int smsId);
 }

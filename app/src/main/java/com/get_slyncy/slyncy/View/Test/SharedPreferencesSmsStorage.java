@@ -15,6 +15,8 @@
  */
 package com.get_slyncy.slyncy.View.Test;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
@@ -30,12 +32,13 @@ class SharedPreferencesSmsStorage implements SmsStorage {
 	private static final int DEFAULT_SMS_PARSED_VALUE = -1;
 
 	private SharedPreferences preferences;
+	private NewMsgDatabaseManager dbManager;
 
-	SharedPreferencesSmsStorage(SharedPreferences preferences) {
+	SharedPreferencesSmsStorage(SharedPreferences preferences, Context context) {
 		if (preferences == null) {
 			throw new IllegalArgumentException("SharedPreferences param can't be null");
 		}
-
+		dbManager = NewMsgDatabaseManager.getInstance(context);
 		this.preferences = preferences;
 	}
 
@@ -54,5 +57,17 @@ class SharedPreferencesSmsStorage implements SmsStorage {
 	@Override
 	public boolean isFirstSmsIntercepted() {
 		return getLastSmsIntercepted() == DEFAULT_SMS_PARSED_VALUE;
+	}
+
+	@Override
+	public void addSms(int smsId)
+	{
+		dbManager.getDb().NewMesNewMsgsDao().addSms(new NewSms(smsId, smsId));
+	}
+
+	@Override
+	public boolean isUnread(int smsId)
+	{
+		return !dbManager.getDb().NewMesNewMsgsDao().getSms().contains(smsId);
 	}
 }

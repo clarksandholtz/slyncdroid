@@ -14,6 +14,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.util.Log;
 import android.util.Patterns;
@@ -97,13 +98,13 @@ public class SmsMmsRadar extends Service
         if (smsStorage == null)
         {
             SharedPreferences preferences = getSharedPreferences("sms_preferences", MODE_PRIVATE);
-            smsStorage = new SharedPreferencesSmsStorage(preferences);
+            smsStorage = new SharedPreferencesSmsStorage(preferences, getApplicationContext());
 
         }
         if (mmsStorage == null)
         {
             SharedPreferences preferences = getSharedPreferences("mms_preferences", MODE_PRIVATE);
-            mmsStorage = new SharedPreferencesMmsStorage(preferences);
+            mmsStorage = new SharedPreferencesMmsStorage(preferences, getApplicationContext());
         }
 
         return START_STICKY;
@@ -180,21 +181,18 @@ public class SmsMmsRadar extends Service
 
                 if (type == 1)
                 {
-                    if (inComingMms.contains(msgId))
+                    if (inComingMms.contains(msgId) && mmsStorage.isUnread(Integer.valueOf(Integer.valueOf(msgId))))
                     {
-                        if (read == 1 && !markedMms.contains(msgId))
+                        if (read == 1 && mmsStorage.isUnread(Integer.valueOf(msgId)))
                         {
-                            markedMms.add(msgId);
-                            if (markedMms.size() > 10)
-                            {
-                                markedMms.remove();
-                            }
+                            mmsStorage.addNewMessage(Integer.valueOf(msgId));
                         }
                         //markAsRead
                     }
                     else if (shouldParseMms(Integer.valueOf(msgId), msgDate))
                     {
                         //it's received MMS
+                        mmsStorage.updateLastMmsIntercepted(Integer.valueOf(msgId));
                         inComingMms.add(msgId);
                         if (inComingMms.size() > 10)
                         {
@@ -237,9 +235,9 @@ public class SmsMmsRadar extends Service
                     //it's received SMS
                     if (inComingSms.contains(msgId))
                     {
-                        if (read == 1 && !markedSms.contains(msgId))
+                        if (read == 1 && smsStorage.isUnread(Integer.valueOf(msgId)))
                         {
-                            markedSms.add(msgId);
+                            smsStorage.addSms(Integer.valueOf(msgId));
                             if (markedSms.size() > 10)
                             {
                                 markedSms.remove();

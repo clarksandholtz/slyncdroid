@@ -24,9 +24,15 @@ package com.get_slyncy.slyncy.View.Test;
 interface MmsStorage
 {
 
-	void updateLastMmsIntercepted(int mmsId);
+    void updateLastMmsIntercepted(int mmsId);
 
-	int getLastMmsIntercepted();
+    int getLastMmsIntercepted();
 
-	boolean isFirstMmsIntercepted();
+    boolean isFirstMmsIntercepted();
+
+    void addNewMessage(int mmsId);
+
+    boolean isUnread(int mmsId);
+
+    void removeMessage(int mmsId);
 }
