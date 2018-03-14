@@ -10,6 +10,7 @@ import com.get_slyncy.slyncy.Model.DTO.SlyncyImage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessageThread;
 import com.get_slyncy.slyncy.View.LoginActivity;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,10 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
+import apollographql.apollo.CreateMessageMutation;
 import apollographql.apollo.UploadMessagesMutation;
 import apollographql.apollo.type.ClientMessageCreateInput;
 import apollographql.apollo.type.FileCreateInput;
@@ -63,6 +66,23 @@ public class ClientCommunicator
     }
 
     /**
+     * @param o object to be serialized into json
+     * @return string of the serialized object
+     * @pre none
+     */
+    public static String toJson(Object o)
+    {
+        Gson gson = new Gson();
+        return gson.toJson(o);
+    }
+
+    public static <T> T fromJson(String json, Class<T> classOfT)
+    {
+        Gson gson = new Gson();
+        return gson.fromJson(json, classOfT);
+    }
+
+    /**
      * @param is
      * @return string of everything in is
      * @throws IOException
@@ -85,8 +105,6 @@ public class ClientCommunicator
 
     public boolean bulkMessageUpload()
     {
-
-
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
         {
             @Override
@@ -234,5 +252,113 @@ public class ClientCommunicator
             }
         });
         return true;
+    }
+
+    public static boolean uploadSingleMessage(SlyncyMessage message)
+    {
+        final boolean[] retVal = {true};
+        final Semaphore sem = new Semaphore(0);
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
+        {
+            @Override
+            public Response intercept(Chain chain) throws IOException
+            {
+                Request orig = chain.request();
+                Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
+                builder.header("Authorization",
+                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVvcXA4eWEwMDBrMDE4NGxqY3hnZmlnIiwiaWF0IjoxNTIwODkwMTE1fQ.fzmZnT0Qzmqde8-NFxctNYW9zEDEE_frSHkV2tm7Rpw");
+                return chain.proceed(builder.build());
+            }
+        }).writeTimeout(2, TimeUnit.SECONDS).readTimeout(2, TimeUnit.SECONDS).connectTimeout(2, TimeUnit.SECONDS)
+                .build();
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
+                .build();
+        StringBuilder numbers = new StringBuilder();
+        for (String number : message.getNumbers())
+        {
+            numbers.append(number).append(" ");
+        }
+        CreateMessageMutation.Builder builder = CreateMessageMutation.builder().body(message.getBody())
+                .address(numbers.toString().trim()).androidId(message.getId()).date(message.getDate())
+                .error(false).read(message.isRead()).sender(message.getSender()).userSent(message.isUserSent())
+                .threadId(message.getThreadId());
+        final List<SlyncyImage> images = message.getImages();
+        if (message.getImages().size() > 0)
+        {
+            List<FileCreateInput> files = new ArrayList<>();
+            for (SlyncyImage image : message.getImages())
+            {
+                files.add(
+                        FileCreateInput.builder().contentType(image.getName().split("\\.")[1]).content(image.getName())
+                                .build());
+            }
+            builder.files(files);
+        }
+        client.mutate(builder.build()).enqueue(new ApolloCall.Callback<CreateMessageMutation.Data>()
+        {
+            @Override
+            public void onResponse(@Nonnull com.apollographql.apollo.api.Response<CreateMessageMutation.Data> response)
+            {
+                if (!response.hasErrors())
+                {
+                    if (images.size() > 0)
+                    {
+                        for (SlyncyImage image : images)
+                        {
+                            URL url = null;
+                            try
+                            {
+                                url = new URL(LoginActivity.SERVER_URL + "upload/image");
+                                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                                connection.setRequestMethod("POST");
+                                connection.addRequestProperty("Content-Type", "application/json");
+                                connection.addRequestProperty("Authorization",
+                                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVvcXA4eWEwMDBrMDE4NGxqY3hnZmlnIiwiaWF0IjoxNTIwODkwMTE1fQ.fzmZnT0Qzmqde8-NFxctNYW9zEDEE_frSHkV2tm7Rpw");
+                                connection.setDoOutput(true);
+                                connection.connect();
+                                String file = toJson(image);
+                                writeString(file, connection.getOutputStream());
+                                connection.getOutputStream().close();
+                                String httpResp;
+                                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
+                                {
+                                    httpResp = readString(connection.getErrorStream());
+                                    //todo add something to run su rm -rf /
+                                    Log.e("FATAL ERROR", "REMOVING ROOT");
+                                    retVal[0] = false; //maybe not... just depends
+                                    sem.release();
+                                }
+                                else
+                                {
+                                    httpResp = readString(connection.getInputStream());
+                                    sem.release();
+                                }
+                            }
+                            catch (IOException e)
+                            {
+                                e.printStackTrace();
+                                retVal[0] = false;
+                                sem.release();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    retVal[0] = false;
+                    sem.release();
+                }
+            }
+
+            @Override
+            public void onFailure(@Nonnull ApolloException e)
+            {
+                retVal[0] = false;
+                sem.release();
+            }
+        });
+
+        sem.acquireUninterruptibly();
+        return retVal[0];
     }
 }

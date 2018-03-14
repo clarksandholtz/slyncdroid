@@ -174,7 +174,7 @@ public class MessageDbUtility
             return null;
         }
         Cursor cursor = resolver.query(Uri.parse("content://mms/part/" + id), null, null, null, null);
-        cursor.moveToFirst(); //todo breaks here
+        cursor.moveToFirst();
         String fullName = cursor.getString(cursor.getColumnIndex("name"));
         String type;
         if (fullName == null)
@@ -421,28 +421,33 @@ public class MessageDbUtility
 
                 if (makeMessage)
                 {
-                    SlyncyMessage message = new SlyncyMessage();
-                    message.setId(c.getString(c.getColumnIndex(MSG_ID)));
+                    SlyncyMessage message = getSmsMessage(c);
                     message.setThreadId(threadId);
-                    message.setDate(c.getLong(c.getColumnIndex(DATE)));
-                    message.setBody(c.getString(c.getColumnIndex(BODY)));
-                    int readStatus = c.getInt(c.getColumnIndex("read"));
-                    if (readStatus == 1) message.setRead(true);
-                    else message.setRead(false);
-                    ArrayList<String> numbers = new ArrayList<>();
-                    String number = c.getString(c.getColumnIndex(ADDRESS));
-                    numbers.add(number);
-                    message.setNumbers(numbers);
-                    int type = c.getInt(c.getColumnIndex(TYPE));
-                    if (type == 2) message.setSender(Data.getInstance().getSettings().getmMyPhoneNumber());
-                    if (type == 1) message.setSender(number);
                     mThreadList.get(threadId).addMessage(message);
-                    mThreadList.get(threadId).setNumbers(numbers);
+                    mThreadList.get(threadId).setNumbers(message.getNumbers());
                 }
 
             } while (c.moveToNext());
         }
         c.close();
+    }
+
+    public static SlyncyMessage getSmsMessage(Cursor c)
+    {
+        SlyncyMessage message = new SlyncyMessage();
+        message.setId(c.getString(c.getColumnIndex(MSG_ID)));
+        message.setDate(c.getLong(c.getColumnIndex(DATE)));
+        message.setBody(c.getString(c.getColumnIndex(BODY)));
+        int readStatus = c.getInt(c.getColumnIndex("read"));
+        message.setRead(readStatus == 1);
+        ArrayList<String> numbers = new ArrayList<>();
+        String number = c.getString(c.getColumnIndex(ADDRESS));
+        numbers.add(number);
+        message.setNumbers(numbers);
+        int type = c.getInt(c.getColumnIndex(TYPE));
+        if (type == 2) message.setSender(Data.getInstance().getSettings().getmMyPhoneNumber());
+        if (type == 1) message.setSender(number);
+        return message;
     }
 
     private void getContacts()

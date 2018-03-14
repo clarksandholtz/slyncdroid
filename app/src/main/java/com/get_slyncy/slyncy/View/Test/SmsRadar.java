@@ -11,6 +11,7 @@ import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.R;
 import com.get_slyncy.slyncy.View.LoginActivity;
 import com.tuenti.smsradar.Sms;
+import com.tuenti.smsradar.SmsListener;
 
 import java.io.IOException;
 
