@@ -8,6 +8,7 @@ package com.get_slyncy.slyncy.View.Test;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -111,6 +112,10 @@ public class SmsMmsRadar extends Service
         {
             builder = new Notification.Builder(this);
         }
+        Intent notifIntent = new Intent(this, PersistentNotifActivity.class);
+        notifIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(pendingIntent);
         Icon icon = Icon.createWithResource(this, R.drawable.ic_stat_name);
         icon.setTint(getColor(R.color.colorPrimary));
         startForeground(getPackageName().hashCode(), builder.setSmallIcon(icon).setColor(getColor(R.color.colorPrimary)).setContentText("Slyncy ForegroundService").setContentTitle("SLYNCY FOREGROUND SERVICE").build());

@@ -6,7 +6,7 @@ import android.arch.persistence.room.RoomDatabase;
 /**
  * Created by undermark5 on 3/14/18.
  */
-@Database(entities = {NewSms.class, NewMms.class}, version = 1)
+@Database(entities = {NewSms.class, NewMms.class}, version = 1, exportSchema = false)
 public abstract class NewMsgDatabase extends RoomDatabase
 {
     public abstract NewMsgsDao NewMesNewMsgsDao();

@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
+
 /**
  * Created by tylerbowers on 2/12/18.
  */

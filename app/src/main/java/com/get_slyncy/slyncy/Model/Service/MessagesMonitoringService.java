@@ -152,21 +152,21 @@ public class MessagesMonitoringService extends Service
         }
     }
 
-    /**
-     * Start the service to process that will run the content observerMsg
-     */
-    public static void beginStartingService(Context context) {
-        if (BuildConfig.DEBUG) Log.v(TAG, "beginStartingService()");
-        context.startService(new Intent(context, MessagesMonitoringService.class));
-    }
-
-    /**
-     * Called back by the service when it has finished processing notifications,
-     * releasing the wake lock if the service is now stopping.
-     */
-    public static void finishStartingService(Service service) {
-        if (BuildConfig.DEBUG) Log.v(TAG, "SmsMonitorService: finishStartingService()");
-        service.stopSelf();
-    }
+//    /**
+//     * Start the service to process that will run the content observerMsg
+//     */
+//    public static void beginStartingService(Context context) {
+//        if (BuildConfig.DEBUG) Log.v(TAG, "beginStartingService()");
+//        context.startService(new Intent(context, MessagesMonitoringService.class));
+//    }
+//
+//    /**
+//     * Called back by the service when it has finished processing notifications,
+//     * releasing the wake lock if the service is now stopping.
+//     */
+//    public static void finishStartingService(Service service) {
+//        if (BuildConfig.DEBUG) Log.v(TAG, "SmsMonitorService: finishStartingService()");
+//        service.stopSelf();
+//    }
 
 }

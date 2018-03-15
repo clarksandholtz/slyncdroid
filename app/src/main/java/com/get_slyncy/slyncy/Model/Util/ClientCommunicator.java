@@ -26,13 +26,13 @@ import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-<<<<<<<
+
 import javax.annotation.Nonnull;
 
 import apollographql.apollo.CreateMessageMutation;
-=======
+
 import apollographql.apollo.MarkThreadAsReadMutation;
->>>>>>>
+
 import apollographql.apollo.UploadMessagesMutation;
 import apollographql.apollo.type.ClientMessageCreateInput;
 import apollographql.apollo.type.FileCreateInput;
@@ -107,7 +107,7 @@ public class ClientCommunicator
         return stringBuilder.toString();
     }
 
-    public boolean bulkMessageUpload()
+    public static boolean bulkMessageUpload()
     {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
         {
