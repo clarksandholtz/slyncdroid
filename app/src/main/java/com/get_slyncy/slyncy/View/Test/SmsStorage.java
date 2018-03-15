@@ -23,16 +23,19 @@ package com.get_slyncy.slyncy.View.Test;
  */
 interface SmsStorage
 {
-
-
-
 	void updateLastSmsIntercepted(int smsId);
 
 	int getLastSmsIntercepted();
 
 	boolean isFirstSmsIntercepted();
 
-	void addSms(int smsId);
+	void addNewMessage(int smsId, boolean isRead);
 
 	boolean isUnread(int smsId);
+
+	void removeMessage(int smsId);
+
+	void markRead(int smsId);
+
+    boolean isAdded(int smsId);
 }

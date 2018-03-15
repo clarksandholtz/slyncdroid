@@ -16,11 +16,17 @@ import java.util.Set;
 @Dao
 public interface NewMsgsDao
 {
-    @Query("select * from NewMms")
-    Set<Integer> getMms();
+    @Query("select * from NewMms where read = 0")
+    List<NewMms> getUnreadMms();
 
-    @Query("select * from NewSms")
-    Set<Integer> getSms();
+    @Query("select * from NewSms where read = 0")
+    List<NewSms> getUnreadSms();
+
+    @Query("select * from NewSms where read = 1")
+    List<NewSms> getReadSms();
+
+    @Query("select * from NewMms where read = 1")
+    List<NewMms> getReadMms();
 
     @Insert
     void addMms(NewMms mms);
@@ -30,4 +36,14 @@ public interface NewMsgsDao
 
     @Delete
     void removeMms(NewMms mms);
+
+    @Update
+    void markSmsRead(NewSms newSms);
+
+    @Update
+    void markMmsRead(NewMms newMms);
+
+    @Delete
+    void removeSms(NewSms newSms);
+
 }

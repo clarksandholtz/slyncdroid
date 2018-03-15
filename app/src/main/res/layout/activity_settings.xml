@@ -259,7 +259,7 @@
                 android:layout_width="30dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                app:srcCompat="@drawable/ic_logout_black_24dp"/>
+                app:srcCompat="@drawable/ic_launcher_foreground"/>
 
             <TextView
                 android:id="@+id/logout_entry"

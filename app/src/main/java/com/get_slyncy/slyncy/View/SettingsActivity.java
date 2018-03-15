@@ -82,7 +82,7 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
         syncIcon.setImageDrawable(getDrawable(R.drawable.ic_sync_black_24dp));
         groupIcon.setImageDrawable(getDrawable(R.drawable.ic_group_black_24dp));
         notifIcon.setImageDrawable(getDrawable(R.drawable.ic_notifications_black_24dp));
-        logoutIcon.setImageDrawable(getDrawable(R.drawable.ic_logout_black_24dp));
+        logoutIcon.setImageDrawable(getDrawable(R.drawable.ic_launcher_foreground));
         notifArrow.setImageDrawable(getDrawable(R.drawable.ic_navigate_next_black_24dp));
 
         syncIcon.setColorFilter(getColor(R.color.colorFontDark));

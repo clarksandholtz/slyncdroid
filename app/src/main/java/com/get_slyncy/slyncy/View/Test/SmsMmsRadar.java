@@ -5,42 +5,42 @@ package com.get_slyncy.slyncy.View.Test;
  */
 
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.util.Log;
-import android.util.Patterns;
 import android.widget.Toast;
 
+import com.get_slyncy.slyncy.*;
 import com.get_slyncy.slyncy.BuildConfig;
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
-import com.tuenti.smsradar.*;
 
-import java.util.ArrayDeque;
 import java.util.Date;
-import java.util.Queue;
 
 public class SmsMmsRadar extends Service
 {
 
     String substr;
     int k;
-    private static Queue<String> inComingMms;
-    private static Queue<String> outGoingMms;
-    private static Queue<String> inComingSms;
-    private static Queue<String> outGoingSms;
-    private static Queue<String> markedMms;
-    private static Queue<String> markedSms;
     private static boolean observerRegistered = false;
     private ContentResolver contentResolver;
     private SMSObserver smsObserver;
@@ -65,18 +65,6 @@ public class SmsMmsRadar extends Service
     {
         observerRegistered = true;
         contentResolver = getContentResolver();
-        if (inComingMms == null)
-            inComingMms = new ArrayDeque<>();
-        if (outGoingMms == null)
-            outGoingMms = new ArrayDeque<>();
-        if (inComingSms == null)
-            inComingSms = new ArrayDeque<>();
-        if (outGoingSms == null)
-            outGoingSms = new ArrayDeque<>();
-        if (markedSms == null)
-            markedSms = new ArrayDeque<>();
-        if (markedMms == null)
-            markedMms = new ArrayDeque<>();
         smsObserver = new SMSObserver(new Handler());
         contentResolver.registerContentObserver(Uri.parse("content://mms-sms/conversations/"),
                 true, smsObserver);
@@ -106,7 +94,26 @@ public class SmsMmsRadar extends Service
             SharedPreferences preferences = getSharedPreferences("mms_preferences", MODE_PRIVATE);
             mmsStorage = new SharedPreferencesMmsStorage(preferences, getApplicationContext());
         }
+        Notification.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            NotificationChannel channel = new NotificationChannel(getPackageName()+ "_persistent", "Persistent", NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(false);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            if(notificationManager != null && !notificationManager.getNotificationChannels().contains(channel))
+            {
+                notificationManager.createNotificationChannel(channel);
+            }
+            builder = new Notification.Builder(this, getPackageName() + "_persistent");
 
+        }
+        else
+        {
+            builder = new Notification.Builder(this);
+        }
+        Icon icon = Icon.createWithResource(this, R.drawable.ic_stat_name);
+        icon.setTint(getColor(R.color.colorPrimary));
+        startForeground(getPackageName().hashCode(), builder.setSmallIcon(icon).setColor(getColor(R.color.colorPrimary)).setContentText("Slyncy ForegroundService").setContentTitle("SLYNCY FOREGROUND SERVICE").build());
         return START_STICKY;
     }
 
@@ -164,9 +171,9 @@ public class SmsMmsRadar extends Service
 
             String msgContentType = mainCursor.getString(mainCursor.
                     getColumnIndex("ct_t"));
-            String msgId = mainCursor.getString(mainCursor.getColumnIndex("_id"));
+            final String msgId = mainCursor.getString(mainCursor.getColumnIndex("_id"));
             String msgDate = mainCursor.getString(mainCursor.getColumnIndex("date"));
-            int read = mainCursor.getInt(mainCursor.getColumnIndex("read"));
+//            int read = mainCursor.getInt(mainCursor.getColumnIndex("read"));
             if (msgContentType != null)
             {
                 // it's MMS
@@ -181,41 +188,48 @@ public class SmsMmsRadar extends Service
 
                 if (type == 1)
                 {
-                    if (inComingMms.contains(msgId) && mmsStorage.isUnread(Integer.valueOf(Integer.valueOf(msgId))))
+                    Cursor readCursor = contentResolver.query(Uri.parse("content://mms"), new String[]{"*"}, "read = 1", null, "date desc");
+                    readCursor.moveToFirst();
+                    final int read = readCursor.getInt(readCursor.getColumnIndex("read"));
+                    final int readId = readCursor.getInt(readCursor.getColumnIndex("_id"));
+                    readCursor.close();
+                    new Thread(new Runnable()
                     {
-                        if (read == 1 && mmsStorage.isUnread(Integer.valueOf(msgId)))
+                        @Override
+                        public void run()
                         {
-                            mmsStorage.addNewMessage(Integer.valueOf(msgId));
+                            if (read == 1 && mmsStorage.isUnread(Integer.valueOf(msgId)))
+                            {
+                                mmsStorage.markRead(readId);
+                                Log.v("MMS LISTENER", readId + " marked as read");
+                            }
                         }
-                        //markAsRead
-                    }
-                    else if (shouldParseMms(Integer.valueOf(msgId), msgDate))
+                    }).start();
+                    if (shouldParseMms(Integer.valueOf(msgId), msgDate) && readId != Integer.valueOf(msgId))
                     {
                         //it's received MMS
+                        mmsStorage.addNewMessage(Integer.valueOf(msgId), false);
                         mmsStorage.updateLastMmsIntercepted(Integer.valueOf(msgId));
-                        inComingMms.add(msgId);
-                        if (inComingMms.size() > 10)
-                        {
-                            inComingMms.remove();
-                        }
                         Log.v("Debug", "it's received MMS");
                         getReceivedMMSinfo();
                     }
                 }
                 else if (type == 2)
                 {
-                    if (!outGoingMms.contains(msgId))
+                    new Thread(new Runnable()
                     {
-                        //it's sent MMS
-                        outGoingMms.add(msgId);
-
-                        if (outGoingMms.size() > 10)
+                        @Override
+                        public void run()
                         {
-                            outGoingMms.remove();
+                            if (!mmsStorage.isAdded(Integer.valueOf(msgId)))
+                            {
+                                //it's sent MMS
+                                mmsStorage.addNewMessage(Integer.valueOf(msgId), true);
+                                Log.v("Debug", "it's Sent MMS");
+                                getSentMMSinfo();
+                            }
                         }
-                        Log.v("Debug", "it's Sent MMS");
-                        getSentMMSinfo();
-                    }
+                    }).start();
                 }
             }
             else
@@ -233,25 +247,27 @@ public class SmsMmsRadar extends Service
                 if (type == 1)
                 {
                     //it's received SMS
-                    if (inComingSms.contains(msgId))
+                    Cursor readCursor = contentResolver.query(Uri.parse("content://sms"), new String[]{"*"}, "read = 1", null, "date desc");
+                    readCursor.moveToFirst();
+                    final int read = readCursor.getInt(readCursor.getColumnIndex("read"));
+                    final int readId = readCursor.getInt(readCursor.getColumnIndex("_id"));
+                    readCursor.close();
+                    new Thread(new Runnable()
                     {
-                        if (read == 1 && smsStorage.isUnread(Integer.valueOf(msgId)))
+                        @Override
+                        public void run()
                         {
-                            smsStorage.addSms(Integer.valueOf(msgId));
-                            if (markedSms.size() > 10)
+                            if (read == 1 && smsStorage.isUnread(readId))
                             {
-                                markedSms.remove();
+                                smsStorage.markRead(readId);
+                                Log.v("SMS LISTENER", readId + " marked as read");
                             }
                         }
-                    }
-                    else if (shouldParseSms(Integer.valueOf(msgId), msgDate))
+                    }).start();
+                    if (shouldParseSms(Integer.valueOf(msgId), msgDate) && readId != Integer.valueOf(msgId))
                     {
-                        updateLastSmsParsed(Integer.valueOf(msgId));
-                        inComingSms.add(msgId);
-                        if (inComingSms.size() > 10)
-                        {
-                            inComingSms.remove();
-                        }
+                        smsStorage.updateLastSmsIntercepted(Integer.valueOf(msgId));
+                        smsStorage.addNewMessage(Integer.valueOf(msgId), false);
                         Log.v("Debug", "it's received SMS");
                         getReceivedSMSinfo();
                     }
@@ -259,16 +275,19 @@ public class SmsMmsRadar extends Service
                 else if (type == 2)
                 {
                     //it's sent SMS
-                    if (!outGoingSms.contains(msgId))
+                    new Thread(new Runnable()
                     {
-                        outGoingSms.add(msgId);
-                        if (outGoingSms.size() > 10)
+                        @Override
+                        public void run()
                         {
-                            outGoingSms.remove();
+                            if (!smsStorage.isAdded(Integer.valueOf(msgId)))
+                            {
+                                smsStorage.addNewMessage(Integer.valueOf(msgId), true);
+                                Log.v("Debug", "it's sent SMS");
+                                getSentSMSinfo();
+                            }
                         }
-                        Log.v("Debug", "it's sent SMS");
-                        getSentSMSinfo();
-                    }
+                    }).start();
                 }
             }//message content type block closed
 
@@ -296,10 +315,6 @@ public class SmsMmsRadar extends Service
 
             int lastMmsIdIntercepted = mmsStorage.getLastMmsIntercepted();
             return mmsId > lastMmsIdIntercepted;
-        }
-
-        private void updateLastSmsParsed(int smsId) {
-            smsStorage.updateLastSmsIntercepted(smsId);
         }
 
         private boolean shouldParseSms(int smsId, String smsDate)
@@ -493,7 +508,7 @@ public class SmsMmsRadar extends Service
 
             if (!ClientCommunicator.uploadSingleMessage(message))
             {
-                outGoingMms.remove(mms_id); //failed to upload so should try again. eventually replaced by job
+                //failed to upload so should try again. eventually replaced by job
                 //schedule job to upload later.
             }
             else

@@ -60,14 +60,52 @@ class SharedPreferencesSmsStorage implements SmsStorage {
 	}
 
 	@Override
-	public void addSms(int smsId)
+	public void addNewMessage(final int smsId, final boolean isRead)
 	{
-		dbManager.getDb().NewMesNewMsgsDao().addSms(new NewSms(smsId, smsId));
+	    new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+	        	dbManager.getDb().NewMesNewMsgsDao().addSms(new NewSms(smsId, smsId, isRead ? 1 : 0));
+            }
+        }).start();
 	}
 
 	@Override
 	public boolean isUnread(int smsId)
 	{
-		return !dbManager.getDb().NewMesNewMsgsDao().getSms().contains(smsId);
+		return dbManager.getDb().NewMesNewMsgsDao().getUnreadSms().contains(new NewSms(smsId, smsId));
 	}
+
+    @Override
+    public void removeMessage(final int smsId)
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                dbManager.getDb().NewMesNewMsgsDao().removeSms(new NewSms(smsId, smsId,1));
+            }
+        }).start();
+    }
+
+    public void markRead(final int smsId)
+	{
+	    new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                dbManager.getDb().NewMesNewMsgsDao().markSmsRead(new NewSms(smsId, smsId, 1));
+            }
+        }).start();
+	}
+
+    @Override
+    public boolean isAdded(int smsId)
+    {
+        return dbManager.getDb().NewMesNewMsgsDao().getUnreadSms().contains(new NewSms(smsId, smsId, 0)) || dbManager.getDb().NewMesNewMsgsDao().getReadSms().contains(new NewSms(smsId, smsId, 1));
+    }
 }

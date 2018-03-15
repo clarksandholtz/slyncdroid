@@ -19,8 +19,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+import java.util.Random;
+
 /**
- * SmsStorage implementation based on shared preferences.
+ * mmsStorage implementation based on shared preferences.
  *
  * @author Pedro Vicente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
@@ -43,9 +45,9 @@ class SharedPreferencesMmsStorage implements MmsStorage {
 	}
 
 	@Override
-	public void updateLastMmsIntercepted(int smsId) {
+	public void updateLastMmsIntercepted(int mmsId) {
 		Editor editor = preferences.edit();
-		editor.putInt(LAST_MMS_PARSED, smsId);
+		editor.putInt(LAST_MMS_PARSED, mmsId);
 		editor.commit();
 	}
 
@@ -60,20 +62,32 @@ class SharedPreferencesMmsStorage implements MmsStorage {
 	}
 
 	@Override
-	public void addNewMessage(int mmsId)
+	public void addNewMessage(int mmsId, boolean isRead)
 	{
-		dbManager.getDb().NewMesNewMsgsDao().addMms(new NewMms(mmsId,mmsId));
+		dbManager.getDb().NewMesNewMsgsDao().addMms(new NewMms(mmsId, mmsId, isRead ? 1 : 0));
 	}
 
 	@Override
 	public boolean isUnread(int mmsId)
 	{
-		return dbManager.getDb().NewMesNewMsgsDao().getMms().contains(mmsId);
+		return dbManager.getDb().NewMesNewMsgsDao().getUnreadMms().contains(new NewMms(mmsId,mmsId));
 	}
 
     @Override
     public void removeMessage(int mmsId)
     {
         dbManager.getDb().NewMesNewMsgsDao().removeMms(new NewMms(mmsId,mmsId));
+    }
+
+    @Override
+    public void markRead(int mmsId)
+    {
+        dbManager.getDb().NewMesNewMsgsDao().markMmsRead(new NewMms(mmsId, mmsId, 1));
+    }
+
+    @Override
+    public boolean isAdded(int mmsId)
+    {
+        return dbManager.getDb().NewMesNewMsgsDao().getUnreadMms().contains(new NewMms(mmsId, mmsId, 0)) || dbManager.getDb().NewMesNewMsgsDao().getReadMms().contains(new NewMms(mmsId, mmsId, 1));
     }
 }
