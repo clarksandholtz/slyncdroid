@@ -24,3 +24,9 @@ mutation UploadMessages($messages: [ClientMessageCreateInput!]){
   }
 }
 
+mutation MarkThreadAsRead($threadId: Int!) {
+  markThreadAsRead(threadId: $threadId) {
+    count
+  }
+}
+
