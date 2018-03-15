@@ -37,12 +37,21 @@ public class SlyncyService extends Service
 //        Intent intents = new Intent(getBaseContext(),hello.class);
 //        intents.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //        startActivity(intents);
-        initializeSlyncy();
-        Toast.makeText(this, "SlyncyService Started", Toast.LENGTH_LONG).show();
-        Log.d(TAG, "onStart");
+//        initializeSlyncy();
+//        Toast.makeText(this, "SlyncyService Started", Toast.LENGTH_LONG).show();
+//        Log.d(TAG, "onStart");
     }
 
-
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId)
+    {
+        super.onStartCommand(intent, flags, startId);
+        if (intent != null)
+            initializeSlyncy();
+        Toast.makeText(this, "SlyncyService Started", Toast.LENGTH_LONG).show();
+        Log.d(TAG, "onStart");
+        return START_STICKY;
+    }
 
     private void initializeSlyncy() {
         Intent messagesMonitoringService = new Intent(this, MessagesMonitoringService.class);

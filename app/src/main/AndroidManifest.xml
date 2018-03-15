@@ -85,7 +85,7 @@
                 <content android:mimeType="application/vnd.wap.mms-message"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".Model.Service.Autostart">
+        <receiver android:name=".Model.Service.AutoStart">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>

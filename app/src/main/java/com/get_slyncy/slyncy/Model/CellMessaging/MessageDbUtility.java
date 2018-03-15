@@ -50,6 +50,7 @@ public class MessageDbUtility
     private static MessageDbUtility instance;
     private static boolean isGettingMessages;
     private Context mContext;
+//    private static ContentResolver mResolver;
     private Map<Integer, SlyncyMessageThread> mThreadList;
 
     private MessageDbUtility()
@@ -62,7 +63,7 @@ public class MessageDbUtility
         instance = getInstance();
 
         instance.mContext = context;
-
+//        mResolver = context.getContentResolver();
         new Thread(new Runnable()
         {
             public void run()
@@ -78,7 +79,7 @@ public class MessageDbUtility
         instance = getInstance();
 
         instance.mContext = context;
-
+//        mResolver = context.getContentResolver();
         new Thread(new Runnable()
         {
             public void run()
@@ -346,8 +347,8 @@ public class MessageDbUtility
 
                     makeMessage = true;
                 }
-                else if (mThreadList.get(threadId) != null && mThreadList.get(threadId)
-                                                                      .getMessageCount() < MAX_MESSAGES_PER_THREAD + ADDTL_MMS_THREADS)
+                else if (mThreadList.get(threadId) != null
+                         && mThreadList.get(threadId).getMessageCount() < MAX_MESSAGES_PER_THREAD + ADDTL_MMS_THREADS)
                 {
                     makeMessage = true;
                 }
@@ -413,8 +414,8 @@ public class MessageDbUtility
 
                     makeMessage = true;
                 }
-                else if (mThreadList.get(threadId) != null && mThreadList.get(threadId)
-                                                                      .getMessageCount() < MAX_MESSAGES_PER_THREAD)
+                else if (mThreadList.get(threadId) != null
+                         && mThreadList.get(threadId).getMessageCount() < MAX_MESSAGES_PER_THREAD)
                 {
                     makeMessage = true;
                 }

@@ -15,11 +15,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
@@ -29,19 +24,19 @@ import android.provider.Telephony;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.get_slyncy.slyncy.*;
 import com.get_slyncy.slyncy.BuildConfig;
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
+import com.get_slyncy.slyncy.R;
 
 import java.util.Date;
 
 public class SmsMmsRadar extends Service
 {
 
-    String substr;
-    int k;
+//    String substr;
+//    int k;
     private static boolean observerRegistered = false;
     private ContentResolver contentResolver;
     private SMSObserver smsObserver;
@@ -76,6 +71,8 @@ public class SmsMmsRadar extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
+        super.onStartCommand(intent, flags, startId);
+//        android.os.Debug.waitForDebugger();
         Log.v("Debug", "Service has been started..");
         Toast.makeText(getApplicationContext(),
                 "Service has been started.. ",
@@ -98,10 +95,11 @@ public class SmsMmsRadar extends Service
         Notification.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
-            NotificationChannel channel = new NotificationChannel(getPackageName()+ "_persistent", "Persistent", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(getPackageName() + "_persistent", "Persistent",
+                    NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(false);
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if(notificationManager != null && !notificationManager.getNotificationChannels().contains(channel))
+            if (notificationManager != null && !notificationManager.getNotificationChannels().contains(channel))
             {
                 notificationManager.createNotificationChannel(channel);
             }
@@ -114,11 +112,13 @@ public class SmsMmsRadar extends Service
         }
         Intent notifIntent = new Intent(this, PersistentNotifActivity.class);
         notifIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent
+                .getActivity(this, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
         Icon icon = Icon.createWithResource(this, R.drawable.ic_stat_name);
         icon.setTint(getColor(R.color.colorPrimary));
-        startForeground(getPackageName().hashCode(), builder.setSmallIcon(icon).setColor(getColor(R.color.colorPrimary)).setContentText("Slyncy ForegroundService").setContentTitle("SLYNCY FOREGROUND SERVICE").build());
+        startForeground(getPackageName().hashCode(), builder.setSmallIcon(icon).setColor(getColor(R.color.colorPrimary))
+                .setContentText("Slyncy ForegroundService").setContentTitle("SLYNCY FOREGROUND SERVICE").build());
         return START_STICKY;
     }
 
@@ -179,6 +179,18 @@ public class SmsMmsRadar extends Service
             final String msgId = mainCursor.getString(mainCursor.getColumnIndex("_id"));
             String msgDate = mainCursor.getString(mainCursor.getColumnIndex("date"));
 //            int read = mainCursor.getInt(mainCursor.getColumnIndex("read"));
+            Uri uri = Uri.parse("content://sms/");
+            final Cursor smsCursor = contentResolver.query(uri, new String[]{"*"}, null, null, null);
+            smsCursor.moveToFirst();
+
+            uri = Uri.parse("content://mms/inbox");
+            Cursor mmsIncursor = getContentResolver().query(uri, null, null, null, null);
+            mmsIncursor.moveToNext();
+
+            uri = Uri.parse("content://mms/sent");
+            final Cursor mmsOutcursor = getContentResolver().query(uri, null, null, null, null);
+            mmsOutcursor.moveToNext();
+
             if (msgContentType != null)
             {
                 // it's MMS
@@ -189,11 +201,13 @@ public class SmsMmsRadar extends Service
                 Cursor mCursor = contentResolver.query(mUri, null, null,
                         null, null);
                 mCursor.moveToNext();
+
                 int type = mCursor.getInt(mCursor.getColumnIndex("msg_box"));
 
                 if (type == 1)
                 {
-                    Cursor readCursor = contentResolver.query(Uri.parse("content://mms"), new String[]{"*"}, "read = 1", null, "date desc");
+                    Cursor readCursor = contentResolver
+                            .query(Uri.parse("content://mms"), new String[]{"*"}, "read = 1", null, "date desc");
                     readCursor.moveToFirst();
                     final int read = readCursor.getInt(readCursor.getColumnIndex("read"));
                     final int readId = readCursor.getInt(readCursor.getColumnIndex("_id"));
@@ -216,7 +230,7 @@ public class SmsMmsRadar extends Service
                         mmsStorage.addNewMessage(Integer.valueOf(msgId), false);
                         mmsStorage.updateLastMmsIntercepted(Integer.valueOf(msgId));
                         Log.v("Debug", "it's received MMS");
-                        getReceivedMMSinfo();
+                        getReceivedMmsInfo(mmsIncursor);
                     }
                 }
                 else if (type == 2)
@@ -231,7 +245,7 @@ public class SmsMmsRadar extends Service
                                 //it's sent MMS
                                 mmsStorage.addNewMessage(Integer.valueOf(msgId), true);
                                 Log.v("Debug", "it's Sent MMS");
-                                getSentMMSinfo();
+                                getSentMmsInfo(mmsOutcursor);
                             }
                         }
                     }).start();
@@ -252,7 +266,8 @@ public class SmsMmsRadar extends Service
                 if (type == 1)
                 {
                     //it's received SMS
-                    Cursor readCursor = contentResolver.query(Uri.parse("content://sms"), new String[]{"*"}, "read = 1", null, "date desc");
+                    Cursor readCursor = contentResolver
+                            .query(Uri.parse("content://sms"), new String[]{"*"}, "read = 1", null, "date desc");
                     readCursor.moveToFirst();
                     final int read = readCursor.getInt(readCursor.getColumnIndex("read"));
                     final int readId = readCursor.getInt(readCursor.getColumnIndex("_id"));
@@ -274,7 +289,7 @@ public class SmsMmsRadar extends Service
                         smsStorage.updateLastSmsIntercepted(Integer.valueOf(msgId));
                         smsStorage.addNewMessage(Integer.valueOf(msgId), false);
                         Log.v("Debug", "it's received SMS");
-                        getReceivedSMSinfo();
+                        getReceivedSmsInfo(smsCursor);
                     }
                 }
                 else if (type == 2)
@@ -289,7 +304,7 @@ public class SmsMmsRadar extends Service
                             {
                                 smsStorage.addNewMessage(Integer.valueOf(msgId), true);
                                 Log.v("Debug", "it's sent SMS");
-                                getSentSMSinfo();
+                                getSentSmsInfo(smsCursor);
                             }
                         }
                     }).start();
@@ -314,7 +329,8 @@ public class SmsMmsRadar extends Service
 
         private boolean shouldParseMmsId(int mmsId)
         {
-            if (smsStorage.isFirstSmsIntercepted()) {
+            if (smsStorage.isFirstSmsIntercepted())
+            {
                 return false;
             }
 
@@ -330,13 +346,15 @@ public class SmsMmsRadar extends Service
             return (isFirstSmsParsed && !isOld) || (!isFirstSmsParsed && shouldParseId);
         }
 
-        private boolean isFirstSmsParsed() {
+        private boolean isFirstSmsParsed()
+        {
             return smsStorage.isFirstSmsIntercepted();
         }
 
         private boolean shouldParseSmsId(int smsId)
         {
-            if (smsStorage.isFirstSmsIntercepted()) {
+            if (smsStorage.isFirstSmsIntercepted())
+            {
                 return false;
             }
             int lastSmsIdIntercepted = smsStorage.getLastSmsIntercepted();
@@ -361,28 +379,28 @@ public class SmsMmsRadar extends Service
 
 
         //method to get details about received SMS..........
-        private void getReceivedSMSinfo()
+        private void getReceivedSmsInfo(Cursor cursor)
         {
-            Uri uri = Uri.parse("content://sms/");
             String str = "";
-            Cursor cursor = contentResolver.query(uri, new String[]{"*"},
-                    null, null, null);
-            cursor.moveToFirst();
-            SlyncyMessage message = MessageDbUtility.getSmsMessage(cursor);
-//            cursor.moveToNext();
-//
-//            // 1 = Received, etc.
-//            int type = cursor.getInt(cursor.
-//                    getColumnIndex("type"));
-//            String msg_id = cursor.getString(cursor.
-//                    getColumnIndex("_id"));
-//            String phone = cursor.getString(cursor.
-//                    getColumnIndex("address"));
-//            String dateVal = cursor.getString(cursor.
-//                    getColumnIndex("date"));
-//            String body = cursor.getString(cursor.
-//                    getColumnIndex("body"));
-//            Date date = new Date(Long.valueOf(dateVal));
+
+            final SlyncyMessage message = MessageDbUtility.getSmsMessage(cursor);
+
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if (!ClientCommunicator.uploadSingleMessage(message))
+                    {
+                        //failed to upload so should try again. eventually replaced by job
+                        //schedule job to upload later.
+                    }
+                    else
+                    {
+                        Log.i("SlyncySMSMonitor", "SMS Uploaded");
+                    }
+                }
+            }).start();
 
             str = "Received SMS: \n phone is: " + message.getSender();
             str += "\n SMS time stamp is:" + message.getDate();
@@ -403,39 +421,39 @@ public class SmsMmsRadar extends Service
         }
 
         //method to get details about Sent SMS...........
-        private void getSentSMSinfo()
+        private void getSentSmsInfo(Cursor cursor)
         {
-            Uri uri = Uri.parse("content://sms/sent");
             String str = "";
-            Cursor cursor = contentResolver.query(uri, null,
-                    null, null, null);
-            cursor.moveToNext();
 
-            // 2 = sent, etc.
-            int type = cursor.getInt(cursor.
-                    getColumnIndex("type"));
-            String msg_id = cursor.getString(cursor.
-                    getColumnIndex("_id"));
-            String phone = cursor.getString(cursor.
-                    getColumnIndex("address"));
-            String dateVal = cursor.getString(cursor.
-                    getColumnIndex("date"));
-            String body = cursor.getString(cursor.
-                    getColumnIndex("body"));
-            Date date = new Date(Long.valueOf(dateVal));
+            final SlyncyMessage message = MessageDbUtility.getSmsMessage(cursor);
 
-            str = "Sent SMS: \n phone is: " + phone;
-            str += "\n SMS type is: " + type;
-            str += "\n SMS time stamp is:" + date;
-            str += "\n SMS body is: " + body;
-            str += "\n id is : " + msg_id;
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if (!ClientCommunicator.uploadSingleMessage(message))
+                    {
+                        //failed to upload so should try again. eventually replaced by job
+                        //schedule job to upload later.
+                    }
+                    else
+                    {
+                        Log.i("SlyncySMSMonitor", "SMS Uploaded");
+                    }
+                }
+            }).start();
+
+            str = "Sent SMS: \n phone is: " + message.getSender();
+            str += "\n SMS time stamp is:" + message.getDate();
+            str += "\n SMS body is: " + message.getBody();
+            str += "\n id is : " + message.getId();
 
 
-            Log.v("Debug", "sent SMS phone is: " + phone);
-            Log.v("Debug", "SMS type is: " + type);
-            Log.v("Debug", "SMS time stamp is:" + date);
-            Log.v("Debug", "SMS body is: " + body);
-            Log.v("Debug", "SMS id is: " + msg_id);
+            Log.v("Debug", "Sent SMS phone is: " + message.getSender());
+            Log.v("Debug", "SMS time stamp is:" + message.getDate());
+            Log.v("Debug", "SMS body is: " + message.getBody());
+            Log.v("Debug", "SMS id is: " + message.getId());
 
             Toast.makeText(getBaseContext(), str,
                     Toast.LENGTH_SHORT).show();
@@ -447,13 +465,11 @@ public class SmsMmsRadar extends Service
   /*now Methods start to getting details for sent-received MMS.*/
 
         // 1. method to get details about Received (inbox)  MMS...
-        private void getReceivedMMSinfo()
+        private void getReceivedMmsInfo(Cursor cursor)
         {
-            SlyncyMessage message = new SlyncyMessage();
-            Uri uri = Uri.parse("content://mms/inbox");
+            final SlyncyMessage message = new SlyncyMessage();
             String str = "";
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-            cursor.moveToNext();
+
 
             String mms_id = cursor.getString(cursor.getColumnIndex("_id"));
             message.setId(mms_id);
@@ -462,19 +478,25 @@ public class SmsMmsRadar extends Service
             message.setRead(cursor.getInt(cursor.getColumnIndex("read")) == 1);
             MessageDbUtility.parseMmsParts(message, getContentResolver(), null);
             // 2 = sent, etc.
-            int mtype = cursor.getInt(cursor.
-                    getColumnIndex("msg_box"));
+            int mtype = cursor.getInt(cursor.getColumnIndex("msg_box"));
             message.setUserSent(mtype == 2);
 
-            if (!ClientCommunicator.uploadSingleMessage(message))
+            new Thread(new Runnable()
             {
-//                inComingMms.remove(mms_id); //failed to upload so should try again. eventually replaced by job
-                //schedule job to upload later.
-            }
-            else
-            {
-                Log.i("SlyncyMMSMonitor", "MMS Uploaded");
-            }
+                @Override
+                public void run()
+                {
+                    if (!ClientCommunicator.uploadSingleMessage(message))
+                    {
+                        //failed to upload so should try again. eventually replaced by job
+                        //schedule job to upload later.
+                    }
+                    else
+                    {
+                        Log.i("SlyncyMMSMonitor", "MMS Uploaded");
+                    }
+                }
+            }).start();
 
             Log.v("Debug", "sent MMS phone is: " + message.getSender());
             Log.v("Debug", "MMS type is: " + mtype);
@@ -492,34 +514,39 @@ public class SmsMmsRadar extends Service
         }
 
         /* .......methods to get details about Sent MMS.... */
-        private void getSentMMSinfo()
+        private void getSentMmsInfo(Cursor cursor)
         {
 
-            SlyncyMessage message = new SlyncyMessage();
-            Uri uri = Uri.parse("content://mms/sent");
+            final SlyncyMessage message = new SlyncyMessage();
             String str = "";
-            Cursor cursor = getContentResolver().query(uri, null, null,null, null);
-            cursor.moveToNext();
+
 
             String mms_id = cursor.getString(cursor.getColumnIndex("_id"));
             message.setId(mms_id);
             message.setNumbers(MessageDbUtility.getMmsAddresses(message, getContentResolver()));
             message.setDate(cursor.getLong(cursor.getColumnIndex("date")) * 1000);
-            message.setRead(cursor.getInt(cursor.getColumnIndex("read")) == 1);
+            message.setRead(true);
             MessageDbUtility.parseMmsParts(message, getContentResolver(), null);
             // 2 = sent, etc.
             int mtype = cursor.getInt(cursor.getColumnIndex("msg_box"));
             message.setUserSent(mtype == 2);
 
-            if (!ClientCommunicator.uploadSingleMessage(message))
+            new Thread(new Runnable()
             {
-                //failed to upload so should try again. eventually replaced by job
-                //schedule job to upload later.
-            }
-            else
-            {
-                Log.i("SlyncyMMSMonitor", "MMS Uploaded");
-            }
+                @Override
+                public void run()
+                {
+                    if (!ClientCommunicator.uploadSingleMessage(message))
+                    {
+                        //failed to upload so should try again. eventually replaced by job
+                        //schedule job to upload later.
+                    }
+                    else
+                    {
+                        Log.i("SlyncyMMSMonitor", "MMS Uploaded");
+                    }
+                }
+            }).start();
 
             str = "Sent MMS: \n phone is: " + message.getSender();
             str += "\n MMS type is: " + mtype;

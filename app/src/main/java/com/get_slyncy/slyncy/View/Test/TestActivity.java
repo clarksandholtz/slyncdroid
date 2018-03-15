@@ -90,7 +90,7 @@ public class TestActivity extends Activity
 
     private void initMessaging()
     {
-        MessageDbUtility.init(this);
+//        MessageDbUtility.init(this);
     }
 
     private void initSettings()

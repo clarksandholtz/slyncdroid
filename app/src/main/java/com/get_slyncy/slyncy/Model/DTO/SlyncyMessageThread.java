@@ -1,6 +1,7 @@
 package com.get_slyncy.slyncy.Model.DTO;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,8 +21,8 @@ public class SlyncyMessageThread
 
     public SlyncyMessageThread()
     {
-        contacts = new ArrayList<>();
-        messages = new ArrayList<>();
+        contacts = Collections.synchronizedList(new ArrayList<Contact>());
+        messages = Collections.synchronizedList(new ArrayList<SlyncyMessage>());
         imageCount = 0;
     }
 
@@ -47,7 +48,7 @@ public class SlyncyMessageThread
 
     public void setNumbers(List<String> numbers)
     {
-        this.numbers = numbers;
+        this.numbers = numbers == null ? null : Collections.synchronizedList(numbers);
     }
 
     public boolean addNumber(String number)
