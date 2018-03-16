@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsradar;
+package com.tuenti.smsmmsradar;
 
 
 import java.util.Date;
@@ -41,7 +41,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 /**
- * Test created to check the correctness of SmsRadarService
+ * Test created to check the correctness of SmsMmsRadarService
  *
  * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>

@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsradar;
+package com.tuenti.smsmmsradar.Mms;
+
+import com.tuenti.smsmmsradar.SmsType;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,25 +32,26 @@ import java.util.Locale;
  * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-public class Sms {
+public class Mms
+{
 
-	private final String address;
+	private final String addresses;
 	private final long date;
 	private final String msg;
 	private final SmsType type;
 	private final long threadId;
 
 
-	public Sms(String address, long date, String msg, SmsType type, long threadId) {
-		this.address = address;
+	public Mms(String addresses, long date, String msg, SmsType type, long threadId) {
+		this.addresses = addresses;
 		this.date = date;
 		this.msg = msg;
 		this.type = type;
 		this.threadId = threadId;
 	}
 
-	public String getAddress() {
-		return address;
+	public String getAddresses() {
+		return addresses;
 	}
 
 	public String getDate() {
@@ -69,17 +72,17 @@ public class Sms {
 	public boolean equals(Object o)
 	{
 		if (this == o) return true;
-		if (!(o instanceof Sms)) return false;
+		if (!(o instanceof Mms)) return false;
 
-		Sms sms = (Sms) o;
+		Mms sms = (Mms) o;
 
-		return (address != null ? address.equals(sms.address) : sms.address == null) && (date == sms.date) && (msg != null ? msg
+		return (addresses != null ? addresses.equals(sms.addresses) : sms.addresses == null) && (date == sms.date) && (msg != null ? msg
 				.equals(sms.msg) : sms.msg == null) && threadId == sms.threadId && type == sms.type;
 	}
 
 	@Override
 	public int hashCode() {
-		int result = address != null ? address.hashCode() : 0;
+		int result = addresses != null ? addresses.hashCode() : 0;
 		result = 31 * result + Long.valueOf(date).hashCode();
 		result = 31 * result + (msg != null ? msg.hashCode() : 0);
 		result = 31 * result + (type != null ? type.hashCode() : 0);
@@ -89,8 +92,8 @@ public class Sms {
 
 	@Override
 	public String toString() {
-		return "Sms{" +
-				"address='" + address + '\'' +
+		return "Mms{" +
+				"addresses='" + addresses + '\'' +
 				", date='" + date + '\'' +
 				", msg='" + msg + '\'' +
 				", type=" + type +

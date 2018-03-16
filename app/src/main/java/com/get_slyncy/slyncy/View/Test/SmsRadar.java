@@ -8,10 +8,13 @@ import android.widget.Toast;
 
 import com.apollographql.apollo.ApolloClient;
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
+import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.R;
 import com.get_slyncy.slyncy.View.LoginActivity;
-import com.tuenti.smsradar.Sms;
-import com.tuenti.smsradar.SmsListener;
+import com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms.MmsListener;
+import com.get_slyncy.slyncy.View.Test.smsmmsradar.Sms.SmsListener;
+import com.get_slyncy.slyncy.View.Test.smsmmsradar.SmsMmsRadar;
+import com.tuenti.smsmmsradar.Sms.Sms;
 
 import java.io.IOException;
 
@@ -36,36 +39,49 @@ public class SmsRadar extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-        Intent serviceIntent = new Intent(this, SmsMmsRadar.class);
-        startService(serviceIntent);
-//        com.tuenti.smsradar.SmsRadar.initializeSmsRadarService(this, new SmsListener()
-//        {
-//            @Override
-//            public void onSmsSent(Sms sms)
-//            {
-//                showSmsSToast(sms);
-//            }
-//
-//            @Override
-//            public void onSmsReceived(Sms sms)
-//            {
-//                showSmsRToast(sms);
-//            }
-//        });
+//        Intent serviceIntent = new Intent(this, SmsMmsRadar.class);
+//        startService(serviceIntent);
+        SmsMmsRadar.initializeSmsRadarService(this, new SmsListener()
+        {
+            @Override
+            public void onSmsSent(SlyncyMessage sms)
+            {
+                showSmsSToast(sms);
+            }
+
+            @Override
+            public void onSmsReceived(SlyncyMessage sms)
+            {
+                showSmsRToast(sms);
+            }
+        }, new MmsListener()
+        {
+            @Override
+            public void onMmsSent(SlyncyMessage mms)
+            {
+                showSmsSToast(mms);
+            }
+
+            @Override
+            public void onMmsReceived(SlyncyMessage mms)
+            {
+                showSmsRToast(mms);
+            }
+        });
     }
 
-    private void showSmsSToast(Sms sms)
+    private void showSmsSToast(SlyncyMessage sms)
     {
         Toast.makeText(this, getSmsToastText(sms, "S"), Toast.LENGTH_SHORT).show();
     }
 
-    private void showSmsRToast(Sms sms)
+    private void showSmsRToast(SlyncyMessage sms)
     {
         Toast.makeText(this, getSmsToastText(sms, "R"), Toast.LENGTH_SHORT).show();
     }
 
 
-    private String getSmsToastText(Sms sms, String type)
+    private String getSmsToastText(SlyncyMessage sms, String type)
     {
 //        ApolloClient.builder().
 //        CustomTypeAdapter<Date> customTypeAdapter = new CustomTypeAdapter<Date>()
@@ -91,7 +107,7 @@ public class SmsRadar extends Activity
                 Request orig = chain.request();
                 Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
                 builder.header("Authorization",
-                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVleDA0YW4wMDBoMDEzMGpodjhma3RyIiwiaWF0IjoxNTIwNTU3NjQyfQ.cQEaGIb2zmjLePWLMGnNJINOoivDY2_4DIhtTN0Cwyc");
+                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMTU4NDg1fQ.-pAAuNQCGkcLUX-WcQbXmXNg1xsYQtivMOCoNP7eMlY");
                 return chain.proceed(builder.build());
             }
         }).build();
@@ -103,21 +119,21 @@ public class SmsRadar extends Activity
             case "R":
                 stringBuilder.append("New SMS from ");
 //                Log.d("SMS in:",  new Date(Long.parseLong(sms.getDate()) * 1000).toString());
-                client.mutate(CreateMessageMutation.builder()
-                        .address(sms.getAddress()).userSent(false)
-                        .body(sms.getMsg()).date(sms.getDate())
-                        .error(false).files(null).read(false).threadId(sms.getThreadId()).build()).enqueue(null);
+//                client.mutate(CreateMessageMutation.builder()
+//                        .address(sms.getAddress()).userSent(false)
+//                        .body(sms.getMsg()).date(sms.getDate())
+//                        .error(false).files(null).read(false).threadId(sms.getThreadId()).build()).enqueue(null);
                 break;
             case "S":
                 stringBuilder.append("New SMS to ");
-                client.mutate(CreateMessageMutation.builder()
-                        .address(sms.getAddress()).userSent(true)
-                        .body(sms.getMsg()).date(sms.getDate())
-                        .error(false).files(null).read(true).threadId(sms.getThreadId()).build()).enqueue(null);
+//                client.mutate(CreateMessageMutation.builder()
+//                        .address(sms.getAddress()).userSent(true)
+//                        .body(sms.getMsg()).date(sms.getDate())
+//                        .error(false).files(null).read(true).threadId(sms.getThreadId()).build()).enqueue(null);
                 break;
         }
-        stringBuilder.append(MessageDbUtility.fetchContactNameByNumber(sms.getAddress(), getContentResolver()))
-                .append("\n").append("MSG: ").append(sms.getMsg());
+        stringBuilder.append(MessageDbUtility.fetchContactNameByNumber(sms.getSender(), getContentResolver()))
+                .append("\n").append("MSG: ").append(sms.getBody());
         return stringBuilder.toString();
     }
 }

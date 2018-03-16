@@ -13,22 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsradar;
+package com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms;
 
+import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 /**
- * The SmsStorage has the responsibility to store the last sms intercepted by the library.
+ * This interface has to be implemented to be notified when an sms be received or sent.
  *
- * @author Pedro Vicente Gómez Sánchez <pgomez@tuenti.com>
+ * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-interface MmsStorage
+public interface MmsListener
 {
 
+	/**
+	 * Invoked when an incoming sms is intercepted.
+	 *
+	 * @param mms intercepted.
+	 */
+	public void onMmsSent(SlyncyMessage mms);
 
+	/**
+	 * Invoked when an outgoing sms is intercepted.
+	 *
+	 * @param mms
+	 */
 
-	void updateLastMmsIntercepted(int mmsId);
+	public void onMmsReceived(SlyncyMessage mms);
 
-	int getLastMmsIntercepted();
-
-	boolean isFirstMmsIntercepted();
 }

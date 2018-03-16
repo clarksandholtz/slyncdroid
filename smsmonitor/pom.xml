@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.tuenti.smsradar</groupId>
+		<groupId>com.tuenti.smsmmsradar</groupId>
 		<artifactId>smsradar-parent</artifactId>
 		<version>1.0.5-SNAPSHOT</version>
 	</parent>

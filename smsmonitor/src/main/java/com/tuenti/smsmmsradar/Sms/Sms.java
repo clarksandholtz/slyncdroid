@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsradar;
+package com.tuenti.smsmmsradar.Sms;
+
+import com.tuenti.smsmmsradar.SmsType;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,8 +32,7 @@ import java.util.Locale;
  * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-public class Mms
-{
+public class Sms {
 
 	private final String address;
 	private final long date;
@@ -40,7 +41,7 @@ public class Mms
 	private final long threadId;
 
 
-	public Mms(String address, long date, String msg, SmsType type, long threadId) {
+	public Sms(String address, long date, String msg, SmsType type, long threadId) {
 		this.address = address;
 		this.date = date;
 		this.msg = msg;
@@ -70,9 +71,9 @@ public class Mms
 	public boolean equals(Object o)
 	{
 		if (this == o) return true;
-		if (!(o instanceof Mms)) return false;
+		if (!(o instanceof Sms)) return false;
 
-		Mms sms = (Mms) o;
+		Sms sms = (Sms) o;
 
 		return (address != null ? address.equals(sms.address) : sms.address == null) && (date == sms.date) && (msg != null ? msg
 				.equals(sms.msg) : sms.msg == null) && threadId == sms.threadId && type == sms.type;
@@ -90,7 +91,7 @@ public class Mms
 
 	@Override
 	public String toString() {
-		return "Mms{" +
+		return "Sms{" +
 				"address='" + address + '\'' +
 				", date='" + date + '\'' +
 				", msg='" + msg + '\'' +

@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsradar;
+package com.tuenti.smsmmsradar;
 
 import android.content.Context;
 import android.content.Intent;
+
+import com.tuenti.smsmmsradar.Mms.MmsListener;
+import com.tuenti.smsmmsradar.Sms.SmsListener;
 
 /**
  * Main library class. This class has to be used to initialize or stop the sms interceptor service.
@@ -24,10 +27,11 @@ import android.content.Intent;
  * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-public class SmsRadar {
+public class SmsMmsRadar
+{
 
-	static SmsListener smsListener;
-
+	public static SmsListener smsListener;
+	public static MmsListener mmsListener;
 
 	/**
 	 * Starts the service and store the listener to be notified when a new incoming or outgoing sms be processed
@@ -36,21 +40,23 @@ public class SmsRadar {
 	 * @param context used to start the service
 	 * @param smsListener to notify when the sms content provider gets a new sms
 	 */
-	public static void initializeSmsRadarService(Context context, SmsListener smsListener) {
-		SmsRadar.smsListener = smsListener;
-		Intent intent = new Intent(context, SmsRadarService.class);
+	public static void initializeSmsRadarService(Context context, SmsListener smsListener, MmsListener mmsListener) {
+		SmsMmsRadar.smsListener = smsListener;
+		SmsMmsRadar.mmsListener = mmsListener;
+		Intent intent = new Intent(context, SmsMmsRadarService.class);
 		context.startService(intent);
 	}
 
 
 	/**
-	 * Stops the service and remove the SmsListener added when the SmsRadar was initialized
+	 * Stops the service and remove the SmsListener added when the SmsMmsRadar was initialized
 	 *
 	 * @param context used to stop the service
 	 */
 	public static void stopSmsRadarService(Context context) {
-		SmsRadar.smsListener = null;
-		Intent intent = new Intent(context, SmsRadarService.class);
+		SmsMmsRadar.smsListener = null;
+		SmsMmsRadar.mmsListener = null;
+		Intent intent = new Intent(context, SmsMmsRadarService.class);
 		context.stopService(intent);
 	}
 }

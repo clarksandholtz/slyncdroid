@@ -117,7 +117,7 @@ public class ClientCommunicator
                 Request orig = chain.request();
                 Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
                 builder.header("Authorization",
-                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVvcXA4eWEwMDBrMDE4NGxqY3hnZmlnIiwiaWF0IjoxNTIwODkwMTE1fQ.fzmZnT0Qzmqde8-NFxctNYW9zEDEE_frSHkV2tm7Rpw");
+                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMTU4NDg1fQ.-pAAuNQCGkcLUX-WcQbXmXNg1xsYQtivMOCoNP7eMlY");
                 return chain.proceed(builder.build());
             }
         }).writeTimeout(2, TimeUnit.MINUTES).readTimeout(2, TimeUnit.MINUTES).connectTimeout(2, TimeUnit.MINUTES)
@@ -219,7 +219,7 @@ public class ClientCommunicator
                                         connection.setRequestMethod("POST");
                                         connection.addRequestProperty("Content-Type", "application/json");
                                         connection.addRequestProperty("Authorization",
-                                                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVvcXA4eWEwMDBrMDE4NGxqY3hnZmlnIiwiaWF0IjoxNTIwODkwMTE1fQ.fzmZnT0Qzmqde8-NFxctNYW9zEDEE_frSHkV2tm7Rpw");
+                                                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMTU4NDg1fQ.-pAAuNQCGkcLUX-WcQbXmXNg1xsYQtivMOCoNP7eMlY");
                                         connection.setDoOutput(true);
                                         connection.connect();
                                         writeString(file, connection.getOutputStream());
@@ -266,7 +266,7 @@ public class ClientCommunicator
             {
                 Request orig = chain.request();
                 Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
-                builder.header("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVleDA0YW4wMDBoMDEzMGpodjhma3RyIiwiaWF0IjoxNTIwMjk4MzQ5fQ.95UYNvydLOzA1loIuhPzkQaJDIvQEwF2YMb3a9ndHQ8");
+                builder.header("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMTU4NDg1fQ.-pAAuNQCGkcLUX-WcQbXmXNg1xsYQtivMOCoNP7eMlY");
                 return chain.proceed(builder.build());
             }
         }).build();
@@ -274,7 +274,21 @@ public class ClientCommunicator
         ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL).build();
 
         MarkThreadAsReadMutation mutation = MarkThreadAsReadMutation.builder().threadId(threadId).build();
-        client.mutate(mutation).enqueue(null);
+        client.mutate(mutation).enqueue(new ApolloCall.Callback<MarkThreadAsReadMutation.Data>()
+        {
+            @Override
+            public void onResponse(@Nonnull com.apollographql.apollo.api.Response<MarkThreadAsReadMutation.Data> response)
+            {
+                if (!response.hasErrors())
+                    Log.d("MARKEd AS READ", "onResponse: ");
+            }
+
+            @Override
+            public void onFailure(@Nonnull ApolloException e)
+            {
+                Log.d("FAIL", "onFailure: FAIL");
+            }
+        });
         return true;
     }
 
@@ -290,7 +304,7 @@ public class ClientCommunicator
                 Request orig = chain.request();
                 Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
                 builder.header("Authorization",
-                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVvcXA4eWEwMDBrMDE4NGxqY3hnZmlnIiwiaWF0IjoxNTIwODkwMTE1fQ.fzmZnT0Qzmqde8-NFxctNYW9zEDEE_frSHkV2tm7Rpw");
+                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMTU4NDg1fQ.-pAAuNQCGkcLUX-WcQbXmXNg1xsYQtivMOCoNP7eMlY");
                 return chain.proceed(builder.build());
             }
         }).writeTimeout(2, TimeUnit.SECONDS).readTimeout(2, TimeUnit.SECONDS).connectTimeout(2, TimeUnit.SECONDS)

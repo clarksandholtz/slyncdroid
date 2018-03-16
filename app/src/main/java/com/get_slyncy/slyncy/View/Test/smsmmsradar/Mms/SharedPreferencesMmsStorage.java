@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsradar;
+package com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+
 
 /**
  * SmsStorage implementation based on shared preferences.
@@ -24,14 +25,14 @@ import android.content.SharedPreferences.Editor;
  * @author Pedro Vicente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-class SharedPreferencesSmsStorage implements SmsStorage {
+public class SharedPreferencesMmsStorage implements MmsStorage {
 
 	private static final String LAST_SMS_PARSED = "last_sms_parsed";
 	private static final int DEFAULT_SMS_PARSED_VALUE = -1;
 
 	private SharedPreferences preferences;
 
-	SharedPreferencesSmsStorage(SharedPreferences preferences) {
+	public SharedPreferencesMmsStorage(SharedPreferences preferences) {
 		if (preferences == null) {
 			throw new IllegalArgumentException("SharedPreferences param can't be null");
 		}
@@ -40,19 +41,19 @@ class SharedPreferencesSmsStorage implements SmsStorage {
 	}
 
 	@Override
-	public void updateLastSmsIntercepted(int smsId) {
+	public void updateLastMmsIntercepted(int smsId) {
 		Editor editor = preferences.edit();
 		editor.putInt(LAST_SMS_PARSED, smsId);
 		editor.commit();
 	}
 
 	@Override
-	public int getLastSmsIntercepted() {
+	public int getLastMmsIntercepted() {
 		return preferences.getInt(LAST_SMS_PARSED, DEFAULT_SMS_PARSED_VALUE);
 	}
 
 	@Override
-	public boolean isFirstSmsIntercepted() {
-		return getLastSmsIntercepted() == DEFAULT_SMS_PARSED_VALUE;
+	public boolean isFirstMmsIntercepted() {
+		return getLastMmsIntercepted() == DEFAULT_SMS_PARSED_VALUE;
 	}
 }

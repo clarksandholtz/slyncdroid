@@ -120,12 +120,12 @@
                 <content android:scheme="mmsto"/>
             </intent-filter>
         </service>
+        <!--<service-->
+            <!--android:name="com.tuenti.smsmmsradar.SmsMmsRadarService"-->
+            <!--android:exported="false"-->
+            <!--android:label="@string/app_name"/>-->
         <service
-            android:name="com.tuenti.smsradar.SmsRadarService"
-            android:exported="false"
-            android:label="@string/app_name"/>
-        <service
-            android:name=".View.Test.SmsMmsRadar"
+            android:name=".View.Test.smsmmsradar.SmsMmsRadarService"
             android:exported="false"
             android:label="@string/app_name"/>
 

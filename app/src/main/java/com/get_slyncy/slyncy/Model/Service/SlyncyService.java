@@ -54,9 +54,9 @@ public class SlyncyService extends Service
     }
 
     private void initializeSlyncy() {
-        Intent messagesMonitoringService = new Intent(this, MessagesMonitoringService.class);
-        startService(messagesMonitoringService);
+//        Intent messagesMonitoringService = new Intent(this, MessagesMonitoringService.class);
+//        startService(messagesMonitoringService);
 
-        MessageDbUtility.init(this);
+//        MessageDbUtility.init(this);
     }
 }

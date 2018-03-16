@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsradar;
+package com.tuenti.smsmmsradar.Mms;
 
 /**
  * This interface has to be implemented to be notified when an sms be received or sent.

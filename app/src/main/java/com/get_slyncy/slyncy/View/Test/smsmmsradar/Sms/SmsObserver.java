@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsradar;
+package com.get_slyncy.slyncy.View.Test.smsmmsradar.Sms;
 
 
 import android.content.ContentResolver;
@@ -21,6 +21,9 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
+
+import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
+import com.get_slyncy.slyncy.View.Test.smsmmsradar.SmsMmsRadar;
 
 
 /**
@@ -39,7 +42,7 @@ import android.os.Handler;
  * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-class SmsObserver extends ContentObserver {
+public class SmsObserver extends ContentObserver {
 
 	private static final Uri SMS_URI = Uri.parse("content://sms/");
 	private static final Uri SMS_SENT_URI = Uri.parse("content://sms/sent");
@@ -50,7 +53,7 @@ class SmsObserver extends ContentObserver {
 	private ContentResolver contentResolver;
 	private SmsCursorParser smsCursorParser;
 
-	SmsObserver(ContentResolver contentResolver, Handler handler, SmsCursorParser smsCursorParser) {
+	public SmsObserver(ContentResolver contentResolver, Handler handler, SmsCursorParser smsCursorParser) {
 		super(handler);
 		this.contentResolver = contentResolver;
 		this.smsCursorParser = smsCursorParser;
@@ -81,19 +84,19 @@ class SmsObserver extends ContentObserver {
 		try {
 			String protocol = cursor.getString(cursor.getColumnIndex(PROTOCOL_COLUM_NAME));
 			smsCursor = getSmsCursor(protocol);
-			Sms sms = parseSms(smsCursor);
+			SlyncyMessage sms = parseSms(smsCursor);
 			notifySmsListener(sms);
 		} finally {
 			close(smsCursor);
 		}
 	}
 
-	private void notifySmsListener(Sms sms) {
-		if (sms != null && SmsRadar.smsListener != null) {
-			if (SmsType.SENT == sms.getType()) {
-				SmsRadar.smsListener.onSmsSent(sms);
+	private void notifySmsListener(SlyncyMessage sms) {
+		if (sms != null && SmsMmsRadar.smsListener != null) {
+			if (sms.isUserSent()) {
+				SmsMmsRadar.smsListener.onSmsSent(sms);
 			} else {
-				SmsRadar.smsListener.onSmsReceived(sms);
+				SmsMmsRadar.smsListener.onSmsReceived(sms);
 			}
 		}
 	}
@@ -131,7 +134,7 @@ class SmsObserver extends ContentObserver {
 		return smsUri != null ? this.contentResolver.query(smsUri, null, null, null, SMS_ORDER) : null;
 	}
 
-	private Sms parseSms(Cursor cursor) {
+	private SlyncyMessage parseSms(Cursor cursor) {
 		return smsCursorParser.parse(cursor);
 	}
 

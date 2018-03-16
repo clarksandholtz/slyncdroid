@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsradar;
+package com.tuenti.smsmmsradar.Sms;
 
 
 import java.util.Date;
 
 import android.database.Cursor;
+
+import com.tuenti.smsmmsradar.SmsType;
+import com.tuenti.smsmmsradar.TimeProvider;
 
 
 /**
@@ -36,7 +39,7 @@ import android.database.Cursor;
  * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-class SmsCursorParser {
+public class SmsCursorParser {
 
 	private static final String ADDRESS_COLUMN_NAME = "address";
 	private static final String DATE_COLUMN_NAME = "date";
@@ -49,12 +52,12 @@ class SmsCursorParser {
 	private SmsStorage smsStorage;
 	private TimeProvider timeProvider;
 
-	SmsCursorParser(SmsStorage smsStorage, TimeProvider timeProvider) {
+	public SmsCursorParser(SmsStorage smsStorage, TimeProvider timeProvider) {
 		this.smsStorage = smsStorage;
 		this.timeProvider = timeProvider;
 	}
 
-	Sms parse(Cursor cursor) {
+	public Sms parse(Cursor cursor) {
 
 		if (!canHandleCursor(cursor) || !cursor.moveToNext()) {
 			return null;

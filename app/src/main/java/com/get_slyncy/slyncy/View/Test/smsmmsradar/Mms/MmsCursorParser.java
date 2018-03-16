@@ -13,11 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsradar;
+package com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms;
 
 
+import android.content.ContentResolver;
 import android.database.Cursor;
-import android.provider.Telephony;
+
+
+import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
+import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
+import com.get_slyncy.slyncy.View.Test.smsmmsradar.TimeProvider;
 
 import java.util.Date;
 
@@ -37,85 +42,101 @@ import java.util.Date;
  * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-class MmsCursorParser
+public class MmsCursorParser
 {
 
     private static final String ADDRESS_COLUMN_NAME = "address";
     private static final String DATE_COLUMN_NAME = "date";
     private static final String BODY_COLUMN_NAME = "body";
-    private static final String TYPE_COLUMN_NAME = "type";
+    private static final String TYPE_COLUMN_NAME = "m_type";
     private static final String ID_COLUMN_NAME = "_id";
-    private static final String THREAD_ID_COLUMN_NAME= "thread_id";
-    private static final int SMS_MAX_AGE_MILLIS = 5000;
+    private static final String THREAD_ID_COLUMN_NAME = "thread_id";
+    private static final int MMS_MAX_AGE_MILLIS = 5000;
 
     private MmsStorage mmsStorage;
     private TimeProvider timeProvider;
 
-    MmsCursorParser(MmsStorage mmsStorage, TimeProvider timeProvider) {
+    public MmsCursorParser(MmsStorage mmsStorage, TimeProvider timeProvider)
+    {
         this.mmsStorage = mmsStorage;
         this.timeProvider = timeProvider;
     }
 
-    Mms parse(Cursor cursor) {
+    SlyncyMessage parse(Cursor cursor, ContentResolver resolver)
+    {
 
-        if (!canHandleCursor(cursor) || !cursor.moveToNext()) {
+        if (!canHandleCursor(cursor) || !cursor.moveToNext())
+        {
             return null;
         }
 
-        Mms mmsParsed = extractMmsInfoFromCursor(cursor);
+        SlyncyMessage mmsParsed = extractMmsInfoFromCursor(cursor, resolver);
 
         int mmsId = cursor.getInt(cursor.getColumnIndex(ID_COLUMN_NAME));
         String date = cursor.getString(cursor.getColumnIndex(DATE_COLUMN_NAME));
         Date mmsDate = new Date(Long.parseLong(date));
 
-        if (shouldParseMms(mmsId, mmsDate)) {
+        if (shouldParseMms(mmsId, mmsDate))
+        {
             updateLastMmsParsed(mmsId);
-        } else {
+        }
+        else
+        {
             mmsParsed = null;
         }
 
         return mmsParsed;
     }
 
-    private void updateLastMmsParsed(int mmsId) {
+    private void updateLastMmsParsed(int mmsId)
+    {
         mmsStorage.updateLastMmsIntercepted(mmsId);
     }
 
-    private boolean shouldParseMms(int mmsId, Date mmsDate) {
+    private boolean shouldParseMms(int mmsId, Date mmsDate)
+    {
         boolean isFirstMmsParsed = isFirstMmsParsed();
         boolean isOld = isOld(mmsDate);
         boolean shouldParseId = shouldParseMmsId(mmsId);
         return (isFirstMmsParsed && !isOld) || (!isFirstMmsParsed && shouldParseId);
     }
 
-    private boolean isOld(Date mmsDate) {
+    private boolean isOld(Date mmsDate)
+    {
         Date now = timeProvider.getDate();
-        return now.getTime() - mmsDate.getTime() > SMS_MAX_AGE_MILLIS;
+        return now.getTime() - mmsDate.getTime() > MMS_MAX_AGE_MILLIS;
     }
 
-    private boolean shouldParseMmsId(int mmsId) {
-        if (mmsStorage.isFirstMmsIntercepted()) {
+    private boolean shouldParseMmsId(int mmsId)
+    {
+        if (mmsStorage.isFirstMmsIntercepted())
+        {
             return false;
         }
         int lastMmsIdIntercepted = mmsStorage.getLastMmsIntercepted();
         return mmsId > lastMmsIdIntercepted;
     }
 
-    private boolean isFirstMmsParsed() {
+    private boolean isFirstMmsParsed()
+    {
         return mmsStorage.isFirstMmsIntercepted();
     }
 
-    private Mms extractMmsInfoFromCursor(Cursor cursor) {
-        String address = cursor.getString(cursor.getColumnIndex(ADDRESS_COLUMN_NAME));
-        long date = cursor.getLong(cursor.getColumnIndex(DATE_COLUMN_NAME));
-        String msg = cursor.getString(cursor.getColumnIndex(BODY_COLUMN_NAME));
-        String type = cursor.getString(cursor.getColumnIndex(TYPE_COLUMN_NAME));
-        long threadId = cursor.getLong(cursor.getColumnIndex(THREAD_ID_COLUMN_NAME));
-        return new Mms(address, date, msg, SmsType.fromValue(Integer.parseInt(type)), threadId);
+    private SlyncyMessage extractMmsInfoFromCursor(Cursor cursor, ContentResolver resolver)
+    {
+        SlyncyMessage message = MessageDbUtility.getMmsMessage(cursor, resolver);
+//        String address = cursor.getString(cursor.getColumnIndex(ADDRESS_COLUMN_NAME));
+//        long date = cursor.getLong(cursor.getColumnIndex(DATE_COLUMN_NAME));
+//        String msg = cursor.getString(cursor.getColumnIndex(BODY_COLUMN_NAME));
+//        String type = cursor.getString(cursor.getColumnIndex(TYPE_COLUMN_NAME));
+//        long threadId = cursor.getLong(cursor.getColumnIndex(THREAD_ID_COLUMN_NAME));
+//        return new Mms(address, date, msg, SmsType.fromValue(Integer.parseInt(type)), threadId)
+        return message;
     }
 
 
-    private boolean canHandleCursor(Cursor cursor) {
+    private boolean canHandleCursor(Cursor cursor)
+    {
         return cursor != null && cursor.getCount() > 0;
     }
 

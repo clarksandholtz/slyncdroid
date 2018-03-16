@@ -14,6 +14,7 @@ import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessageThread;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.Model.Util.Data;
+import com.google.android.mms.ContentType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -193,13 +194,13 @@ public class MessageDbUtility
 
     }
 
-    public static List<String> getMmsAddresses(SlyncyMessage message, ContentResolver resolver)
+    public static List<String> getMmsAddresses(SlyncyMessage message, Cursor c)
     {
-        String id = message.getId();
-        String sel = new String("msg_id=" + id);
-        String uriString = "content://mms/" + id + "/addr";
-        Uri uri = Uri.parse(uriString);
-        Cursor c = resolver.query(uri, null, sel, null, null);
+//        String id = message.getId();
+//        String sel = new String("msg_id=" + id);
+//        String uriString = "content://mms/" + id + "/addr";
+//        Uri uri = Uri.parse(uriString);
+//        Cursor c = resolver.query(uri, null, sel, null, null);
         List<String> numberList = new ArrayList<>();
         while (c.moveToNext())
         {
@@ -355,7 +356,9 @@ public class MessageDbUtility
 
                 if (makeMessage)
                 {
-                    SlyncyMessage message = new SlyncyMessage();
+                    ///*
+                    SlyncyMessage message = getMmsMessage(c, mContext.getContentResolver());
+                    /*new SlyncyMessage();
                     message.setId(c.getString(c.getColumnIndex(MSG_ID)));
                     message.setThreadId(threadId);
                     message.setDate(c.getLong(c.getColumnIndex(DATE)));
@@ -363,10 +366,10 @@ public class MessageDbUtility
                     if (readStatus == 1) message.setRead(true);
                     else message.setRead(false);
                     List<String> numbers = getMmsAddresses(message);
-                    message.setNumbers(numbers);
+                    message.setNumbers(numbers);//*/
                     mThreadList.get(threadId).addMessage(message);
-                    mThreadList.get(threadId).setNumbers(numbers);
-                    parseMmsParts(message);
+                    mThreadList.get(threadId).setNumbers(message.getNumbers());//*/
+//                    parseMmsParts(message);
                 }
 
             } while (c.moveToNext());
@@ -388,7 +391,12 @@ public class MessageDbUtility
 
     private List<String> getMmsAddresses(SlyncyMessage message)
     {
-        return getMmsAddresses(message, mContext.getContentResolver());
+        String id = message.getId();
+        String sel = "msg_id=" + id;
+        String uriString = "content://mms/" + id + "/addr";
+        Uri uri = Uri.parse(uriString);
+        Cursor c = mContext.getContentResolver().query(uri, null, sel, null, null);
+        return getMmsAddresses(message, c);
     }
 
     private void getSMS()
@@ -433,9 +441,32 @@ public class MessageDbUtility
         c.close();
     }
 
+    public static SlyncyMessage getMmsMessage(Cursor c, ContentResolver resolver)
+    {
+        SlyncyMessage message = new SlyncyMessage();
+        message.setId(c.getString(c.getColumnIndex(MSG_ID)));
+        String id = message.getId();
+        String sel = "msg_id=" + id;
+        String uriString = "content://mms/" + id + "/addr";
+        Uri uri = Uri.parse(uriString);
+        Cursor addrC = resolver.query(uri, null, sel, null, null);
+        message.setThreadId(c.getInt(c.getColumnIndex("thread_id")));
+        message.setDate(c.getLong(c.getColumnIndex(DATE)));
+        int readStatus = c.getInt(c.getColumnIndex(READ));
+        if (readStatus == 1) message.setRead(true);
+        else message.setRead(false);
+        List<String> numbers = getMmsAddresses(message, addrC);
+        message.setNumbers(numbers);
+        parseMmsParts(message, resolver, null);
+//        mThreadList.get(threadId).addMessage(message);
+//        mThreadList.get(threadId).setNumbers(numbers);
+        return message;
+    }
+
     public static SlyncyMessage getSmsMessage(Cursor c)
     {
         SlyncyMessage message = new SlyncyMessage();
+        message.setThreadId(c.getInt(c.getColumnIndex("thread_id")));
         message.setId(c.getString(c.getColumnIndex(MSG_ID)));
         message.setDate(c.getLong(c.getColumnIndex(DATE)));
         message.setBody(c.getString(c.getColumnIndex(BODY)));
@@ -448,6 +479,7 @@ public class MessageDbUtility
         int type = c.getInt(c.getColumnIndex(TYPE));
         if (type == 2) message.setSender(Data.getInstance().getSettings().getmMyPhoneNumber());
         if (type == 1) message.setSender(number);
+        message.setUserSent(type == 2);
         return message;
     }
 

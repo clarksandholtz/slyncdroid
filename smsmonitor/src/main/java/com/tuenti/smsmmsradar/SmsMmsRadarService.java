@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsradar;
+package com.tuenti.smsmmsradar;
 
 
 import android.app.AlarmManager;
@@ -27,6 +27,12 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 
+import com.tuenti.smsmmsradar.Mms.MmsObserver;
+import com.tuenti.smsmmsradar.Sms.SharedPreferencesSmsStorage;
+import com.tuenti.smsmmsradar.Sms.SmsCursorParser;
+import com.tuenti.smsmmsradar.Sms.SmsObserver;
+import com.tuenti.smsmmsradar.Sms.SmsStorage;
+
 
 /**
  * Service created to handle the SmsContentObserver registration. This service has the responsibility of register and
@@ -38,7 +44,7 @@ import android.os.IBinder;
  * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-public class SmsRadarService extends Service {
+public class SmsMmsRadarService extends Service {
 
     private static final String CONTENT_SMS_URI = "content://sms";
     private static final int ONE_SECOND = 1000;
@@ -133,7 +139,7 @@ public class SmsRadarService extends Service {
     }
 
     private void restartService() {
-        Intent intent = new Intent(this, SmsRadarService.class);
+        Intent intent = new Intent(this, SmsMmsRadarService.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
         long now = getTimeProvider().getDate().getTime();
         getAlarmManager().set(AlarmManager.RTC_WAKEUP, now + ONE_SECOND, pendingIntent);

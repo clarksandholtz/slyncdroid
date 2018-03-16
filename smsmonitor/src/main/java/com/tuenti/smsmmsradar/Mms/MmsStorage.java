@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsradar;
-
-import java.util.Date;
+package com.tuenti.smsmmsradar.Mms;
 
 /**
- * Class created to work as time provider. This entity returns the current date. Avoid the client code to use System
- * .currentTimeMillis or create a new Date object directly.
+ * The SmsStorage has the responsibility to store the last sms intercepted by the library.
  *
  * @author Pedro Vicente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-class TimeProvider {
+interface MmsStorage
+{
 
 
-	public Date getDate() {
-		return new Date();
-	}
 
+	void updateLastMmsIntercepted(int mmsId);
+
+	int getLastMmsIntercepted();
+
+	boolean isFirstMmsIntercepted();
 }
