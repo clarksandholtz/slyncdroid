@@ -17,16 +17,24 @@ package com.get_slyncy.slyncy.View.Test.smsmmsradar;
 
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Telephony;
 
+import com.get_slyncy.slyncy.R;
+import com.get_slyncy.slyncy.View.Test.PersistentNotifActivity;
 import com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms.MmsCursorParser;
 import com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms.MmsObserver;
 import com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms.MmsStorage;
@@ -51,6 +59,7 @@ public class SmsMmsRadarService extends Service
 {
 
     private static final String CONTENT_SMS_URI = "content://sms";
+    private static final String CONTENT_MMS_URI = "content://mms";
     private static final int ONE_SECOND = 1000;
 
 
@@ -76,6 +85,33 @@ public class SmsMmsRadarService extends Service
         {
             initializeService();
         }
+                Notification.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            NotificationChannel channel = new NotificationChannel(getPackageName() + "_persistent", "Persistent",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(false);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            if (notificationManager != null && !notificationManager.getNotificationChannels().contains(channel))
+            {
+                notificationManager.createNotificationChannel(channel);
+            }
+            builder = new Notification.Builder(this, getPackageName() + "_persistent");
+
+        }
+        else
+        {
+            builder = new Notification.Builder(this);
+        }
+        Intent notifIntent = new Intent(this, PersistentNotifActivity.class);
+        notifIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent
+                .getActivity(this, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(pendingIntent);
+        Icon icon = Icon.createWithResource(this, R.drawable.ic_stat_name);
+        icon.setTint(getColor(R.color.colorPrimary));
+        startForeground(getPackageName().hashCode(), builder.setSmallIcon(icon).setColor(getColor(R.color.colorPrimary))
+                .setContentText("Slyncy ForegroundService").setContentTitle("SLYNCY FOREGROUND SERVICE").build());
         return START_STICKY;
     }
 
@@ -98,6 +134,7 @@ public class SmsMmsRadarService extends Service
         initialized = true;
         initializeDependencies();
         registerSmsContentObserver();
+        registerMmsContentObserver();
     }
 
     private void initializeDependencies()
@@ -106,6 +143,7 @@ public class SmsMmsRadarService extends Service
         {
             initializeContentResolver();
             initializeSmsObserver();
+            initializeMmsObserver();
         }
     }
 
@@ -117,12 +155,16 @@ public class SmsMmsRadarService extends Service
     private void initializeSmsObserver()
     {
         Handler handler = new Handler();
-        Handler handler1 = new Handler();
         SmsCursorParser smsCursorParser = initializeSmsCursorParser();
-        MmsCursorParser mmsCursorParser = initializeMmsCursorParser();
         this.smsObserver = new SmsObserver(contentResolver, handler, smsCursorParser);
-        this.mmsObserver = new MmsObserver(contentResolver, handler1, mmsCursorParser);
 
+    }
+
+    private void initializeMmsObserver()
+    {
+        Handler handler = new Handler();
+        MmsCursorParser mmsCursorParser = initializeMmsCursorParser();
+        this.mmsObserver = new MmsObserver(contentResolver, handler, mmsCursorParser);
     }
 
     private SmsCursorParser initializeSmsCursorParser()
@@ -150,6 +192,11 @@ public class SmsMmsRadarService extends Service
         unregisterSmsContentObserver();
     }
 
+    private void registerMmsContentObserver()
+    {
+        boolean notifyForDescendants = true;
+        contentResolver.registerContentObserver(Telephony.MmsSms.CONTENT_URI, notifyForDescendants, mmsObserver);
+    }
 
     private void registerSmsContentObserver()
     {

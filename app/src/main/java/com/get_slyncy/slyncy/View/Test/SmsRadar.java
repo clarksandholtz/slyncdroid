@@ -2,13 +2,18 @@ package com.get_slyncy.slyncy.View.Test;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
+import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.apollographql.apollo.ApolloClient;
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
+import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.R;
 import com.get_slyncy.slyncy.View.LoginActivity;
 import com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms.MmsListener;
@@ -46,37 +51,55 @@ public class SmsRadar extends Activity
             @Override
             public void onSmsSent(SlyncyMessage sms)
             {
-                showSmsSToast(sms);
+                if (sms != null)
+                {
+                    showSmsSToast(sms);
+                    ClientCommunicator.uploadSingleMessage(sms);
+                }
             }
 
             @Override
             public void onSmsReceived(SlyncyMessage sms)
             {
-                showSmsRToast(sms);
+                if (sms != null)
+                {
+                    showSmsRToast(sms);
+                    ClientCommunicator.uploadSingleMessage(sms);
+                }
             }
         }, new MmsListener()
         {
             @Override
             public void onMmsSent(SlyncyMessage mms)
             {
-                showSmsSToast(mms);
+                if (mms != null)
+                {
+                    showSmsSToast(mms);
+                    ClientCommunicator.uploadSingleMessage(mms);
+                }
             }
 
             @Override
             public void onMmsReceived(SlyncyMessage mms)
             {
-                showSmsRToast(mms);
+                if (mms != null)
+                {
+                    showSmsRToast(mms);
+                    ClientCommunicator.uploadSingleMessage(mms);
+                }
             }
         });
     }
 
     private void showSmsSToast(SlyncyMessage sms)
     {
+        Looper.prepare();
         Toast.makeText(this, getSmsToastText(sms, "S"), Toast.LENGTH_SHORT).show();
     }
 
     private void showSmsRToast(SlyncyMessage sms)
     {
+        Looper.prepare();
         Toast.makeText(this, getSmsToastText(sms, "R"), Toast.LENGTH_SHORT).show();
     }
 
@@ -99,20 +122,20 @@ public class SmsRadar extends Activity
 //                return String.valueOf(value.getTime());
 //            }
 //        };
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
-        {
-            @Override
-            public Response intercept(Chain chain) throws IOException
-            {
-                Request orig = chain.request();
-                Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
-                builder.header("Authorization",
-                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMTU4NDg1fQ.-pAAuNQCGkcLUX-WcQbXmXNg1xsYQtivMOCoNP7eMlY");
-                return chain.proceed(builder.build());
-            }
-        }).build();
-        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
-                .build();
+//        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
+//        {
+//            @Override
+//            public Response intercept(Chain chain) throws IOException
+//            {
+//                Request orig = chain.request();
+//                Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
+//                builder.header("Authorization",
+//                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMTU4NDg1fQ.-pAAuNQCGkcLUX-WcQbXmXNg1xsYQtivMOCoNP7eMlY");
+//                return chain.proceed(builder.build());
+//            }
+//        }).build();
+//        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
+//                .build();
         StringBuilder stringBuilder = new StringBuilder();
         switch (type)
         {
@@ -134,6 +157,7 @@ public class SmsRadar extends Activity
         }
         stringBuilder.append(MessageDbUtility.fetchContactNameByNumber(sms.getSender(), getContentResolver()))
                 .append("\n").append("MSG: ").append(sms.getBody());
+        Log.d("MSGRadar", stringBuilder.toString());
         return stringBuilder.toString();
     }
 }

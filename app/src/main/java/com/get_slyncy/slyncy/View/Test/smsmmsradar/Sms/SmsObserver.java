@@ -42,124 +42,164 @@ import com.get_slyncy.slyncy.View.Test.smsmmsradar.SmsMmsRadar;
  * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-public class SmsObserver extends ContentObserver {
+public class SmsObserver extends ContentObserver
+{
 
-	private static final Uri SMS_URI = Uri.parse("content://sms/");
-	private static final Uri SMS_SENT_URI = Uri.parse("content://sms/sent");
-	private static final Uri SMS_INBOX_URI = Uri.parse("content://sms/inbox");
-	private static final String PROTOCOL_COLUM_NAME = "protocol";
-	private static final String SMS_ORDER = "date DESC";
+    private static final Uri SMS_URI = Uri.parse("content://sms/");
+    private static final Uri SMS_SENT_URI = Uri.parse("content://sms/sent");
+    private static final Uri SMS_INBOX_URI = Uri.parse("content://sms/inbox");
+    private static final String PROTOCOL_COLUM_NAME = "protocol";
+    private static final String SMS_ORDER = "date DESC";
 
-	private ContentResolver contentResolver;
-	private SmsCursorParser smsCursorParser;
+    private ContentResolver contentResolver;
+    private SmsCursorParser smsCursorParser;
 
-	public SmsObserver(ContentResolver contentResolver, Handler handler, SmsCursorParser smsCursorParser) {
-		super(handler);
-		this.contentResolver = contentResolver;
-		this.smsCursorParser = smsCursorParser;
-	}
+    public SmsObserver(ContentResolver contentResolver, Handler handler, SmsCursorParser smsCursorParser)
+    {
+        super(handler);
+        this.contentResolver = contentResolver;
+        this.smsCursorParser = smsCursorParser;
+    }
 
 
-	@Override
-	public boolean deliverSelfNotifications() {
-		return true;
-	}
+    @Override
+    public boolean deliverSelfNotifications()
+    {
+        return true;
+    }
 
-	@Override
-	public void onChange(boolean selfChange) {
-		super.onChange(selfChange);
-		Cursor cursor = null;
-		try {
-			cursor = getSmsContentObserverCursor();
-			if (cursor != null && cursor.moveToFirst()) {
-				processSms(cursor);
-			}
-		} finally {
-			close(cursor);
-		}
-	}
+    @Override
+    public void onChange(boolean selfChange)
+    {
+        super.onChange(selfChange);
+        Cursor cursor = null;
+        try
+        {
+            cursor = getSmsContentObserverCursor();
+            if (cursor != null && cursor.moveToFirst())
+            {
+                String protocol = cursor.getString(cursor.getColumnIndex(PROTOCOL_COLUM_NAME));
+                processSms(protocol);
+            }
+        }
+        finally
+        {
+            close(cursor);
+        }
+    }
 
-	private void processSms(Cursor cursor) {
-		Cursor smsCursor = null;
-		try {
-			String protocol = cursor.getString(cursor.getColumnIndex(PROTOCOL_COLUM_NAME));
-			smsCursor = getSmsCursor(protocol);
-			SlyncyMessage sms = parseSms(smsCursor);
-			notifySmsListener(sms);
-		} finally {
-			close(smsCursor);
-		}
-	}
+    private void processSms(final String protocol)
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Cursor smsCursor = null;
+                try
+                {
+                    smsCursor = getSmsCursor(protocol);
+                    SlyncyMessage sms = parseSms(smsCursor);
+                    notifySmsListener(sms);
+                }
+                finally
+                {
+                    close(smsCursor);
+                }
+            }
+        }).start();
+    }
 
-	private void notifySmsListener(SlyncyMessage sms) {
-		if (sms != null && SmsMmsRadar.smsListener != null) {
-			if (sms.isUserSent()) {
-				SmsMmsRadar.smsListener.onSmsSent(sms);
-			} else {
-				SmsMmsRadar.smsListener.onSmsReceived(sms);
-			}
-		}
-	}
+    private void notifySmsListener(SlyncyMessage sms)
+    {
+        if (sms != null && SmsMmsRadar.smsListener != null)
+        {
+            if (sms.isUserSent())
+            {
+                SmsMmsRadar.smsListener.onSmsSent(sms);
+            }
+            else
+            {
+                SmsMmsRadar.smsListener.onSmsReceived(sms);
+            }
+        }
+    }
 
-	private Cursor getSmsCursor(String protocol) {
-		return getSmsDetailsCursor(protocol);
-	}
+    private Cursor getSmsCursor(String protocol)
+    {
+        return getSmsDetailsCursor(protocol);
+    }
 
-	private Cursor getSmsDetailsCursor(String protocol) {
-		Cursor smsCursor;
-		if (isProtocolForOutgoingSms(protocol)) {
-			//SMS Sent
-			smsCursor = getSmsDetailsCursor(SmsContext.SMS_SENT.getUri());
-		} else {
-			//SMSReceived
-			smsCursor = getSmsDetailsCursor(SmsContext.SMS_RECEIVED.getUri());
-		}
-		return smsCursor;
-	}
+    private Cursor getSmsDetailsCursor(String protocol)
+    {
+        Cursor smsCursor;
+        if (isProtocolForOutgoingSms(protocol))
+        {
+            //SMS Sent
+            smsCursor = getSmsDetailsCursor(SmsContext.SMS_SENT.getUri());
+        }
+        else
+        {
+            //SMSReceived
+            smsCursor = getSmsDetailsCursor(SmsContext.SMS_RECEIVED.getUri());
+        }
+        return smsCursor;
+    }
 
-	private Cursor getSmsContentObserverCursor() {
-		String[] projection = null;
-		String selection = null;
-		String[] selectionArgs = null;
-		String sortOrder = null;
-		return contentResolver.query(SMS_URI, projection, selection, selectionArgs, sortOrder);
-	}
+    private Cursor getSmsContentObserverCursor()
+    {
+        String[] projection = null;
+        String selection = null;
+        String[] selectionArgs = null;
+        String sortOrder = null;
+        return contentResolver.query(SMS_URI, projection, selection, selectionArgs, sortOrder);
+    }
 
-	private boolean isProtocolForOutgoingSms(String protocol) {
-		return protocol == null;
-	}
+    private boolean isProtocolForOutgoingSms(String protocol)
+    {
+        return protocol == null;
+    }
 
-	private Cursor getSmsDetailsCursor(Uri smsUri) {
+    private Cursor getSmsDetailsCursor(Uri smsUri)
+    {
 
-		return smsUri != null ? this.contentResolver.query(smsUri, null, null, null, SMS_ORDER) : null;
-	}
+        return smsUri != null ? this.contentResolver.query(smsUri, null, null, null, SMS_ORDER) : null;
+    }
 
-	private SlyncyMessage parseSms(Cursor cursor) {
-		return smsCursorParser.parse(cursor);
-	}
+    private SlyncyMessage parseSms(Cursor cursor)
+    {
+        return smsCursorParser.parse(cursor);
+    }
 
-	private void close(Cursor cursor) {
-		if (cursor != null) {
-			cursor.close();
-		}
-	}
+    private void close(Cursor cursor)
+    {
+        if (cursor != null)
+        {
+            cursor.close();
+        }
+    }
 
-	/**
-	 * Represents the SMS origin.
-	 */
-	private enum SmsContext {
-		SMS_SENT {
-			@Override
-			Uri getUri() {
-				return SMS_SENT_URI;
-			}
-		}, SMS_RECEIVED {
-			@Override
-			Uri getUri() {
-				return SMS_INBOX_URI;
-			}
-		};
+    /**
+     * Represents the SMS origin.
+     */
+    private enum SmsContext
+    {
+        SMS_SENT
+                {
+                    @Override
+                    Uri getUri()
+                    {
+                        return SMS_SENT_URI;
+                    }
+                }, SMS_RECEIVED
+            {
+                @Override
+                Uri getUri()
+                {
+                    return SMS_INBOX_URI;
+                }
+            };
 
-		abstract Uri getUri();
-	}
+        abstract Uri getUri();
+    }
 }

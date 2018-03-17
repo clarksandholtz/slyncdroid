@@ -78,7 +78,8 @@ public class MmsObserver extends ContentObserver
             cursor = getMmsContentObserverCursor();
             if (cursor != null && cursor.moveToFirst())
             {
-                processMms(cursor);
+                int protocol = cursor.getInt(cursor.getColumnIndex(PROTOCOL_COLUMN_NAME));
+                processMms(protocol);
             }
         }
         finally
@@ -88,21 +89,30 @@ public class MmsObserver extends ContentObserver
 //        Telephony.Mms.Sent.CONTENT_URI;
     }
 
-    private void processMms(Cursor cursor)
+    private void processMms(final int protocol)
     {
-        Cursor mmsCursor = null;
-        try
+        new Thread(new Runnable()
         {
-            int protocol = cursor.getInt(cursor.getColumnIndex(PROTOCOL_COLUMN_NAME));
-            mmsCursor = getMmsCursor(protocol);
-            SlyncyMessage mms = parseMms(mmsCursor);
-            mms.setUserSent(protocol == 2);
-            notifyMmsListener(mms);
-        }
-        finally
-        {
-            close(mmsCursor);
-        }
+            @Override
+            public void run()
+            {
+                Cursor mmsCursor = null;
+                try
+                {
+                    mmsCursor = getMmsCursor(protocol);
+                    SlyncyMessage mms = parseMms(mmsCursor);
+                    if (mms != null)
+                    {
+                        mms.setUserSent(protocol == 2);
+                    }
+                    notifyMmsListener(mms);
+                }
+                finally
+                {
+                    close(mmsCursor);
+                }
+            }
+        }).start();
     }
 
     private void notifyMmsListener(SlyncyMessage mms)

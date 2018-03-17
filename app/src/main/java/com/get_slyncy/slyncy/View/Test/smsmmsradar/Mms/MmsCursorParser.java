@@ -26,6 +26,8 @@ import com.get_slyncy.slyncy.View.Test.smsmmsradar.TimeProvider;
 
 import java.util.Date;
 
+import static com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility.*;
+
 
 /**
  * Works as cursor parser to get mms info from a cursor obtained from mms inbox/sent content provider.
@@ -74,7 +76,7 @@ public class MmsCursorParser
 
         int mmsId = cursor.getInt(cursor.getColumnIndex(ID_COLUMN_NAME));
         String date = cursor.getString(cursor.getColumnIndex(DATE_COLUMN_NAME));
-        Date mmsDate = new Date(Long.parseLong(date));
+        Date mmsDate = new Date(Long.parseLong(date) * 1000);
 
         if (shouldParseMms(mmsId, mmsDate))
         {
@@ -124,14 +126,13 @@ public class MmsCursorParser
 
     private SlyncyMessage extractMmsInfoFromCursor(Cursor cursor, ContentResolver resolver)
     {
-        SlyncyMessage message = MessageDbUtility.getMmsMessage(cursor, resolver);
-//        String address = cursor.getString(cursor.getColumnIndex(ADDRESS_COLUMN_NAME));
+        //        String address = cursor.getString(cursor.getColumnIndex(ADDRESS_COLUMN_NAME));
 //        long date = cursor.getLong(cursor.getColumnIndex(DATE_COLUMN_NAME));
 //        String msg = cursor.getString(cursor.getColumnIndex(BODY_COLUMN_NAME));
 //        String type = cursor.getString(cursor.getColumnIndex(TYPE_COLUMN_NAME));
 //        long threadId = cursor.getLong(cursor.getColumnIndex(THREAD_ID_COLUMN_NAME));
 //        return new Mms(address, date, msg, SmsType.fromValue(Integer.parseInt(type)), threadId)
-        return message;
+        return getMmsMessage(cursor, resolver);
     }
 
 

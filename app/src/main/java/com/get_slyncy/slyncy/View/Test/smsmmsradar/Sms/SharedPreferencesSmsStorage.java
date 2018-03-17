@@ -18,6 +18,8 @@ package com.get_slyncy.slyncy.View.Test.smsmmsradar.Sms;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
+import java.util.concurrent.Semaphore;
+
 /**
  * SmsStorage implementation based on shared preferences.
  *
@@ -28,6 +30,7 @@ public class SharedPreferencesSmsStorage implements SmsStorage {
 
 	private static final String LAST_SMS_PARSED = "last_sms_parsed";
 	private static final int DEFAULT_SMS_PARSED_VALUE = -1;
+	private static final Semaphore sem = new Semaphore(1, true);
 
 	private SharedPreferences preferences;
 
@@ -41,14 +44,19 @@ public class SharedPreferencesSmsStorage implements SmsStorage {
 
 	@Override
 	public void updateLastSmsIntercepted(int smsId) {
+	    sem.acquireUninterruptibly();
 		Editor editor = preferences.edit();
 		editor.putInt(LAST_SMS_PARSED, smsId);
 		editor.commit();
+		sem.release();
 	}
 
 	@Override
 	public int getLastSmsIntercepted() {
-		return preferences.getInt(LAST_SMS_PARSED, DEFAULT_SMS_PARSED_VALUE);
+	    sem.acquireUninterruptibly();
+        int val = preferences.getInt(LAST_SMS_PARSED, DEFAULT_SMS_PARSED_VALUE);
+	    sem.release();
+		return val;
 	}
 
 	@Override

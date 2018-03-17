@@ -75,6 +75,7 @@ public class MessagesMonitoringService extends Service
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         super.onStartCommand(intent, flags, startId);
+
         return START_STICKY;
     }
 

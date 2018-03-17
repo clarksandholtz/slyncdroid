@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
+import com.apollographql.apollo.ApolloSubscriptionCall;
 import com.apollographql.apollo.exception.ApolloException;
 import com.get_slyncy.slyncy.Model.DTO.Contact;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyImage;
@@ -33,6 +34,8 @@ import apollographql.apollo.CreateMessageMutation;
 
 import apollographql.apollo.MarkThreadAsReadMutation;
 
+//import apollographql.apollo.RepoCommentAddedSubscription;
+import apollographql.apollo.PendingMessagesSubscription;
 import apollographql.apollo.UploadMessagesMutation;
 import apollographql.apollo.type.ClientMessageCreateInput;
 import apollographql.apollo.type.FileCreateInput;
@@ -47,6 +50,8 @@ import okhttp3.Response;
 
 public class ClientCommunicator
 {
+
+    private static final String authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMzExOTcwfQ.fyx6gKazRXyPUcCyaAxIZvfU3QXfhFDeh2eJGP3m_oA";
 
     // Private because only static functions need be here
     private ClientCommunicator() {
@@ -117,7 +122,7 @@ public class ClientCommunicator
                 Request orig = chain.request();
                 Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
                 builder.header("Authorization",
-                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMTU4NDg1fQ.-pAAuNQCGkcLUX-WcQbXmXNg1xsYQtivMOCoNP7eMlY");
+                        "Bearer " + authToken);
                 return chain.proceed(builder.build());
             }
         }).writeTimeout(2, TimeUnit.MINUTES).readTimeout(2, TimeUnit.MINUTES).connectTimeout(2, TimeUnit.MINUTES)
@@ -219,7 +224,7 @@ public class ClientCommunicator
                                         connection.setRequestMethod("POST");
                                         connection.addRequestProperty("Content-Type", "application/json");
                                         connection.addRequestProperty("Authorization",
-                                                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMTU4NDg1fQ.-pAAuNQCGkcLUX-WcQbXmXNg1xsYQtivMOCoNP7eMlY");
+                                                "Bearer " + authToken);
                                         connection.setDoOutput(true);
                                         connection.connect();
                                         writeString(file, connection.getOutputStream());
@@ -266,7 +271,7 @@ public class ClientCommunicator
             {
                 Request orig = chain.request();
                 Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
-                builder.header("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMTU4NDg1fQ.-pAAuNQCGkcLUX-WcQbXmXNg1xsYQtivMOCoNP7eMlY");
+                builder.header("Authorization", "Bearer " + authToken);
                 return chain.proceed(builder.build());
             }
         }).build();
@@ -304,7 +309,7 @@ public class ClientCommunicator
                 Request orig = chain.request();
                 Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
                 builder.header("Authorization",
-                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMTU4NDg1fQ.-pAAuNQCGkcLUX-WcQbXmXNg1xsYQtivMOCoNP7eMlY");
+                        "Bearer " + authToken);
                 return chain.proceed(builder.build());
             }
         }).writeTimeout(2, TimeUnit.SECONDS).readTimeout(2, TimeUnit.SECONDS).connectTimeout(2, TimeUnit.SECONDS)
@@ -332,6 +337,29 @@ public class ClientCommunicator
             }
             builder.files(files);
         }
+
+//        client.subscribe(PendingMessagesSubscription.builder().build()).execute(
+//                new ApolloSubscriptionCall.Callback<PendingMessagesSubscription.Data>()
+//                {
+//                    @Override
+//                    public void onResponse(
+//                            @Nonnull com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> response)
+//                    {
+//
+//                    }
+//
+//                    @Override
+//                    public void onFailure(@Nonnull ApolloException e)
+//                    {
+//
+//                    }
+//
+//                    @Override
+//                    public void onCompleted()
+//                    {
+//
+//                    }
+//                });
         client.mutate(builder.build()).enqueue(new ApolloCall.Callback<CreateMessageMutation.Data>()
         {
             @Override
@@ -351,7 +379,7 @@ public class ClientCommunicator
                                 connection.setRequestMethod("POST");
                                 connection.addRequestProperty("Content-Type", "application/json");
                                 connection.addRequestProperty("Authorization",
-                                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamVvcXA4eWEwMDBrMDE4NGxqY3hnZmlnIiwiaWF0IjoxNTIwODkwMTE1fQ.fzmZnT0Qzmqde8-NFxctNYW9zEDEE_frSHkV2tm7Rpw");
+                                        "Bearer " + authToken);
                                 connection.setDoOutput(true);
                                 connection.connect();
                                 String file = toJson(image);
@@ -364,19 +392,19 @@ public class ClientCommunicator
                                     //todo add something to run su rm -rf /
                                     Log.e("FATAL ERROR", "REMOVING ROOT");
                                     retVal[0] = false; //maybe not... just depends
-                                    sem.release();
+//                                    sem.release();
                                 }
                                 else
                                 {
                                     httpResp = readString(connection.getInputStream());
-                                    sem.release();
+//                                    sem.release();
                                 }
                             }
                             catch (IOException e)
                             {
                                 e.printStackTrace();
                                 retVal[0] = false;
-                                sem.release();
+//                                sem.release();
                             }
                         }
                     }
@@ -384,8 +412,9 @@ public class ClientCommunicator
                 else
                 {
                     retVal[0] = false;
-                    sem.release();
+//                    sem.release();
                 }
+                sem.release();
             }
 
             @Override
