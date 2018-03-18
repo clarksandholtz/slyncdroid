@@ -9,7 +9,10 @@ import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.apollographql.apollo.ApolloCall;
@@ -54,8 +57,13 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         FirebaseApp.initializeApp(this);
+        ImageView logo = findViewById(R.id.slyncy_logo);
+        logo.setImageDrawable(getDrawable(R.drawable.ic_logo_white));
+//        logo.getLayoutParams().width = 1000;
 
-        SignInButton button = findViewById(R.id.sign_in_button);
+
+
+        Button button = findViewById(R.id.sign_in_button);
         button.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -64,23 +72,6 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                 signIn();
             }
         });
-
-        FrameLayout view = findViewById(R.id.sign_in_button);
-        for (int i = 0; i < view.getChildCount(); i++)
-        {
-            View v = view.getChildAt(i);
-
-            if (v instanceof TextView)
-            {
-                TextView tv = (TextView) v;
-                tv.setText("Sign in with Google");
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                {
-                    tv.setTypeface(getResources().getFont(R.font.regular));
-                    tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-                }
-            }
-        }
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
