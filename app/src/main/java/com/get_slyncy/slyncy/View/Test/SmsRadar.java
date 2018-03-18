@@ -1,33 +1,19 @@
 package com.get_slyncy.slyncy.View.Test;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.apollographql.apollo.ApolloClient;
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.R;
-import com.get_slyncy.slyncy.View.LoginActivity;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms.MmsListener;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.Sms.SmsListener;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.SmsMmsRadar;
-import com.tuenti.smsmmsradar.Sms.Sms;
-
-import java.io.IOException;
-
-import apollographql.apollo.CreateMessageMutation;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsListener;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsListener;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 
 //import apollographql.apollo.UploadMessagesMutation;
 //import apollographql.apollo.type.CustomType;

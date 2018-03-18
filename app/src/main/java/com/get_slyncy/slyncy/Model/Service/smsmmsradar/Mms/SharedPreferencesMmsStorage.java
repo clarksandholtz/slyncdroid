@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms;
+package com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;

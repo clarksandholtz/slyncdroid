@@ -81,11 +81,10 @@
             android:textColorHint="@color/white"/>
 
         <FrameLayout
+            android:id="@+id/email_confirm_pad"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
-
-        </FrameLayout>
+            android:layout_weight="1"/>
 
         <EditText
             android:id="@+id/email_field"
@@ -103,6 +102,29 @@
             android:paddingStart="20dp"
             android:textColor="@color/colorFontDark"
             android:textColorHint="@color/white"/>
+
+        <FrameLayout
+            android:id="@+id/sms_confirm_pad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:visibility="gone"/>
+
+        <EditText
+            android:id="@+id/verification_code"
+            android:layout_width="275dp"
+            android:layout_height="35dp"
+            android:background="@drawable/edit_text_no_text"
+            android:ems="10"
+            android:fontFamily="@font/regular"
+            android:hint="@string/hint_verification_code"
+            android:inputType="number"
+            android:paddingEnd="5dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="5dp"
+            android:paddingStart="20dp"
+            android:textColorHint="@color/white"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

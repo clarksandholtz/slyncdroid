@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.get_slyncy.slyncy.View.Test.smsmmsradar;
+package com.get_slyncy.slyncy.Model.Service.smsmmsradar;
 
 
 import android.app.AlarmManager;
@@ -34,15 +34,15 @@ import android.os.IBinder;
 import android.provider.Telephony;
 
 import com.get_slyncy.slyncy.R;
-import com.get_slyncy.slyncy.View.Test.PersistentNotifActivity;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms.MmsCursorParser;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms.MmsObserver;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms.MmsStorage;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms.SharedPreferencesMmsStorage;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.Sms.SharedPreferencesSmsStorage;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.Sms.SmsCursorParser;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.Sms.SmsObserver;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.Sms.SmsStorage;
+import com.get_slyncy.slyncy.View.PersistentNotifActivity;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsCursorParser;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsObserver;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsStorage;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.SharedPreferencesMmsStorage;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SharedPreferencesSmsStorage;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsCursorParser;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsObserver;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsStorage;
 
 
 /**

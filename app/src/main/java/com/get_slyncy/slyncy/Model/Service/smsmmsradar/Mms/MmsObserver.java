@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms;
+package com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms;
 
 
 import android.content.ContentResolver;
@@ -23,7 +23,7 @@ import android.net.Uri;
 import android.os.Handler;
 
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.SmsMmsRadar;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 
 
 /**

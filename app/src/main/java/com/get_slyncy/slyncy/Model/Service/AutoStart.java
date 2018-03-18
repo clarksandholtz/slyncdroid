@@ -3,10 +3,7 @@ package com.get_slyncy.slyncy.Model.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.util.Log;
-
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.SmsMmsRadar;
 
 //import com.get_slyncy.slyncy.View.Test.SmsMmsRadar;
 

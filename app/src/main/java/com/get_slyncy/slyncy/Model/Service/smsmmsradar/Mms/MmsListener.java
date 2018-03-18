@@ -13,22 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.get_slyncy.slyncy.View.Test.smsmmsradar;
+package com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms;
 
-import java.util.Date;
-
+import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 /**
- * Class created to work as time provider. This entity returns the current date. Avoid the client code to use System
- * .currentTimeMillis or create a new Date object directly.
+ * This interface has to be implemented to be notified when an sms be received or sent.
  *
- * @author Pedro Vicente Gómez Sánchez <pgomez@tuenti.com>
+ * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-public class TimeProvider {
+public interface MmsListener
+{
 
+	/**
+	 * Invoked when an incoming sms is intercepted.
+	 *
+	 * @param mms intercepted.
+	 */
+	public void onMmsSent(SlyncyMessage mms);
 
-	public Date getDate() {
-		return new Date();
-	}
+	/**
+	 * Invoked when an outgoing sms is intercepted.
+	 *
+	 * @param mms
+	 */
+
+	public void onMmsReceived(SlyncyMessage mms);
 
 }

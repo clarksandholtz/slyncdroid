@@ -19,6 +19,7 @@ import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
+import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.Model.Util.DownloadImageTask;
 import com.get_slyncy.slyncy.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -191,6 +192,10 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                         }
                         else
                         {
+                            if (response.data() != null)
+                            {
+                                ClientCommunicator.setAuthToken(response.data().login().token());
+                            }
                             new DownloadImageTask(LoginActivity.this.getCacheDir().getPath(),
                                     LoginActivity.this).execute(user.getPhotoUrl().toString()
                                     .replace("s96-c", "s960-c"));

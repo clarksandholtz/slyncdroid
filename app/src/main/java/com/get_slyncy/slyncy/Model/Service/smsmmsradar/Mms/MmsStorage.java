@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.get_slyncy.slyncy.View.Test.smsmmsradar.Sms;
+package com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms;
 
 /**
  * The SmsStorage has the responsibility to store the last sms intercepted by the library.
@@ -21,13 +21,14 @@ package com.get_slyncy.slyncy.View.Test.smsmmsradar.Sms;
  * @author Pedro Vicente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-public interface SmsStorage {
+public interface MmsStorage
+{
 
 
 
-	void updateLastSmsIntercepted(int smsId);
+	void updateLastMmsIntercepted(int mmsId);
 
-	int getLastSmsIntercepted();
+	int getLastMmsIntercepted();
 
-	boolean isFirstSmsIntercepted();
+	boolean isFirstMmsIntercepted();
 }

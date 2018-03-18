@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms;
+package com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms;
 
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 /**
@@ -22,22 +22,21 @@ import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
  * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-public interface MmsListener
-{
+public interface SmsListener {
 
 	/**
 	 * Invoked when an incoming sms is intercepted.
 	 *
-	 * @param mms intercepted.
+	 * @param sms intercepted.
 	 */
-	public void onMmsSent(SlyncyMessage mms);
+	public void onSmsSent(SlyncyMessage sms);
 
 	/**
 	 * Invoked when an outgoing sms is intercepted.
 	 *
-	 * @param mms
+	 * @param sms
 	 */
 
-	public void onMmsReceived(SlyncyMessage mms);
+	public void onSmsReceived(SlyncyMessage sms);
 
 }

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.get_slyncy.slyncy.View.Test.smsmmsradar;
+package com.get_slyncy.slyncy.Model.Service.smsmmsradar;
 
 import android.content.Context;
 import android.content.Intent;
 
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms.MmsListener;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.Sms.SmsListener;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsListener;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsListener;
 
 
 /**

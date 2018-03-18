@@ -51,7 +51,8 @@ import okhttp3.Response;
 public class ClientCommunicator
 {
 
-    private static final String authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMzExOTcwfQ.fyx6gKazRXyPUcCyaAxIZvfU3QXfhFDeh2eJGP3m_oA";
+
+    private static String authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMzExOTcwfQ.fyx6gKazRXyPUcCyaAxIZvfU3QXfhFDeh2eJGP3m_oA";
 
     // Private because only static functions need be here
     private ClientCommunicator() {
@@ -110,6 +111,11 @@ public class ClientCommunicator
             stringBuilder.append(buf, 0, len);
         }
         return stringBuilder.toString();
+    }
+
+    public static void setAuthToken(String authToken)
+    {
+        ClientCommunicator.authToken = authToken;
     }
 
     public static boolean bulkMessageUpload()

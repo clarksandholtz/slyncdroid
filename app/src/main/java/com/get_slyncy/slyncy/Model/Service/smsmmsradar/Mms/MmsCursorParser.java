@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.get_slyncy.slyncy.View.Test.smsmmsradar.Mms;
+package com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms;
 
 
 import android.content.ContentResolver;
 import android.database.Cursor;
 
 
-import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
-import com.get_slyncy.slyncy.View.Test.smsmmsradar.TimeProvider;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.TimeProvider;
 
 import java.util.Date;
 

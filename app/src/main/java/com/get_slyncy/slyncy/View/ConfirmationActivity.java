@@ -18,6 +18,7 @@ import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
+import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.Model.Util.DownloadImageTask;
 import com.get_slyncy.slyncy.R;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -53,6 +54,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
     private EditText nameField;
     private EditText phoneField;
     private EditText emailField;
+    private EditText verificationField;
     private String name;
     private String phone;
     private String email;
@@ -84,6 +86,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
         nameField = findViewById(R.id.name_field);
         phoneField = findViewById(R.id.phone_field);
         emailField = findViewById(R.id.email_field);
+        verificationField = findViewById(R.id.verification_code);
 
         if (name != null && !name.isEmpty())
         {
@@ -210,6 +213,57 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
 
 
         @Override
+        public void onCodeAutoRetrievalTimeOut(String s)
+        {
+            super.onCodeAutoRetrievalTimeOut(s);
+            emailField.setVisibility(View.GONE);
+            findViewById(R.id.email_confirm_pad).setVisibility(View.GONE);
+            findViewById(R.id.sms_confirm_pad).setVisibility(View.VISIBLE);
+            verificationField.setVisibility(View.VISIBLE);
+            verificationField.setError("Please enter your verification code");
+            emailField.setEnabled(false);
+            phoneField.setEnabled(false);
+            nameField.setEnabled(false);
+            verificationField.addTextChangedListener(new TextWatcher()
+            {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after)
+                {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count)
+                {
+                    confirmButton.setEnabled(verificationField.getText().toString().length() >= 6);
+                    if (verificationField.getText().toString().length() >= 6)
+                    {
+                        verificationField.setError(null);
+                    }
+                    else
+                    {
+                        verificationField.setError("Please enter your verification code");
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s)
+                {
+                }
+            });
+
+            confirmButton.setText("Verify");
+            confirmButton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Snackbar.make(v, "Manual verification still needs implementation", Snackbar.LENGTH_LONG);
+                }
+            });
+        }
+
+        @Override
         public void onVerificationCompleted(PhoneAuthCredential credential)
         {
             // This callback will be invoked in two situations:
@@ -244,6 +298,10 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                                     {
                                         if (!response.hasErrors())
                                         {
+                                            if (response.data() != null)
+                                            {
+                                                ClientCommunicator.setAuthToken(response.data().signup().token());
+                                            }
                                             if (!new File(getCacheDir() + "/profilePic.jpg").exists())
                                             {
                                                 new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(),
@@ -276,7 +334,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
             if (e instanceof FirebaseAuthInvalidCredentialsException)
             {
                 // Invalid request
-                phoneField.setError("Invalid phone number!");
+                verificationField.setError("Invalid verification code");
             }
             else if (e instanceof FirebaseTooManyRequestsException)
             {

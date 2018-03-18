@@ -1,4 +1,4 @@
-package com.get_slyncy.slyncy.View.Test;
+package com.get_slyncy.slyncy.View;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
