@@ -6,6 +6,11 @@ import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.ApolloSubscriptionCall;
 import com.apollographql.apollo.exception.ApolloException;
+import com.apollographql.apollo.internal.interceptor.ApolloServerInterceptor;
+import com.apollographql.apollo.rx2.Rx2Apollo;
+import com.apollographql.apollo.subscription.WebSocketSubscriptionTransport;
+import com.get_slyncy.slyncy.Model.CellMessaging.MessageSender;
+import com.get_slyncy.slyncy.Model.DTO.CellMessage;
 import com.get_slyncy.slyncy.Model.DTO.Contact;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyImage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
@@ -18,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -39,10 +45,19 @@ import apollographql.apollo.PendingMessagesSubscription;
 import apollographql.apollo.UploadMessagesMutation;
 import apollographql.apollo.type.ClientMessageCreateInput;
 import apollographql.apollo.type.FileCreateInput;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subscribers.DisposableSubscriber;
+import okhttp3.Headers;
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.WebSocket;
+
+import static com.apollographql.apollo.api.internal.Utils.checkNotNull;
 
 /**
  * Created by tylerbowers on 2/27/18.
@@ -433,5 +448,126 @@ public class ClientCommunicator
 
         sem.acquireUninterruptibly();
         return retVal[0];
+    }
+
+    private static final CompositeDisposable disposables = new CompositeDisposable();
+
+    public static void subscribeToNewMessages()
+    {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
+        {
+            @Override
+            public Response intercept(Chain chain) throws IOException
+            {
+                Request orig = chain.request();
+                Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
+                builder.header("Authorization", "Bearer " + authToken);
+                return chain.proceed(builder.build());
+            }
+        }).build();
+        WebSocketSubscriptionTransport.Factory factory = new WebSocketSubscriptionTransport.Factory(LoginActivity.SERVER_URL, okHttpClient);
+//        try
+//        {
+////            Field[] fields = WebSocketSubscriptionTransport.Factory.class.getDeclaredFields();
+//
+//            Field myField = WebSocketSubscriptionTransport.Factory.class.getDeclaredField("webSocketRequest");
+//            myField.setAccessible(true);
+//            Request request = (Request) myField.get(factory);
+//            Request.Builder builder = request.newBuilder();
+//            builder.addHeader("Authorization", "Bearer " + authToken);
+//            builder.addHeader("From","TEST@EXAMPLE.COM");
+//            myField.set(factory, builder.build());
+//        }
+//        catch (NoSuchFieldException e)
+//        {
+//            e.printStackTrace();
+//        }
+//        catch (IllegalAccessException e)
+//        {
+//            e.printStackTrace();
+//        }
+
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
+                .subscriptionTransportFactory(factory).build();
+
+        ApolloSubscriptionCall<PendingMessagesSubscription.Data> subscription = client.subscribe(PendingMessagesSubscription.builder().build());
+        disposables.add(Rx2Apollo.from(subscription).subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread())
+                .subscribeWith(
+                        new DisposableSubscriber<com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data>>()
+                        {
+                            @Override
+                            public void onNext(com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> dataResponse)
+                            {
+                                Log.d("OnNext", "subscrition");
+                            }
+
+                            @Override
+                            public void onError(Throwable t)
+                            {
+                                Log.d("error", "subscrition");
+
+                            }
+
+                            @Override
+                            public void onComplete()
+                            {
+                                Log.d("complete", "subscrition");
+
+                            }
+                        }));
+// .execute(
+//                new ApolloSubscriptionCall.Callback<PendingMessagesSubscription.Data>()
+//                {
+//                    @Override
+//                    public void onResponse(
+//                            @Nonnull com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> response)
+//                    {
+//                        if (response.hasErrors())
+//                        {
+//                            Log.e("SUBSCTIPTION:", "RESPONSE ERROR");
+//                        }
+//                        else
+//                        {
+//                            if (response.data() != null && response.data().pendingMessages() != null)
+//                            {
+//                                PendingMessagesSubscription.Node node = response.data().pendingMessages().node();
+//                                String address = node.address();
+//                                String body = node.body();
+//                                List<PendingMessagesSubscription.File> files = node.files();
+//                                PendingMessagesSubscription.File file = null;
+//                                for (PendingMessagesSubscription.File ifile : files)
+//                                {
+//                                    if (ifile != null)
+//                                        if (ifile.uploaded())
+//                                        {
+//                                            file = ifile;
+//                                        }
+//                                }
+//                                if (file != null)
+//                                {
+//                                    String fileName = file.content();
+//                                    //todo download;
+//                                }
+//                                else
+//                                {
+////                                    MessageSender.sendSMSMessage(new CellMessage());
+//                                    Log.v("SUBSCRIPTION", "MESSAGE SENT");
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(@Nonnull ApolloException e)
+//                    {
+//                        Log.e("SUBSCRIPTION", "ERROROROROROROROROROROROROROROROOROROROROR");
+//                    }
+//
+//                    @Override
+//                    public void onCompleted()
+//                    {
+//                        Log.i("SUBSCRIPTION", "COMPLETED");
+//                    }
+//                });
     }
 }

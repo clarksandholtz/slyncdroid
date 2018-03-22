@@ -45,7 +45,7 @@ import apollographql.apollo.LoginMutation;
 public class LoginActivity extends Activity implements DownloadImageTask.PostExecCallBack
 {
 
-    public static final String SERVER_URL = "http://773dd16b.ngrok.io/";
+    public static final String SERVER_URL = "http://10.24.27.180:4000/";
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
     private FirebaseAuth mAuth;

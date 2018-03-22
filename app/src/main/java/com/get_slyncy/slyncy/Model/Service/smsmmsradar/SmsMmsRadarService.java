@@ -33,7 +33,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Telephony;
 
+import com.apollographql.apollo.ApolloClient;
+import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.R;
+import com.get_slyncy.slyncy.View.LoginActivity;
 import com.get_slyncy.slyncy.View.PersistentNotifActivity;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsCursorParser;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsObserver;
@@ -43,6 +46,13 @@ import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SharedPreferencesSmsS
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsCursorParser;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsObserver;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsStorage;
+
+import java.io.IOException;
+
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 
 /**
@@ -135,6 +145,7 @@ public class SmsMmsRadarService extends Service
         initializeDependencies();
         registerSmsContentObserver();
         registerMmsContentObserver();
+        ClientCommunicator.subscribeToNewMessages();
     }
 
     private void initializeDependencies()

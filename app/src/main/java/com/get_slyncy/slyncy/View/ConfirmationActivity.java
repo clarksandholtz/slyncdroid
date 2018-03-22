@@ -286,7 +286,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                     if (task.isSuccessful())
                     {
                         Log.d(TAG, "onComplete: Phone number update successful");
-                        ApolloClient client = ApolloClient.builder().serverUrl("http://fac85b84.ngrok.io").build();
+                        ApolloClient client = ApolloClient.builder().serverUrl(LoginActivity.SERVER_URL).build();
 
 
                         client.mutate(SignupMutation.builder().email(user.getEmail()).name(user.getDisplayName())

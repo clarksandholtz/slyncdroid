@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadarService;
 import com.get_slyncy.slyncy.Model.Util.DownloadImageTask;
 import com.get_slyncy.slyncy.Model.Util.SettingsDb;
 import com.get_slyncy.slyncy.R;
@@ -111,6 +113,9 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
                 SettingsDb.setGroupMessageSettings(getFilesDir(), isChecked);
             }
         });
+
+        Intent intent = new Intent(this, SmsMmsRadarService.class);
+        startService(intent);
     }
 
     public void launchNotifFilter(View view)

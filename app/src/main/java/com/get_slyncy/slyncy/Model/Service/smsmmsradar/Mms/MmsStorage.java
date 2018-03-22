@@ -31,4 +31,10 @@ public interface MmsStorage
 	int getLastMmsIntercepted();
 
 	boolean isFirstMmsIntercepted();
+
+	boolean isFirstMmsRead();
+
+	int getLastMmsRead();
+
+	void updateLastMmsRead(int mmsId);
 }

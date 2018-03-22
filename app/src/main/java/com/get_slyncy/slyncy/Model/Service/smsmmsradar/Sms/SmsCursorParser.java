@@ -50,12 +50,12 @@ public class SmsCursorParser {
 	private static final String THREAD_ID_COLUMN_NAME= "thread_id";
 	private static final int SMS_MAX_AGE_MILLIS = 5000;
 
-	private SmsStorage smsStorage;
-	private TimeProvider timeProvider;
+	private static SmsStorage smsStorage;
+	private static TimeProvider timeProvider;
 
 	public SmsCursorParser(SmsStorage smsStorage, TimeProvider timeProvider) {
-		this.smsStorage = smsStorage;
-		this.timeProvider = timeProvider;
+		SmsCursorParser.smsStorage = smsStorage;
+		SmsCursorParser.timeProvider = timeProvider;
 	}
 
 	public SlyncyMessage parse(Cursor cursor) {
@@ -83,20 +83,20 @@ public class SmsCursorParser {
 		smsStorage.updateLastSmsIntercepted(smsId);
 	}
 
-	private boolean shouldParseSms(int smsId, Date smsDate) {
+	public static boolean shouldParseSms(int smsId, Date smsDate) {
 		boolean isFirstSmsParsed = isFirstSmsParsed();
 		boolean isOld = isOld(smsDate);
 		boolean shouldParseId = shouldParseSmsId(smsId);
 		return (isFirstSmsParsed && !isOld) || (!isFirstSmsParsed && shouldParseId);
 	}
 
-	private boolean isOld(Date smsDate) {
+	private static boolean isOld(Date smsDate) {
 		Date now = timeProvider.getDate();
 		return now.getTime() - smsDate.getTime() > SMS_MAX_AGE_MILLIS;
 	}
 
 
-	private boolean shouldParseSmsId(int smsId) {
+	private static boolean shouldParseSmsId(int smsId) {
 		if (smsStorage.isFirstSmsIntercepted()) {
 			return false;
 		}
@@ -104,7 +104,12 @@ public class SmsCursorParser {
 		return smsId > lastSmsIdIntercepted;
 	}
 
-	private boolean isFirstSmsParsed() {
+	public static void updateLastSmsRead(int smsId)
+	{
+		smsStorage.updateLastSmsRead(smsId);
+	}
+
+	private static boolean isFirstSmsParsed() {
 		return smsStorage.isFirstSmsIntercepted();
 	}
 

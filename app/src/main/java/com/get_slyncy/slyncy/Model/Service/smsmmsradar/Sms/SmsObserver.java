@@ -21,9 +21,13 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
+import android.provider.Telephony;
 
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
+import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
+
+import java.util.Date;
 
 
 /**
@@ -79,6 +83,10 @@ public class SmsObserver extends ContentObserver
             if (cursor != null && cursor.moveToFirst())
             {
                 String protocol = cursor.getString(cursor.getColumnIndex(PROTOCOL_COLUM_NAME));
+                if (!isProtocolForOutgoingSms(protocol))
+                {
+                    processReadSms();
+                }
                 processSms(protocol);
             }
         }
@@ -86,6 +94,43 @@ public class SmsObserver extends ContentObserver
         {
             close(cursor);
         }
+    }
+
+    private void processReadSms()
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Cursor cursor = null;
+                try
+                {
+                    cursor = contentResolver.query(Telephony.Sms.Inbox.CONTENT_URI, new String[]{"*"}, "read = 1", null, "date desc");
+                    if (cursor != null && cursor.moveToFirst())
+                    {
+                        int msgId = cursor.getInt(cursor.getColumnIndex("_id"));
+                        long date = cursor.getLong(cursor.getColumnIndex("date"));
+                        int threadId = cursor.getInt(cursor.getColumnIndex("thread_id"));
+                        if (SmsCursorParser.shouldParseSms(msgId, new Date(date)))
+                        {
+                            if (ClientCommunicator.markThreadAsRead(threadId))
+                            {
+                                SmsCursorParser.updateLastSmsRead(msgId);
+                            }
+                            else
+                            {
+                                SmsCursorParser.updateLastSmsRead(msgId);
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    close(cursor);
+                }
+            }
+        }).start();
     }
 
     private void processSms(final String protocol)

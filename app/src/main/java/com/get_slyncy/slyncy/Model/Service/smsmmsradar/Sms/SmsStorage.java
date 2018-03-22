@@ -30,4 +30,10 @@ public interface SmsStorage {
 	int getLastSmsIntercepted();
 
 	boolean isFirstSmsIntercepted();
+
+	boolean isFirstSmsRead();
+
+	int getLastSmsRead();
+
+	void updateLastSmsRead(int smsId);
 }

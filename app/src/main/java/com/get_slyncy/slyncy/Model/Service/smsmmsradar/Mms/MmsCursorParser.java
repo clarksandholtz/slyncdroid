@@ -54,13 +54,13 @@ public class MmsCursorParser
     private static final String THREAD_ID_COLUMN_NAME = "thread_id";
     private static final int MMS_MAX_AGE_MILLIS = 5000;
 
-    private MmsStorage mmsStorage;
-    private TimeProvider timeProvider;
+    private static MmsStorage mmsStorage;
+    private static TimeProvider timeProvider;
 
     public MmsCursorParser(MmsStorage mmsStorage, TimeProvider timeProvider)
     {
-        this.mmsStorage = mmsStorage;
-        this.timeProvider = timeProvider;
+        MmsCursorParser.mmsStorage = mmsStorage;
+        MmsCursorParser.timeProvider = timeProvider;
     }
 
     SlyncyMessage parse(Cursor cursor, ContentResolver resolver)
@@ -94,7 +94,12 @@ public class MmsCursorParser
         mmsStorage.updateLastMmsIntercepted(mmsId);
     }
 
-    private boolean shouldParseMms(int mmsId, Date mmsDate)
+    public static void updateLastMmsRead(int mmsId)
+    {
+        mmsStorage.updateLastMmsRead(mmsId);
+    }
+
+    public static boolean shouldParseMms(int mmsId, Date mmsDate)
     {
         boolean isFirstMmsParsed = isFirstMmsParsed();
         boolean isOld = isOld(mmsDate);
@@ -102,13 +107,13 @@ public class MmsCursorParser
         return (isFirstMmsParsed && !isOld) || (!isFirstMmsParsed && shouldParseId);
     }
 
-    private boolean isOld(Date mmsDate)
+    private static boolean isOld(Date mmsDate)
     {
         Date now = timeProvider.getDate();
         return now.getTime() - mmsDate.getTime() > MMS_MAX_AGE_MILLIS;
     }
 
-    private boolean shouldParseMmsId(int mmsId)
+    private static boolean shouldParseMmsId(int mmsId)
     {
         if (mmsStorage.isFirstMmsIntercepted())
         {
@@ -118,7 +123,7 @@ public class MmsCursorParser
         return mmsId > lastMmsIdIntercepted;
     }
 
-    private boolean isFirstMmsParsed()
+    private static boolean isFirstMmsParsed()
     {
         return mmsStorage.isFirstMmsIntercepted();
     }

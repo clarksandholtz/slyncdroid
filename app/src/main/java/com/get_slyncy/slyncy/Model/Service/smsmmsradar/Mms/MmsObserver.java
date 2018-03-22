@@ -21,9 +21,13 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
+import android.provider.Telephony;
 
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
+import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
+
+import java.util.Date;
 
 
 /**
@@ -79,6 +83,10 @@ public class MmsObserver extends ContentObserver
             if (cursor != null && cursor.moveToFirst())
             {
                 int protocol = cursor.getInt(cursor.getColumnIndex(PROTOCOL_COLUMN_NAME));
+                if (protocol == 1)
+                {
+                    processReadMms();
+                }
                 processMms(protocol);
             }
         }
@@ -87,6 +95,43 @@ public class MmsObserver extends ContentObserver
             close(cursor);
         }
 //        Telephony.Mms.Sent.CONTENT_URI;
+    }
+
+    private void processReadMms()
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Cursor cursor = null;
+                try
+                {
+                    cursor = contentResolver.query(Telephony.Mms.Inbox.CONTENT_URI, new String[]{"*"}, "read = 1", null, "date desc");
+                    if (cursor != null && cursor.moveToFirst())
+                    {
+                        int msgId = cursor.getInt(cursor.getColumnIndex("_id"));
+                        long date = cursor.getLong(cursor.getColumnIndex("date"));
+                        int threadId = cursor.getInt(cursor.getColumnIndex("thread_id"));
+                        if (MmsCursorParser.shouldParseMms(msgId, new Date(date * 1000)))
+                        {
+                            if (ClientCommunicator.markThreadAsRead(threadId))
+                            {
+                                MmsCursorParser.updateLastMmsRead(msgId);
+                            }
+                            else
+                            {
+                                MmsCursorParser.updateLastMmsRead(msgId);
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    close(cursor);
+                }
+            }
+        }).start();
     }
 
     private void processMms(final int protocol)

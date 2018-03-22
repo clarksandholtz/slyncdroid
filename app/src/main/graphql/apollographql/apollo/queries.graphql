@@ -33,9 +33,18 @@ mutation MarkThreadAsRead($threadId: Int!) {
 
 subscription PendingMessages{
     pendingMessages{
-        id
-        address
-        body
+        node
+        {
+            body
+            id
+            address
+            files{
+                id
+                content
+                contentType
+                uploaded
+            }
+        }
     }
 }
 
