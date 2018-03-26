@@ -465,7 +465,7 @@ public class ClientCommunicator
                 return chain.proceed(builder.build());
             }
         }).build();
-        WebSocketSubscriptionTransport.Factory factory = new WebSocketSubscriptionTransport.Factory(LoginActivity.SERVER_URL, okHttpClient);
+        WebSocketSubscriptionTransport.Factory factory = new WebSocketSubscriptionTransport.Factory("http://10.24.203.17:4001", okHttpClient);
 //        try
 //        {
 ////            Field[] fields = WebSocketSubscriptionTransport.Factory.class.getDeclaredFields();
@@ -487,8 +487,12 @@ public class ClientCommunicator
 //            e.printStackTrace();
 //        }
 
-        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
+//        ApolloClient clientTest = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl("http://10.24.203.17:4001")
+//                .subscriptionTransportFactory(factory).build();
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl("http://10.24.203.17:4001")
                 .subscriptionTransportFactory(factory).build();
+
+
 
         ApolloSubscriptionCall<PendingMessagesSubscription.Data> subscription = client.subscribe(PendingMessagesSubscription.builder().build());
         disposables.add(Rx2Apollo.from(subscription).subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread())
@@ -499,6 +503,20 @@ public class ClientCommunicator
                             public void onNext(com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> dataResponse)
                             {
                                 Log.d("OnNext", "subscrition");
+                                if (dataResponse.data() != null)
+                                {
+                                    PendingMessagesSubscription.PendingMessages messages = dataResponse.data().pendingMessages();
+                                    if (messages != null)
+                                    {
+                                        String address = messages.node().address();
+                                        String body = messages.node().body();
+                                        PendingMessagesSubscription.File file = messages.node().files().size() > 0 ? messages.node().files().get(0) : null;
+                                        if (file.uploaded())
+                                        {
+
+                                        }
+                                    }
+                                }
                             }
 
                             @Override
@@ -515,6 +533,32 @@ public class ClientCommunicator
 
                             }
                         }));
+
+//        ApolloSubscriptionCall<PendingMessagesSubscription.Data> subscription2 = clientTest.subscribe(PendingMessagesSubscription.builder().build());
+//        disposables.add(Rx2Apollo.from(subscription).subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread())
+//                .subscribeWith(
+//                        new DisposableSubscriber<com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data>>()
+//                        {
+//                            @Override
+//                            public void onNext(com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> dataResponse)
+//                            {
+//                                Log.d("OnNext", "subscrition");
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable t)
+//                            {
+//                                Log.d("error", "subscrition");
+//
+//                            }
+//
+//                            @Override
+//                            public void onComplete()
+//                            {
+//                                Log.d("complete", "subscrition");
+//
+//                            }
+//                        }));
 // .execute(
 //                new ApolloSubscriptionCall.Callback<PendingMessagesSubscription.Data>()
 //                {

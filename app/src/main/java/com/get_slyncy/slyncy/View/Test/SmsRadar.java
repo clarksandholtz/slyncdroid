@@ -32,6 +32,7 @@ public class SmsRadar extends Activity
         setContentView(R.layout.activity_test);
 //        Intent serviceIntent = new Intent(this, SmsMmsRadar.class);
 //        startService(serviceIntent);
+//        ClientCommunicator.subscribeToNewMessages();
         SmsMmsRadar.initializeSmsRadarService(this, new SmsListener()
         {
             @Override
