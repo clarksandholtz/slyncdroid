@@ -34,6 +34,7 @@ import android.os.IBinder;
 import android.provider.Telephony;
 
 import com.apollographql.apollo.ApolloClient;
+import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.R;
 import com.get_slyncy.slyncy.View.LoginActivity;
@@ -145,7 +146,7 @@ public class SmsMmsRadarService extends Service
         initializeDependencies();
         registerSmsContentObserver();
         registerMmsContentObserver();
-        ClientCommunicator.subscribeToNewMessages();
+        ClientCommunicator.subscribeToNewMessages(getApplicationContext());
     }
 
     private void initializeDependencies()
@@ -238,6 +239,8 @@ public class SmsMmsRadarService extends Service
     {
         return alarmManager != null ? alarmManager : (AlarmManager) getSystemService(Context.ALARM_SERVICE);
     }
+
+
 
     
     

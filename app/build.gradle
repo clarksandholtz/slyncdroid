@@ -26,12 +26,12 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:27.0.2'
-    implementation 'com.android.support:design:27.0.2'
+    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation 'com.android.support:design:27.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.google.firebase:firebase-auth:11.8.0'
     implementation 'com.google.android.gms:play-services-auth:11.8.0'
-    implementation 'com.android.support:support-annotations:27.0.2'
+    implementation 'com.android.support:support-annotations:27.1.0'
     implementation 'com.shobhitpuri.custombuttons:google-signin:1.0.0'
     implementation 'com.apollographql.apollo:apollo-runtime:0.4.4'
     implementation 'com.mikhaellopez:circularimageview:3.0.2'
@@ -41,18 +41,13 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation project(':messaging_library')
-    implementation project(':smsmonitor')
+//    implementation project(':smsmonitor')
     implementation 'com.apollographql.apollo:apollo-rx2-support:0.4.4'
-    implementation "android.arch.persistence.room:runtime:1.0.0"
+    implementation 'android.arch.persistence.room:runtime:1.0.0'
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
+
 }
 
 apply plugin: 'com.google.gms.google-services'
 
 apply plugin: 'com.apollographql.android'
-
-apollo {
-    customTypeMapping['Int'] = "java.lang.Integer"
-    customTypeMapping['DateTime'] = "java.util.Date"
-    customTypeMapping['Boolean'] = "java.lang.Boolean"
-}

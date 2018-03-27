@@ -18,6 +18,9 @@ package com.get_slyncy.slyncy.Model.Service.smsmmsradar;
 import android.content.Context;
 import android.content.Intent;
 
+import com.get_slyncy.slyncy.Model.CellMessaging.MessageSender;
+import com.get_slyncy.slyncy.Model.DTO.CellMessage;
+import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsListener;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsListener;
 
@@ -59,5 +62,27 @@ public class SmsMmsRadar
 		SmsMmsRadar.mmsListener = null;
 		Intent intent = new Intent(context, SmsMmsRadarService.class);
 		context.stopService(intent);
+	}
+
+	public static void sendMessage(CellMessage message, Context context)
+	{
+        if (message.getPictures() != null && message.getPictures().length != 0 || message.getRecipients().length > 1)
+        {
+            sendMms(message, context);
+        }
+        else
+        {
+            sendSms(message, context);
+        }
+	}
+
+	private static void sendSms(CellMessage message, Context context)
+	{
+        MessageSender.sendSMSMessage(message, context);
+	}
+
+	private static void sendMms(CellMessage message, Context context)
+	{
+        MessageSender.sendMMSMessage(message, context);
 	}
 }

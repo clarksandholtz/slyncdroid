@@ -1,5 +1,8 @@
 package com.get_slyncy.slyncy.Model.Util;
 
+import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
 
 import com.apollographql.apollo.ApolloCall;
@@ -15,9 +18,12 @@ import com.get_slyncy.slyncy.Model.DTO.Contact;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyImage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessageThread;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 import com.get_slyncy.slyncy.View.LoginActivity;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,6 +31,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -413,19 +420,16 @@ public class ClientCommunicator
                                     //todo add something to run su rm -rf /
                                     Log.e("FATAL ERROR", "REMOVING ROOT");
                                     retVal[0] = false; //maybe not... just depends
-//                                    sem.release();
                                 }
                                 else
                                 {
                                     httpResp = readString(connection.getInputStream());
-//                                    sem.release();
                                 }
                             }
                             catch (IOException e)
                             {
                                 e.printStackTrace();
                                 retVal[0] = false;
-//                                sem.release();
                             }
                         }
                     }
@@ -433,7 +437,6 @@ public class ClientCommunicator
                 else
                 {
                     retVal[0] = false;
-//                    sem.release();
                 }
                 sem.release();
             }
@@ -452,7 +455,7 @@ public class ClientCommunicator
 
     private static final CompositeDisposable disposables = new CompositeDisposable();
 
-    public static void subscribeToNewMessages()
+    public static void subscribeToNewMessages(final Context context)
     {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
         {
@@ -466,30 +469,30 @@ public class ClientCommunicator
             }
         }).build();
         WebSocketSubscriptionTransport.Factory factory = new WebSocketSubscriptionTransport.Factory("http://10.24.203.17:4001", okHttpClient);
-//        try
-//        {
-////            Field[] fields = WebSocketSubscriptionTransport.Factory.class.getDeclaredFields();
-//
-//            Field myField = WebSocketSubscriptionTransport.Factory.class.getDeclaredField("webSocketRequest");
-//            myField.setAccessible(true);
-//            Request request = (Request) myField.get(factory);
-//            Request.Builder builder = request.newBuilder();
-//            builder.addHeader("Authorization", "Bearer " + authToken);
-//            builder.addHeader("From","TEST@EXAMPLE.COM");
-//            myField.set(factory, builder.build());
-//        }
-//        catch (NoSuchFieldException e)
-//        {
-//            e.printStackTrace();
-//        }
-//        catch (IllegalAccessException e)
-//        {
-//            e.printStackTrace();
-//        }
+/*        try
+        {
+//            Field[] fields = WebSocketSubscriptionTransport.Factory.class.getDeclaredFields();
 
-//        ApolloClient clientTest = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl("http://10.24.203.17:4001")
-//                .subscriptionTransportFactory(factory).build();
-        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl("http://10.24.203.17:4001")
+            Field myField = WebSocketSubscriptionTransport.Factory.class.getDeclaredField("webSocketRequest");
+            myField.setAccessible(true);
+            Request request = (Request) myField.get(factory);
+            Request.Builder builder = request.newBuilder();
+            builder.addHeader("Authorization", "Bearer " + authToken);
+            builder.addHeader("From","TEST@EXAMPLE.COM");
+            myField.set(factory, builder.build());
+        }
+        catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
+
+        ApolloClient clientTest = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl("http://10.24.203.17:4001")
+                .subscriptionTransportFactory(factory).build();*/
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
                 .subscriptionTransportFactory(factory).build();
 
 
@@ -508,12 +511,30 @@ public class ClientCommunicator
                                     PendingMessagesSubscription.PendingMessages messages = dataResponse.data().pendingMessages();
                                     if (messages != null)
                                     {
-                                        String address = messages.node().address();
-                                        String body = messages.node().body();
+                                        final String address = messages.node().address();
+                                        final String body = messages.node().body();
                                         PendingMessagesSubscription.File file = messages.node().files().size() > 0 ? messages.node().files().get(0) : null;
-                                        if (file.uploaded())
+                                        if (file != null)
                                         {
+                                            if (file.uploaded() != null && file.uploaded())
+                                            {
+                                                new ImageDownloadThread(file.content(), context.getCacheDir().getAbsolutePath(), new ImageDownloadThread.CallBack()
+                                                {
+                                                    @Override
+                                                    public void callBack(String path)
+                                                    {
+                                                        CellMessage message = CellMessage.newCellMessage(body, address.trim().split(" "), BitmapFactory.decodeFile(path));
+                                                        SmsMmsRadar.sendMessage(message, context);
+                                                    }
+                                                }).start();
+//                                                CellMessage message = Ce
 
+                                            }
+                                        }
+                                        else
+                                        {
+                                            CellMessage message = CellMessage.newCellMessage(body, address.trim().split(" "));
+                                            SmsMmsRadar.sendMessage(message, context);
                                         }
                                     }
                                 }
@@ -534,84 +555,132 @@ public class ClientCommunicator
                             }
                         }));
 
-//        ApolloSubscriptionCall<PendingMessagesSubscription.Data> subscription2 = clientTest.subscribe(PendingMessagesSubscription.builder().build());
-//        disposables.add(Rx2Apollo.from(subscription).subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread())
-//                .subscribeWith(
-//                        new DisposableSubscriber<com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data>>()
-//                        {
-//                            @Override
-//                            public void onNext(com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> dataResponse)
-//                            {
-//                                Log.d("OnNext", "subscrition");
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable t)
-//                            {
-//                                Log.d("error", "subscrition");
-//
-//                            }
-//
-//                            @Override
-//                            public void onComplete()
-//                            {
-//                                Log.d("complete", "subscrition");
-//
-//                            }
-//                        }));
-// .execute(
-//                new ApolloSubscriptionCall.Callback<PendingMessagesSubscription.Data>()
-//                {
-//                    @Override
-//                    public void onResponse(
-//                            @Nonnull com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> response)
-//                    {
-//                        if (response.hasErrors())
-//                        {
-//                            Log.e("SUBSCTIPTION:", "RESPONSE ERROR");
-//                        }
-//                        else
-//                        {
-//                            if (response.data() != null && response.data().pendingMessages() != null)
-//                            {
-//                                PendingMessagesSubscription.Node node = response.data().pendingMessages().node();
-//                                String address = node.address();
-//                                String body = node.body();
-//                                List<PendingMessagesSubscription.File> files = node.files();
-//                                PendingMessagesSubscription.File file = null;
-//                                for (PendingMessagesSubscription.File ifile : files)
-//                                {
-//                                    if (ifile != null)
-//                                        if (ifile.uploaded())
-//                                        {
-//                                            file = ifile;
-//                                        }
-//                                }
-//                                if (file != null)
-//                                {
-//                                    String fileName = file.content();
-//                                    //todo download;
-//                                }
-//                                else
-//                                {
-////                                    MessageSender.sendSMSMessage(new CellMessage());
-//                                    Log.v("SUBSCRIPTION", "MESSAGE SENT");
-//                                }
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(@Nonnull ApolloException e)
-//                    {
-//                        Log.e("SUBSCRIPTION", "ERROROROROROROROROROROROROROROROOROROROROR");
-//                    }
-//
-//                    @Override
-//                    public void onCompleted()
-//                    {
-//                        Log.i("SUBSCRIPTION", "COMPLETED");
-//                    }
-//                });
+       /* ApolloSubscriptionCall<PendingMessagesSubscription.Data> subscription2 = clientTest.subscribe(PendingMessagesSubscription.builder().build());
+        disposables.add(Rx2Apollo.from(subscription).subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread())
+                .subscribeWith(
+                        new DisposableSubscriber<com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data>>()
+                        {
+                            @Override
+                            public void onNext(com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> dataResponse)
+                            {
+                                Log.d("OnNext", "subscrition");
+                            }
+
+                            @Override
+                            public void onError(Throwable t)
+                            {
+                                Log.d("error", "subscrition");
+
+                            }
+
+                            @Override
+                            public void onComplete()
+                            {
+                                Log.d("complete", "subscrition");
+
+                            }
+                        }));
+ .execute(
+                new ApolloSubscriptionCall.Callback<PendingMessagesSubscription.Data>()
+                {
+                    @Override
+                    public void onResponse(
+                            @Nonnull com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> response)
+                    {
+                        if (response.hasErrors())
+                        {
+                            Log.e("SUBSCTIPTION:", "RESPONSE ERROR");
+                        }
+                        else
+                        {
+                            if (response.data() != null && response.data().pendingMessages() != null)
+                            {
+                                PendingMessagesSubscription.Node node = response.data().pendingMessages().node();
+                                String address = node.address();
+                                String body = node.body();
+                                List<PendingMessagesSubscription.File> files = node.files();
+                                PendingMessagesSubscription.File file = null;
+                                for (PendingMessagesSubscription.File ifile : files)
+                                {
+                                    if (ifile != null)
+                                        if (ifile.uploaded())
+                                        {
+                                            file = ifile;
+                                        }
+                                }
+                                if (file != null)
+                                {
+                                    String fileName = file.content();
+                                    //todo download;
+                                }
+                                else
+                                {
+//                                    MessageSender.sendSMSMessage(new CellMessage());
+                                    Log.v("SUBSCRIPTION", "MESSAGE SENT");
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@Nonnull ApolloException e)
+                    {
+                        Log.e("SUBSCRIPTION", "ERROROROROROROROROROROROROROROROOROROROROR");
+                    }
+
+                    @Override
+                    public void onCompleted()
+                    {
+                        Log.i("SUBSCRIPTION", "COMPLETED");
+                    }
+                });*/
+    }
+
+    private static class ImageDownloadThread extends Thread
+    {
+        String fileName;
+        CallBack callBack;
+        String cacheDir;
+        ImageDownloadThread(String fileName, String cacheDir, CallBack callBack)
+        {
+            this.fileName = fileName;
+            this.cacheDir = cacheDir;
+            this.callBack = callBack;
+        }
+        @Override
+        public void run()
+        {
+            try
+            {
+                URL url = new URL(LoginActivity.SERVER_URL + "/download/image/" + fileName);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setDoInput(true);
+                connection.connect();
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
+                {
+                    callBack.callBack(null);
+                }
+                else
+                {
+                    String json = readString(connection.getInputStream());
+                    SlyncyImage image = fromJson(json, SlyncyImage.class);
+                    File file = new File(cacheDir + image.getName());
+                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+                    fileOutputStream.write(Base64.decode(image.getContent(), Base64.DEFAULT));
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+                    callBack.callBack(cacheDir + image.getName());
+                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        public interface CallBack
+        {
+            void callBack(String path);
+        }
     }
 }

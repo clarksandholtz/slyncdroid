@@ -16,13 +16,13 @@ import com.get_slyncy.slyncy.View.Test.TestActivity;
 public class CellMessagesPresenter
 {
 
-    private Activity mView;
+//    private Activity mView;
     private Context mContext;
 
     public CellMessagesPresenter(TestActivity view)
     {
-        mView = view;
-        mContext = mView.getApplicationContext();
+//        mView = view;
+        mContext = view.getApplicationContext();
     }
 
     public void sendMessage(CellMessage message)
