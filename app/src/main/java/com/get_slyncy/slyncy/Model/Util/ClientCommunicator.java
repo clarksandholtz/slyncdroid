@@ -22,6 +22,8 @@ import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 import com.get_slyncy.slyncy.View.LoginActivity;
 import com.google.gson.Gson;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -468,7 +470,7 @@ public class ClientCommunicator
                 return chain.proceed(builder.build());
             }
         }).build();
-        WebSocketSubscriptionTransport.Factory factory = new WebSocketSubscriptionTransport.Factory("http://10.24.203.17:4001", okHttpClient);
+        WebSocketSubscriptionTransport.Factory factory = new WebSocketSubscriptionTransport.Factory(LoginActivity.SERVER_URL, okHttpClient);
 /*        try
         {
 //            Field[] fields = WebSocketSubscriptionTransport.Factory.class.getDeclaredFields();
@@ -497,7 +499,7 @@ public class ClientCommunicator
 
 
 
-        ApolloSubscriptionCall<PendingMessagesSubscription.Data> subscription = client.subscribe(PendingMessagesSubscription.builder().build());
+        ApolloSubscriptionCall<PendingMessagesSubscription.Data> subscription = client.subscribe(PendingMessagesSubscription.builder().token(authToken).build());
         disposables.add(Rx2Apollo.from(subscription).subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread())
                 .subscribeWith(
                         new DisposableSubscriber<com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data>>()
@@ -505,15 +507,15 @@ public class ClientCommunicator
                             @Override
                             public void onNext(com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> dataResponse)
                             {
-                                Log.d("OnNext", "subscrition");
+                                Log.d("OnNext", "subscription");
                                 if (dataResponse.data() != null)
                                 {
                                     PendingMessagesSubscription.PendingMessages messages = dataResponse.data().pendingMessages();
                                     if (messages != null)
                                     {
-                                        final String address = messages.node().address();
-                                        final String body = messages.node().body();
-                                        PendingMessagesSubscription.File file = messages.node().files().size() > 0 ? messages.node().files().get(0) : null;
+                                        final String address = messages.address();
+                                        final String body = messages.body();
+                                        PendingMessagesSubscription.File file = messages.file();
                                         if (file != null)
                                         {
                                             if (file.uploaded() != null && file.uploaded())
@@ -543,14 +545,14 @@ public class ClientCommunicator
                             @Override
                             public void onError(Throwable t)
                             {
-                                Log.d("error", "subscrition");
+                                Log.d("error", "subscription");
 
                             }
 
                             @Override
                             public void onComplete()
                             {
-                                Log.d("complete", "subscrition");
+                                Log.d("complete", "subscription");
 
                             }
                         }));
@@ -652,28 +654,38 @@ public class ClientCommunicator
         {
             try
             {
-                URL url = new URL(LoginActivity.SERVER_URL + "/download/image/" + fileName);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setDoInput(true);
-                connection.connect();
+                URL url2 = new URL(LoginActivity.SERVER_URL + "download/image?name=" + fileName);
+                HttpURLConnection connection = (HttpURLConnection) url2.openConnection();
+//                connection.disconnect();
+//                connection.addRequestProperty("Authorization", "Bearer " + authToken);
+//                connection.setRequestMethod("GET");
+//                connection.setDoInput(true);
+//                connection.connect();
                 if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
                 {
                     callBack.callBack(null);
                 }
                 else
                 {
-                    String json = readString(connection.getInputStream());
-                    SlyncyImage image = fromJson(json, SlyncyImage.class);
-                    File file = new File(cacheDir + image.getName());
+                    byte[] data = new byte[16384];
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    int readBytes;
+                    while ((readBytes = connection.getInputStream().read(data)) != -1)
+                    {
+                        bos.write(data, 0, readBytes);
+                    }
+                    bos.flush();
+                    data = bos.toByteArray();
+//                    String name = UUID.randomUUID().toString();
+                    File file = new File(cacheDir + "/" + fileName);
                     FileOutputStream fileOutputStream = new FileOutputStream(file);
-                    fileOutputStream.write(Base64.decode(image.getContent(), Base64.DEFAULT));
+                    fileOutputStream.write(data);
                     fileOutputStream.flush();
                     fileOutputStream.close();
-                    callBack.callBack(cacheDir + image.getName());
+                    callBack.callBack(cacheDir + "/" + fileName);
                 }
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 e.printStackTrace();
             }

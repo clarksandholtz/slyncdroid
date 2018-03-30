@@ -179,7 +179,7 @@ public class MessageDbUtility
         cursor.moveToFirst();
         String fullName = cursor.getString(cursor.getColumnIndex("name"));
         String type;
-        if (fullName == null)
+        if (fullName == null || fullName.matches("image_(\\p{Digit})+"))
         {
             String[] temp = cursor.getString(cursor.getColumnIndex("ct")).split("/");
             type = "." + temp[temp.length - 1];

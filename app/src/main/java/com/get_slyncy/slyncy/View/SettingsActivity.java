@@ -150,6 +150,8 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.signOut();
 
+        stopService(new Intent(this, SmsMmsRadarService.class));
+
         File file = new File(getCacheDir() + "/profilePic.jpg");
         if (file.exists())
         {

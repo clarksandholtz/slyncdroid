@@ -31,19 +31,15 @@ mutation MarkThreadAsRead($threadId: Int!) {
   }
 }
 
-subscription PendingMessages{
-    pendingMessages{
-        node
-        {
-            body
-            id
-            address
-            files{
-                id
-                content
-                contentType
-                uploaded
-            }
+subscription PendingMessages($token : String!){
+    pendingMessages(token : $token){
+        body
+        address
+        id
+        file{
+            contentType
+            content
+            uploaded
         }
     }
 }
