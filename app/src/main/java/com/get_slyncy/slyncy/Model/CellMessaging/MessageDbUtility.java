@@ -523,7 +523,7 @@ public class MessageDbUtility
         return fetchPhoneContacts(mContext.getContentResolver());
     }
 
-    private String fetchContactNameByNumber(String number)
+    public String fetchContactNameByNumber(String number)
     {
         return fetchContactNameByNumber(number, mContext.getContentResolver());
     }

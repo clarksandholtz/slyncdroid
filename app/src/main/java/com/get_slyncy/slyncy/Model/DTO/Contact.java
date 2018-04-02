@@ -13,7 +13,6 @@ public class Contact
 
     private String mNumber;
     private String mName;
-    private Bitmap mAvatar;
 
     public Contact(String number)
     {
@@ -42,16 +41,6 @@ public class Contact
     public void setmName(String mName)
     {
         this.mName = mName;
-    }
-
-    public Bitmap getmAvatar()
-    {
-        return mAvatar;
-    }
-
-    public void setmAvatar(Bitmap mAvatar)
-    {
-        this.mAvatar = mAvatar;
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.apollographql.apollo.exception.ApolloException;
 import com.apollographql.apollo.internal.interceptor.ApolloServerInterceptor;
 import com.apollographql.apollo.rx2.Rx2Apollo;
 import com.apollographql.apollo.subscription.WebSocketSubscriptionTransport;
+import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageSender;
 import com.get_slyncy.slyncy.Model.DTO.CellMessage;
 import com.get_slyncy.slyncy.Model.DTO.Contact;
@@ -182,12 +183,7 @@ public class ClientCommunicator
 
                 // Put each contact's phone number in a space separated string
                 Contact[] contacts = message.getContacts().toArray(new Contact[0]);
-                StringBuilder sb = new StringBuilder();
-                for (Contact contact : contacts)
-                {
-                    sb.append(contact.getmNumber() + " ");
-                }
-                String address = sb.toString();
+                String contactsJson = toJson(contacts);
 
                 boolean read = message.isRead();
                 String body = message.getBody();
@@ -209,7 +205,7 @@ public class ClientCommunicator
                 }
 
                 String date = message.getDate();
-                ClientMessageCreateInput.Builder builder = ClientMessageCreateInput.builder().address(address)
+                ClientMessageCreateInput.Builder builder = ClientMessageCreateInput.builder().address(contactsJson)
                         .androidMsgId(msgId).body(body)
                         .read(read).threadId(threadId).date(date).error(error).sender(sender).userSent(userSent);
                 if (files != null)
@@ -327,7 +323,7 @@ public class ClientCommunicator
         return true;
     }
 
-    public static boolean uploadSingleMessage(SlyncyMessage message)
+    public static boolean uploadSingleMessage(SlyncyMessage message, Context context)
     {
         final boolean[] retVal = {true};
         final Semaphore sem = new Semaphore(0);
@@ -346,13 +342,20 @@ public class ClientCommunicator
                 .build();
         ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
                 .build();
-        StringBuilder numbers = new StringBuilder();
-        for (String number : message.getNumbers())
+
+        Contact[] contacts = new Contact[message.getNumbers().size()];
+        for (int i = 0; i < message.getNumbers().size(); i++)
         {
-            numbers.append(number).append(" ");
+            String number = message.getNumbers().get(i);
+            Contact contact = new Contact(number);
+            contact.setmName(MessageDbUtility.fetchContactNameByNumber(number, context.getContentResolver()));
+            contacts[i] = new Contact(number);
         }
+
+        String contactsJson = toJson(contacts);
+
         CreateMessageMutation.Builder builder = CreateMessageMutation.builder().body(message.getBody())
-                .address(numbers.toString().trim()).androidId(message.getId()).date(message.getDate())
+                .address(contactsJson).androidId(message.getId()).date(message.getDate())
                 .error(false).read(message.isRead()).sender(message.getSender()).userSent(message.isUserSent())
                 .threadId(message.getThreadId());
         final List<SlyncyImage> images = message.getImages();
