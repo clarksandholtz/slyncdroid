@@ -44,5 +44,9 @@ public class SlyncyService extends Service {
 //        RecipientIdCache.init(this);
 //        MessageDbUtility.queryAllThreads(this);
         MessageDbUtility.init(this);
+
+        // Start the notification monitoring
+        Intent notificationsIntent = new Intent(this, NotificationsListenerService.class);
+        startService(notificationsIntent);
     }
 }

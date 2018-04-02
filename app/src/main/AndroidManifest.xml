@@ -97,6 +97,9 @@
         <service
             android:name=".Model.Service.MessagesMonitoringService"
             android:enabled="true"/>
+        <service
+            android:name=".Model.Service.NotificationsListenerService"
+            android:enabled="true"/>
 
         <receiver
             android:name="com.klinker.android.send_message.MmsSentReceiver"
