@@ -42,12 +42,16 @@ public class MainActivity extends AppCompatActivity
             NotificationChannel channel = new NotificationChannel(getPackageName() + "notif"
                     , "Basic Notifications", NotificationManager.IMPORTANCE_DEFAULT);
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.createNotificationChannel(channel);
+            if (notificationManager != null)
+            {
+                notificationManager.createNotificationChannel(channel);
+            }
         }
 
         // Start the background service
-        Intent serviceIntent = new Intent(this, SlyncyService.class);
-        startService(serviceIntent);
+//        Intent serviceIntent = new Intent(this, SlyncyService.class);
+//        startService(serviceIntent);
+//        Intent intent = new Intent(this, LoginActivity.class);
     }
 
     public void launchSettings(View view)

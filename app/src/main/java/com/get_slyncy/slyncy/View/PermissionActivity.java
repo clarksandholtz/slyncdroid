@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 
-import com.get_slyncy.slyncy.View.Test.TestActivity;
 
 public class PermissionActivity extends Activity
 {
@@ -77,7 +76,7 @@ public class PermissionActivity extends Activity
                 .putBoolean("request_permissions", false)
                 .apply();
 
-        startActivity(new Intent(this, TestActivity.class));
+        startActivity(new Intent(this, LoginActivity.class));
         finish();
     }
 

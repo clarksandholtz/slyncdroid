@@ -1,6 +1,8 @@
 package com.get_slyncy.slyncy.View;
 
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
+import com.get_slyncy.slyncy.Model.Util.Data;
 import com.get_slyncy.slyncy.Model.Util.DownloadImageTask;
 import com.get_slyncy.slyncy.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -57,7 +60,30 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        FirebaseApp.initializeApp(this);
+        FirebaseApp.initializeApp(getApplicationContext());
+
+        // Check if permissions are needed
+        if (PermissionActivity.needPermissionRequest(this))
+        {
+            startActivity(new Intent(this, PermissionActivity.class));
+            finish();
+            return;
+        }
+
+        // Init settings
+        Data.getInstance().updateCellSettings(this);
+
+        // Setup notification channel
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+        {
+            NotificationChannel channel = new NotificationChannel(getPackageName() + "notif"
+                    , "Basic Notifications", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            if (notificationManager != null)
+            {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
         ImageView logo = findViewById(R.id.slyncy_logo);
         logo.setImageDrawable(getDrawable(R.drawable.ic_logo_white));
 //        logo.getLayoutParams().width = 1000;

@@ -15,12 +15,15 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
         }
     }
-    buildToolsVersion '27.0.2'
+    buildToolsVersion '27.0.3'
 }
 
 dependencies {
@@ -29,8 +32,8 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.0'
     implementation 'com.android.support:design:27.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.google.firebase:firebase-auth:11.8.0'
-    implementation 'com.google.android.gms:play-services-auth:11.8.0'
+    implementation 'com.google.firebase:firebase-auth:12.0.1'
+    implementation 'com.google.android.gms:play-services-auth:12.0.1'
     implementation 'com.android.support:support-annotations:27.1.0'
     implementation 'com.shobhitpuri.custombuttons:google-signin:1.0.0'
     implementation 'com.apollographql.apollo:apollo-runtime:0.4.4'
