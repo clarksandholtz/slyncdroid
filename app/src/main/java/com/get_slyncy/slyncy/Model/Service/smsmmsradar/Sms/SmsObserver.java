@@ -112,7 +112,7 @@ public class SmsObserver extends ContentObserver
                         int msgId = cursor.getInt(cursor.getColumnIndex("_id"));
                         long date = cursor.getLong(cursor.getColumnIndex("date"));
                         int threadId = cursor.getInt(cursor.getColumnIndex("thread_id"));
-                        if (SmsCursorParser.shouldParseSms(msgId, new Date(date)))
+                        if (SmsCursorParser.shouldParseReadSms(msgId))
                         {
                             if (ClientCommunicator.markThreadAsRead(threadId))
                             {

@@ -83,7 +83,24 @@ public class SmsCursorParser {
 		smsStorage.updateLastSmsIntercepted(smsId);
 	}
 
-	public static boolean shouldParseSms(int smsId, Date smsDate) {
+	public static boolean shouldParseReadSms(int smsId)
+    {
+        boolean isFirstSmsParsed = smsStorage.isFirstSmsRead();
+        boolean shouldParseId = shouldParseReadSmsId(smsId);
+        return (isFirstSmsParsed || shouldParseId);
+    }
+
+    private static boolean shouldParseReadSmsId(int smsId)
+    {
+        if (smsStorage.isFirstSmsRead())
+        {
+            return false;
+        }
+        int lastRead = smsStorage.getLastSmsRead();
+        return smsId != lastRead;
+    }
+
+    public static boolean shouldParseSms(int smsId, Date smsDate) {
 		boolean isFirstSmsParsed = isFirstSmsParsed();
 		boolean isOld = isOld(smsDate);
 		boolean shouldParseId = shouldParseSmsId(smsId);

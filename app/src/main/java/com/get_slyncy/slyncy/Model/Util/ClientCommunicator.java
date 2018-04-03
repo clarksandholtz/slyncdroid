@@ -2,18 +2,15 @@ package com.get_slyncy.slyncy.Model.Util;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.util.Log;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.ApolloSubscriptionCall;
 import com.apollographql.apollo.exception.ApolloException;
-import com.apollographql.apollo.internal.interceptor.ApolloServerInterceptor;
 import com.apollographql.apollo.rx2.Rx2Apollo;
 import com.apollographql.apollo.subscription.WebSocketSubscriptionTransport;
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
-import com.get_slyncy.slyncy.Model.CellMessaging.MessageSender;
 import com.get_slyncy.slyncy.Model.DTO.CellMessage;
 import com.get_slyncy.slyncy.Model.DTO.Contact;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyImage;
@@ -23,7 +20,6 @@ import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 import com.get_slyncy.slyncy.View.LoginActivity;
 import com.google.gson.Gson;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,9 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,18 +48,15 @@ import apollographql.apollo.MarkThreadAsReadMutation;
 import apollographql.apollo.PendingMessagesSubscription;
 import apollographql.apollo.UploadMessagesMutation;
 import apollographql.apollo.type.ClientMessageCreateInput;
+import apollographql.apollo.type.ContactCreateWithoutConversationInput;
 import apollographql.apollo.type.FileCreateInput;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.DisposableSubscriber;
-import okhttp3.Headers;
 import okhttp3.Interceptor;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.WebSocket;
 
 import static com.apollographql.apollo.api.internal.Utils.checkNotNull;
 
@@ -80,7 +71,8 @@ public class ClientCommunicator
     private static String authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMzExOTcwfQ.fyx6gKazRXyPUcCyaAxIZvfU3QXfhFDeh2eJGP3m_oA";
 
     // Private because only static functions need be here
-    private ClientCommunicator() {
+    private ClientCommunicator()
+    {
     }
 
     /**
@@ -226,7 +218,6 @@ public class ClientCommunicator
             {
                 if (response.hasErrors())
                 {
-                    //todo add something to run su rm -rf /
                     Log.e("FATAL ERROR", "REMOVING ROOT");
                 }
                 else
@@ -259,7 +250,6 @@ public class ClientCommunicator
                                         if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
                                         {
                                             response = readString(connection.getErrorStream());
-                                            //todo add something to run su rm -rf /
                                             Log.e("FATAL ERROR", "REMOVING ROOT");
                                         }
                                         else
@@ -289,7 +279,8 @@ public class ClientCommunicator
         return true;
     }
 
-    public static boolean markThreadAsRead(int threadId) {
+    public static boolean markThreadAsRead(int threadId)
+    {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
         {
             @Override
@@ -302,7 +293,8 @@ public class ClientCommunicator
             }
         }).build();
 
-        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL).build();
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
+                .build();
 
         MarkThreadAsReadMutation mutation = MarkThreadAsReadMutation.builder().threadId(threadId).build();
         client.mutate(mutation).enqueue(new ApolloCall.Callback<MarkThreadAsReadMutation.Data>()
@@ -342,20 +334,23 @@ public class ClientCommunicator
                 .build();
         ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
                 .build();
-
-        Contact[] contacts = new Contact[message.getNumbers().size()];
+        List<ContactCreateWithoutConversationInput> contacts = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+//        Contact[] contacts = new Contact[message.getNumbers().size()];
         for (int i = 0; i < message.getNumbers().size(); i++)
         {
             String number = message.getNumbers().get(i);
-            Contact contact = new Contact(number);
-            contact.setmName(MessageDbUtility.fetchContactNameByNumber(number, context.getContentResolver()));
-            contacts[i] = new Contact(number);
+            ContactCreateWithoutConversationInput contact = ContactCreateWithoutConversationInput.builder()
+                    .name(MessageDbUtility.fetchContactNameByNumber(number, context.getContentResolver()))
+                    .phone(number).build();
+            contacts.add(contact);
+            sb.append(number + " ");
         }
 
-        String contactsJson = toJson(contacts);
+
 
         CreateMessageMutation.Builder builder = CreateMessageMutation.builder().body(message.getBody())
-                .address(contactsJson).androidId(message.getId()).date(message.getDate())
+                .participants(contacts).androidId(message.getId()).date(message.getDate()).address(sb.toString().trim())
                 .error(false).read(message.isRead()).sender(message.getSender()).userSent(message.isUserSent())
                 .threadId(message.getThreadId());
         final List<SlyncyImage> images = message.getImages();
@@ -409,12 +404,19 @@ public class ClientCommunicator
                             {
                                 url = new URL(LoginActivity.SERVER_URL + "upload/image");
                                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                                connection.setRequestMethod("POST");
-                                connection.addRequestProperty("Content-Type", "application/json");
-                                connection.addRequestProperty("Authorization",
-                                        "Bearer " + authToken);
-                                connection.setDoOutput(true);
-                                connection.connect();
+                                try
+                                {
+                                    connection.setRequestMethod("POST");
+                                    connection.addRequestProperty("Content-Type", "application/json");
+                                    connection.addRequestProperty("Authorization",
+                                            "Bearer " + authToken);
+                                    connection.setDoOutput(true);
+                                    connection.connect();
+                                }
+                                catch (IllegalStateException e)
+                                {
+                                    e.printStackTrace();
+                                }
                                 String file = toJson(image);
                                 writeString(file, connection.getOutputStream());
                                 connection.getOutputStream().close();
@@ -473,42 +475,21 @@ public class ClientCommunicator
                 return chain.proceed(builder.build());
             }
         }).build();
-        WebSocketSubscriptionTransport.Factory factory = new WebSocketSubscriptionTransport.Factory(LoginActivity.SERVER_URL, okHttpClient);
-/*        try
-        {
-//            Field[] fields = WebSocketSubscriptionTransport.Factory.class.getDeclaredFields();
-
-            Field myField = WebSocketSubscriptionTransport.Factory.class.getDeclaredField("webSocketRequest");
-            myField.setAccessible(true);
-            Request request = (Request) myField.get(factory);
-            Request.Builder builder = request.newBuilder();
-            builder.addHeader("Authorization", "Bearer " + authToken);
-            builder.addHeader("From","TEST@EXAMPLE.COM");
-            myField.set(factory, builder.build());
-        }
-        catch (NoSuchFieldException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IllegalAccessException e)
-        {
-            e.printStackTrace();
-        }
-
-        ApolloClient clientTest = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl("http://10.24.203.17:4001")
-                .subscriptionTransportFactory(factory).build();*/
-        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
+        WebSocketSubscriptionTransport.Factory factory = new WebSocketSubscriptionTransport.Factory(
+                LoginActivity.SERVER_URL, okHttpClient);
+        final ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL.replace(":4000", ":5000"))
                 .subscriptionTransportFactory(factory).build();
 
 
-
-        ApolloSubscriptionCall<PendingMessagesSubscription.Data> subscription = client.subscribe(PendingMessagesSubscription.builder().token(authToken).build());
-        disposables.add(Rx2Apollo.from(subscription).subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread())
-                .subscribeWith(
+        ApolloSubscriptionCall<PendingMessagesSubscription.Data> subscription = client
+                .subscribe(PendingMessagesSubscription.builder().token(authToken).build());
+        disposables.add(Rx2Apollo.from(subscription).subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.newThread()).subscribeWith(
                         new DisposableSubscriber<com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data>>()
                         {
                             @Override
-                            public void onNext(com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> dataResponse)
+                            public void onNext(
+                                    com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> dataResponse)
                             {
                                 Log.d("OnNext", "subscription");
                                 if (dataResponse.data() != null)
@@ -523,22 +504,26 @@ public class ClientCommunicator
                                         {
                                             if (file.uploaded() != null && file.uploaded())
                                             {
-                                                new ImageDownloadThread(file.content(), context.getCacheDir().getAbsolutePath(), new ImageDownloadThread.CallBack()
-                                                {
-                                                    @Override
-                                                    public void callBack(String path)
-                                                    {
-                                                        CellMessage message = CellMessage.newCellMessage(body, address.trim().split(" "), BitmapFactory.decodeFile(path));
-                                                        SmsMmsRadar.sendMessage(message, context);
-                                                    }
-                                                }).start();
-//                                                CellMessage message = Ce
+                                                new ImageDownloadThread(file.content(),
+                                                        context.getCacheDir().getAbsolutePath(),
+                                                        new ImageDownloadThread.CallBack()
+                                                        {
+                                                            @Override
+                                                            public void callBack(String path)
+                                                            {
+                                                                CellMessage message = CellMessage
+                                                                        .newCellMessage(body, address.trim().split(" "),
+                                                                                BitmapFactory.decodeFile(path));
+                                                                SmsMmsRadar.sendMessage(message, context);
+                                                            }
+                                                        }).start();
 
                                             }
                                         }
                                         else
                                         {
-                                            CellMessage message = CellMessage.newCellMessage(body, address.trim().split(" "));
+                                            CellMessage message = CellMessage
+                                                    .newCellMessage(body, address.trim().split(" "));
                                             SmsMmsRadar.sendMessage(message, context);
                                         }
                                     }
@@ -556,89 +541,8 @@ public class ClientCommunicator
                             public void onComplete()
                             {
                                 Log.d("complete", "subscription");
-
                             }
                         }));
-
-       /* ApolloSubscriptionCall<PendingMessagesSubscription.Data> subscription2 = clientTest.subscribe(PendingMessagesSubscription.builder().build());
-        disposables.add(Rx2Apollo.from(subscription).subscribeOn(Schedulers.io()).observeOn(Schedulers.newThread())
-                .subscribeWith(
-                        new DisposableSubscriber<com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data>>()
-                        {
-                            @Override
-                            public void onNext(com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> dataResponse)
-                            {
-                                Log.d("OnNext", "subscrition");
-                            }
-
-                            @Override
-                            public void onError(Throwable t)
-                            {
-                                Log.d("error", "subscrition");
-
-                            }
-
-                            @Override
-                            public void onComplete()
-                            {
-                                Log.d("complete", "subscrition");
-
-                            }
-                        }));
- .execute(
-                new ApolloSubscriptionCall.Callback<PendingMessagesSubscription.Data>()
-                {
-                    @Override
-                    public void onResponse(
-                            @Nonnull com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> response)
-                    {
-                        if (response.hasErrors())
-                        {
-                            Log.e("SUBSCTIPTION:", "RESPONSE ERROR");
-                        }
-                        else
-                        {
-                            if (response.data() != null && response.data().pendingMessages() != null)
-                            {
-                                PendingMessagesSubscription.Node node = response.data().pendingMessages().node();
-                                String address = node.address();
-                                String body = node.body();
-                                List<PendingMessagesSubscription.File> files = node.files();
-                                PendingMessagesSubscription.File file = null;
-                                for (PendingMessagesSubscription.File ifile : files)
-                                {
-                                    if (ifile != null)
-                                        if (ifile.uploaded())
-                                        {
-                                            file = ifile;
-                                        }
-                                }
-                                if (file != null)
-                                {
-                                    String fileName = file.content();
-                                    //todo download;
-                                }
-                                else
-                                {
-//                                    MessageSender.sendSMSMessage(new CellMessage());
-                                    Log.v("SUBSCRIPTION", "MESSAGE SENT");
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@Nonnull ApolloException e)
-                    {
-                        Log.e("SUBSCRIPTION", "ERROROROROROROROROROROROROROROROOROROROROR");
-                    }
-
-                    @Override
-                    public void onCompleted()
-                    {
-                        Log.i("SUBSCRIPTION", "COMPLETED");
-                    }
-                });*/
     }
 
     private static class ImageDownloadThread extends Thread
@@ -646,12 +550,14 @@ public class ClientCommunicator
         String fileName;
         CallBack callBack;
         String cacheDir;
+
         ImageDownloadThread(String fileName, String cacheDir, CallBack callBack)
         {
             this.fileName = fileName;
             this.cacheDir = cacheDir;
             this.callBack = callBack;
         }
+
         @Override
         public void run()
         {
@@ -659,11 +565,17 @@ public class ClientCommunicator
             {
                 URL url2 = new URL(LoginActivity.SERVER_URL + "download/image?name=" + fileName);
                 HttpURLConnection connection = (HttpURLConnection) url2.openConnection();
-//                connection.disconnect();
-//                connection.addRequestProperty("Authorization", "Bearer " + authToken);
-//                connection.setRequestMethod("GET");
-//                connection.setDoInput(true);
-//                connection.connect();
+                try
+                {
+                    connection.addRequestProperty("Authorization", "Bearer " + authToken);
+                    connection.setRequestMethod("GET");
+                    connection.setDoInput(true);
+                    connection.connect();
+                }
+                catch (IllegalStateException e)
+                {
+                    e.printStackTrace();
+                }
                 if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
                 {
                     callBack.callBack(null);
@@ -688,11 +600,12 @@ public class ClientCommunicator
                     callBack.callBack(cacheDir + "/" + fileName);
                 }
             }
-            catch (Exception e)
+            catch (IOException e)
             {
                 e.printStackTrace();
             }
         }
+
         public interface CallBack
         {
             void callBack(String path);

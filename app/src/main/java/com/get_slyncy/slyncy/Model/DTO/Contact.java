@@ -1,7 +1,5 @@
 package com.get_slyncy.slyncy.Model.DTO;
 
-import android.graphics.Bitmap;
-
 /**
  * Created by tylerbowers on 2/12/18.
  */
@@ -11,36 +9,36 @@ public class Contact
 
     private static final String TAG = "Contact";
 
-    private String mNumber;
-    private String mName;
+    private String phone;
+    private String name;
 
     public Contact(String number)
     {
-        mNumber = number;
+        this.phone = number;
         if (number == null || number.length() < 1)
         {
             return;
         }
     }
 
-    public String getmNumber()
+    public String getPhone()
     {
-        return mNumber;
+        return phone;
     }
 
-    public void setmNumber(String mNumber)
+    public void setPhone(String phone)
     {
-        this.mNumber = mNumber;
+        this.phone = phone;
     }
 
-    public String getmName()
+    public String getName()
     {
-        return mName;
+        return name;
     }
 
-    public void setmName(String mName)
+    public void setName(String name)
     {
-        this.mName = mName;
+        this.name = name;
     }
 
     @Override
@@ -53,7 +51,7 @@ public class Contact
 
         Contact c = (Contact) obj;
 
-        if (!this.getmName().equalsIgnoreCase(c.getmName()))
+        if (!this.getName().equalsIgnoreCase(c.getName()))
         {
             return false;
         }

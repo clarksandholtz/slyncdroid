@@ -10,8 +10,8 @@ mutation Signup($name: String!, $phone: String!, $email: String!, $uid: String!)
 }
 
 
-mutation CreateMessage($address: String!, $sender: String!, $userSent: Boolean!, $body: String!, $read: Boolean!, $threadId: Int!, $androidId : String! $date: String!, $error: Boolean!, $files: [FileCreateInput!]) {
-  createMessage(address: $address sender: $sender userSent: $userSent androidMsgId: $androidId body: $body read: $read threadId: $threadId date: $date error: $error files: $files){
+mutation CreateMessage($address: String!, $participants: [ContactCreateWithoutConversationInput!]!, $sender: String!, $userSent: Boolean!, $body: String!, $read: Boolean!, $threadId: Int!, $androidId : String! $date: String!, $error: Boolean!, $files: [FileCreateInput!]) {
+  createMessage(address: $address sender: $sender participants: $participants userSent: $userSent androidMsgId: $androidId body: $body read: $read threadId: $threadId date: $date error: $error files: $files){
     id
     body
   }

@@ -14,10 +14,8 @@ import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessageThread;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.Model.Util.Data;
-import com.google.android.mms.ContentType;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -176,21 +174,24 @@ public class MessageDbUtility
             return null;
         }
         Cursor cursor = resolver.query(Uri.parse("content://mms/part/" + id), null, null, null, null);
-        cursor.moveToFirst();
-        String fullName = cursor.getString(cursor.getColumnIndex("name"));
-        String type;
-        if (fullName == null || fullName.matches("image_(\\p{Digit})+"))
+        if (cursor != null && cursor.moveToFirst())
         {
-            String[] temp = cursor.getString(cursor.getColumnIndex("ct")).split("/");
-            type = "." + temp[temp.length - 1];
+            String fullName = cursor.getString(cursor.getColumnIndex("name"));
+            String type;
+            if (fullName == null || fullName.matches("image_(\\p{Digit})+"))
+            {
+                String[] temp = cursor.getString(cursor.getColumnIndex("ct")).split("/");
+                type = "." + temp[temp.length - 1];
+            }
+            else
+            {
+                type = "." + fullName.split("\\.")[1];
+            }
+            cursor.close();
+            return new SlyncyImage(UUID.randomUUID().toString() + type,
+                    android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT).replace("\n", ""));
         }
-        else
-        {
-            type = "." + fullName.split("\\.")[1];
-        }
-        cursor.close();
-        return new SlyncyImage(UUID.randomUUID().toString() + type,
-                android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT).replace("\n", ""));
+        return null;
 
     }
 
@@ -505,11 +506,11 @@ public class MessageDbUtility
 
                 if (contactMap.containsKey(number))
                 {
-                    contact.setmName(contactMap.get(number));
+                    contact.setName(contactMap.get(number));
                 }
                 else
                 {
-                    contact.setmName(fetchContactNameByNumber(number));
+                    contact.setName(fetchContactNameByNumber(number));
                 }
 
                 threadIter.getValue().addContact(contact);
