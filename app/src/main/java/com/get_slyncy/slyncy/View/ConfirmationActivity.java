@@ -120,8 +120,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
         {
             emailField.setText(email);
             emailField.setBackground(getDrawable(R.drawable.edit_text_text));
-            if (verifyEmail(email))
-                emailField.setEnabled(false);
+            if (verifyEmail(email)) emailField.setEnabled(false);
         }
 
         if (name != null && !name.isEmpty() && email != null && !email.isEmpty() && phone != null && !phone.isEmpty())
@@ -176,8 +175,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
 
     private void startPhoneNumberVerification(String phoneNumber)
     {
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                phoneNumber,        // Phone number to verify
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber,        // Phone number to verify
                 60,                 // Timeout duration
                 TimeUnit.SECONDS,   // Unit of timeout
                 this,               // Activity (for callback binding)
@@ -213,7 +211,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
 
 
         @Override
-        public void onCodeAutoRetrievalTimeOut(String s)
+        public void onCodeAutoRetrievalTimeOut(final String s)
         {
             super.onCodeAutoRetrievalTimeOut(s);
             emailField.setVisibility(View.GONE);
@@ -259,6 +257,55 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                 public void onClick(View v)
                 {
                     Snackbar.make(v, "Manual verification still needs implementation", Snackbar.LENGTH_LONG);
+                    final PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.getCredential(s, verificationField.getText().toString());
+                    FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>()
+                    {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task)
+                        {
+                            user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(nameField.getText().toString()).build());
+                            user.updatePhoneNumber(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<Void>()
+                            {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task)
+                                {
+                                    if (task.isSuccessful())
+                                    {
+                                        Log.d(TAG, "onComplete: Phone number update successful");
+                                        ApolloClient client = ApolloClient.builder().serverUrl(LoginActivity.SERVER_URL).build();
+
+
+                                        client.mutate(SignupMutation.builder().email(user.getEmail())
+                                                .name(user.getDisplayName()).phone(user.getPhoneNumber())
+                                                .uid(user.getUid()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()
+                                        {
+                                            @Override
+                                            public void onResponse(@Nonnull Response<SignupMutation.Data> response)
+                                            {
+                                                if (!response.hasErrors())
+                                                {
+                                                    if (response.data() != null)
+                                                    {
+                                                        ClientCommunicator.setAuthToken(response.data().signup().token());
+                                                    }
+                                                    if (!new File(getCacheDir() + "/profilePic.jpg").exists())
+                                                    {
+                                                        new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(), ConfirmationActivity.this).execute(user.getPhotoUrl() != null ? user.getPhotoUrl().toString().replace("s96-c", "s960-c") : "");
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFailure(@Nonnull ApolloException e)
+                                            {
+
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
                 }
             });
         }
@@ -276,8 +323,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
 
             mVerificationInProgress = false;
 
-            user.updateProfile(
-                    new UserProfileChangeRequest.Builder().setDisplayName(nameField.getText().toString()).build());
+            user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(nameField.getText().toString()).build());
             user.updatePhoneNumber(credential).addOnCompleteListener(new OnCompleteListener<Void>()
             {
                 @Override
@@ -292,31 +338,29 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                         client.mutate(SignupMutation.builder().email(user.getEmail()).name(user.getDisplayName())
                                 .phone(user.getPhoneNumber()).uid(user.getUid()).build())
                                 .enqueue(new ApolloCall.Callback<SignupMutation.Data>()
+                        {
+                            @Override
+                            public void onResponse(@Nonnull Response<SignupMutation.Data> response)
+                            {
+                                if (!response.hasErrors())
                                 {
-                                    @Override
-                                    public void onResponse(@Nonnull Response<SignupMutation.Data> response)
+                                    if (response.data() != null)
                                     {
-                                        if (!response.hasErrors())
-                                        {
-                                            if (response.data() != null)
-                                            {
-                                                ClientCommunicator.setAuthToken(response.data().signup().token());
-                                            }
-                                            if (!new File(getCacheDir() + "/profilePic.jpg").exists())
-                                            {
-                                                new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(),
-                                                        ConfirmationActivity.this).execute(user.getPhotoUrl().toString()
-                                                        .replace("s96-c", "s960-c"));
-                                            }
-                                        }
+                                        ClientCommunicator.setAuthToken(response.data().signup().token());
                                     }
-
-                                    @Override
-                                    public void onFailure(@Nonnull ApolloException e)
+                                    if (!new File(getCacheDir() + "/profilePic.jpg").exists())
                                     {
-
+                                        new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(), ConfirmationActivity.this).execute(user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
                                     }
-                                });
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(@Nonnull ApolloException e)
+                            {
+
+                            }
+                        });
                     }
                 }
             });
@@ -339,15 +383,13 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
             else if (e instanceof FirebaseTooManyRequestsException)
             {
                 // The SMS quota for the project has been exceeded
-                Snackbar.make(findViewById(android.R.id.content), "Quota exceeded.",
-                        Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(android.R.id.content), "Quota exceeded.", Snackbar.LENGTH_SHORT).show();
 
             }
         }
 
         @Override
-        public void onCodeSent(String verificationId,
-                               PhoneAuthProvider.ForceResendingToken token)
+        public void onCodeSent(String verificationId, PhoneAuthProvider.ForceResendingToken token)
         {
             // The SMS verification code has been sent to the provided phone number, we
             // now need to ask the user to enter the code and then construct a credential
