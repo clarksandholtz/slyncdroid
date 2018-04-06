@@ -2,6 +2,7 @@ package com.get_slyncy.slyncy.View;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -198,6 +199,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
             intent.putExtra("name", user.getDisplayName());
             intent.putExtra("email", user.getEmail());
             intent.putExtra("phone", user.getPhoneNumber());
+            intent.putExtra("sync", true);
             if (user.getPhotoUrl() != null)
                 intent.putExtra("pic", user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
         }
@@ -307,9 +309,9 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                                                             ApolloClient client = ApolloClient.builder().serverUrl(LoginActivity.SERVER_URL).build();
 
 
-                                                            client.mutate(SignupMutation.builder().email(user.getEmail())
-                                                                    .name(user.getDisplayName()).phone(user.getPhoneNumber())
-                                                                    .uid(FirebaseAuth.getInstance().getCurrentUser().getUid()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()
+                                                            client.mutate(SignupMutation.builder().email(user.getEmail() == null ? "ThisShouldn'tShowUp.Ever." : user.getEmail())
+                                                                    .name(user.getDisplayName() == null ? "" : user.getDisplayName()).phone(user.getPhoneNumber())
+                                                                    .uid(user.getUid()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()
                                                             {
                                                                 @Override
                                                                 public void onResponse(@Nonnull Response<SignupMutation.Data> response)
@@ -318,7 +320,14 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                                                                     {
                                                                         if (response.data() != null)
                                                                         {
-                                                                            ClientCommunicator.setAuthToken(response.data().signup().token());
+                                                                            SharedPreferences sharedPreferences = getSharedPreferences("authorization", MODE_PRIVATE);
+                                                                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                                            editor.putString("email", user.getEmail());
+                                                                            editor.putString("phone", user.getPhoneNumber());
+                                                                            editor.putString("name", user.getDisplayName());
+                                                                            editor.putString("pic", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
+                                                                            editor.commit();
+                                                                            ClientCommunicator.persistAuthToken(response.data().signup().token(), getApplicationContext());
                                                                         }
                                                                         if (!new File(getCacheDir() + "/profilePic.jpg").exists())
                                                                         {

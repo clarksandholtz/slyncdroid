@@ -2,6 +2,7 @@ package com.get_slyncy.slyncy.View;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.Telephony;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadarService;
+import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.Model.Util.DownloadImageTask;
 import com.get_slyncy.slyncy.Model.Util.SettingsDb;
 import com.get_slyncy.slyncy.R;
@@ -70,10 +72,17 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
 
         if (bundle != null)
         {
-            accountName.setText(bundle.getString("name"));
-            accountEmail.setText(bundle.getString("email"));
-            accountPhone.setText(bundle.getString("phone") == null ? "" : bundle.getString("phone"));
+            accountName.setText(bundle.getString("name", ""));
+            accountEmail.setText(bundle.getString("email", ""));
+            accountPhone.setText(bundle.getString("phone", ""));
             picUrl = bundle.getString("pic");
+            if (bundle.containsKey("sync"))
+            {
+                if (bundle.getBoolean("sync"))
+                {
+                    ClientCommunicator.bulkMessageUpload();
+                }
+            }
         }
 
 //        accountProfile.setImageDrawable(getDrawable(R.drawable.ic_account_circle_black_24dp));
@@ -146,7 +155,13 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.signOut();
 
-//
+        SharedPreferences sharedPreferences = getSharedPreferences("authorization", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("email");
+        editor.remove("phone");
+        editor.remove("name");
+        editor.remove("pic");
+        editor.commit();
         SmsMmsRadar.stopSmsMmsRadarService(this);
 
         File file = new File(getCacheDir() + "/profilePic.jpg");
@@ -154,7 +169,7 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
         {
             file.delete();
         }
-
+        FirebaseAuth.getInstance().signOut();
         // Google sign out
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))

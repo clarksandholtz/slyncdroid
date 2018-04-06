@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -86,7 +87,18 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
         }
         if (getSharedPreferences("authorization", MODE_PRIVATE).contains("token"))
         {
+            //need to keep the email name and phone number around.
+            SharedPreferences prefs = getSharedPreferences("authorization", MODE_PRIVATE);
+            String email = prefs.getString("email", "");
+            String name = prefs.getString("name", "");
+            String phone = prefs.getString("phone", "");
+            String picUrl = prefs.getString("pic", null);
             Intent intent = new Intent(this, SettingsActivity.class);
+            intent.putExtra("email", email);
+            intent.putExtra("name", name);
+            intent.putExtra("phone", phone);
+            intent.putExtra("pic", picUrl);
+            intent.putExtra("sync", false);
             startActivity(intent);
             finish();
             return;
@@ -159,6 +171,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
             intent.putExtra("email", user.getEmail());
             intent.putExtra("phone", user.getPhoneNumber());
             intent.putExtra("pic", user.getPhotoUrl().toString());
+            intent.putExtra("sync", true);
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
@@ -221,6 +234,14 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                         }
                         else
                         {
+
+                            SharedPreferences sharedPreferences = getSharedPreferences("authorization", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("email", user.getEmail());
+                            editor.putString("phone", user.getPhoneNumber());
+                            editor.putString("name", user.getDisplayName());
+                            editor.putString("pic", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
+                            editor.commit();
                             if (response.data() != null)
                             {
                                 ClientCommunicator.persistAuthToken(response.data().login().token(), getApplicationContext());
