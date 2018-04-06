@@ -11,8 +11,8 @@ import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.R;
-import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsListener;
-import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsListener;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.IMmsListener;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.ISmsListener;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 
 //import apollographql.apollo.UploadMessagesMutation;
@@ -33,7 +33,7 @@ public class SmsRadar extends Activity
 //        Intent serviceIntent = new Intent(this, SmsMmsRadar.class);
 //        startService(serviceIntent);
 //        ClientCommunicator.subscribeToNewMessages();
-        SmsMmsRadar.initializeSmsRadarService(this, new SmsListener()
+        SmsMmsRadar.initializeSmsRadarService(this, new ISmsListener()
         {
             @Override
             public void onSmsSent(SlyncyMessage sms)
@@ -54,7 +54,7 @@ public class SmsRadar extends Activity
                     ClientCommunicator.uploadSingleMessage(sms, getApplicationContext());
                 }
             }
-        }, new MmsListener()
+        }, new IMmsListener()
         {
             @Override
             public void onMmsSent(SlyncyMessage mms)

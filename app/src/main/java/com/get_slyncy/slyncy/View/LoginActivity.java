@@ -48,7 +48,7 @@ import apollographql.apollo.LoginMutation;
 public class LoginActivity extends Activity implements DownloadImageTask.PostExecCallBack
 {
 
-    public static final String SERVER_URL = "http://10.24.194.209:4000/";
+    public static final String SERVER_URL = "http://192.168.254.171:4000/";
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
     private FirebaseAuth mAuth;
@@ -84,6 +84,13 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                 notificationManager.createNotificationChannel(channel);
             }
         }
+        if (getSharedPreferences("authorization", MODE_PRIVATE).contains("token"))
+        {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
         ImageView logo = findViewById(R.id.slyncy_logo);
         logo.setImageDrawable(getDrawable(R.drawable.ic_logo_white));
 //        logo.getLayoutParams().width = 1000;
@@ -105,14 +112,8 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-
-
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-
         mAuth = FirebaseAuth.getInstance();
-
-        boolean b = mAuth != null;
     }
 
 
@@ -121,8 +122,8 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
     {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        updateUI(currentUser);
     }
 
     @Override
@@ -210,8 +211,10 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                             intent.putExtra("email", user.getEmail());
                             intent.putExtra("phone", user.getPhoneNumber());
                             intent.putExtra("acct", acct);
+                            intent.putExtra("emailCred", user);
                             intent.putExtra("pic", user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
 
+                            Log.d("UID:", user.getUid());
                             mAuth.signOut();
 
                             startActivity(intent);
@@ -220,7 +223,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                         {
                             if (response.data() != null)
                             {
-                                ClientCommunicator.setAuthToken(response.data().login().token());
+                                ClientCommunicator.persistAuthToken(response.data().login().token(), getApplicationContext());
                             }
                             new DownloadImageTask(LoginActivity.this.getCacheDir().getPath(),
                                     LoginActivity.this).execute(user.getPhotoUrl().toString()
@@ -231,13 +234,29 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                     @Override
                     public void onFailure(@Nonnull ApolloException e)
                     {
-                        Log.e("Apollo eror:", e.getMessage());
-                        Snackbar.make(findViewById(R.id.main_layout), "Unable to reach Slyncy Servers.",
+                        Log.e("Apollo error:", e.getMessage());
+                        Snackbar.make(findViewById(R.id.main_layout), "Unable to reach Slyncy Servers. Please try again later.",
                                 Snackbar.LENGTH_SHORT).show();
+
+
+                        Intent intent = new Intent(LoginActivity.this, ConfirmationActivity.class);
+                        intent.putExtra("name", user.getDisplayName());
+                        intent.putExtra("email", user.getEmail());
+                        intent.putExtra("phone", user.getPhoneNumber());
+                        intent.putExtra("acct", acct);
+                        intent.putExtra("emailCred", user);
+                        intent.putExtra("pic", user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
+
+                        Log.d("UID:", user.getUid());
+                        mAuth.signOut();
+
+                        startActivity(intent);
 /**     code below will allow you into settings without connecting to slyncy's server */
+                        /**
                         new DownloadImageTask(LoginActivity.this.getCacheDir().getPath(),
                                 LoginActivity.this).execute(user.getPhotoUrl().toString()
                                 .replace("s96-c", "s960-c"));
+                                //*/
                     }
                 });
     }

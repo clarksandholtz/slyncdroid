@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     android:gravity="center_horizontal"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/confirmation_root">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -111,7 +112,7 @@
             android:visibility="gone"/>
 
         <EditText
-            android:id="@+id/verification_code"
+            android:id="@+id/verification_field"
             android:layout_width="275dp"
             android:layout_height="35dp"
             android:background="@drawable/edit_text_no_text"
@@ -123,6 +124,7 @@
             android:paddingLeft="20dp"
             android:paddingRight="5dp"
             android:paddingStart="20dp"
+            android:textColor="@color/colorFontDark"
             android:textColorHint="@color/white"
             android:visibility="gone"/>
 

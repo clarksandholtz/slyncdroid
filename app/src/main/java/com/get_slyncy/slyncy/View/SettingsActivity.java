@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadarService;
 import com.get_slyncy.slyncy.Model.Util.DownloadImageTask;
 import com.get_slyncy.slyncy.Model.Util.SettingsDb;
@@ -33,21 +34,9 @@ import java.io.File;
 
 public class SettingsActivity extends Activity implements DownloadImageTask.PostExecCallBack
 {
-    private TextView accountName;
-    private TextView accountEmail;
-    private TextView accountPhone;
-    private TextView syncEntry;
-    private TextView groupMessageEntry;
-    private TextView notifEntry;
-    private TextView logoutEntry;
     private String picUrl;
 
     private ImageView accountProfile;
-    private ImageView syncIcon;
-    private ImageView groupIcon;
-    private ImageView notifIcon;
-    private ImageView logoutIcon;
-    private ImageView notifArrow;
     private Switch groupMessageSwitch;
 
     @Override
@@ -56,19 +45,26 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         Bundle bundle = getIntent().getExtras();
+        TextView accountName;
+        TextView accountEmail;
+        TextView accountPhone;
+//        TextView syncEntry;
+//        TextView groupMessageEntry;
+//        TextView notifEntry;
+//        TextView logoutEntry;
         accountName = findViewById(R.id.account_name);
         accountEmail = findViewById(R.id.account_email);
         accountPhone = findViewById(R.id.account_phone);
         accountProfile = findViewById(R.id.account_profile);
-        syncIcon = findViewById(R.id.sync_icon);
-        groupIcon = findViewById(R.id.group_message_icon);
-        notifIcon = findViewById(R.id.notification_icon);
-        logoutIcon = findViewById(R.id.logout_icon);
-        notifArrow = findViewById(R.id.notification_arrow);
-        syncEntry = findViewById(R.id.sync_entry_title);
-        groupMessageEntry = findViewById(R.id.group_message_entry);
-        notifEntry = findViewById(R.id.notification_entry);
-        logoutEntry = findViewById(R.id.logout_entry);
+        ImageView syncIcon = findViewById(R.id.sync_icon);
+        ImageView groupIcon = findViewById(R.id.group_message_icon);
+        ImageView notificationIcon = findViewById(R.id.notification_icon);
+        ImageView logoutIcon = findViewById(R.id.logout_icon);
+        ImageView notificationArrow = findViewById(R.id.notification_arrow);
+//        syncEntry = findViewById(R.id.sync_entry_title);
+//        groupMessageEntry = findViewById(R.id.group_message_entry);
+//        notifEntry = findViewById(R.id.notification_entry);
+//        logoutEntry = findViewById(R.id.logout_entry);
         groupMessageSwitch = findViewById(R.id.group_messages_switch);
 
 
@@ -83,22 +79,22 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
 //        accountProfile.setImageDrawable(getDrawable(R.drawable.ic_account_circle_black_24dp));
         syncIcon.setImageDrawable(getDrawable(R.drawable.ic_sync_black_24dp));
         groupIcon.setImageDrawable(getDrawable(R.drawable.ic_group_black_24dp));
-        notifIcon.setImageDrawable(getDrawable(R.drawable.ic_notifications_black_24dp));
+        notificationIcon.setImageDrawable(getDrawable(R.drawable.ic_notifications_black_24dp));
         logoutIcon.setImageDrawable(getDrawable(R.drawable.ic_logout_black_24dp));
-        notifArrow.setImageDrawable(getDrawable(R.drawable.ic_navigate_next_black_24dp));
+        notificationArrow.setImageDrawable(getDrawable(R.drawable.ic_navigate_next_black_24dp));
 
         syncIcon.setColorFilter(getColor(R.color.colorFontDark));
         groupIcon.setColorFilter(getColor(R.color.colorFontDark));
         logoutIcon.setColorFilter(getColor(R.color.colorFontDark));
-        notifArrow.setColorFilter(getColor(R.color.colorFontDark));
-        notifIcon.setColorFilter(getColor(R.color.colorFontDark));
+        notificationArrow.setColorFilter(getColor(R.color.colorFontDark));
+        notificationIcon.setColorFilter(getColor(R.color.colorFontDark));
 
         File file = new File(getCacheDir() + "/profilePic.jpg");
         if (file.exists())
         {
             accountProfile.setImageBitmap(BitmapFactory.decodeFile(file.getPath()));
         }
-        else
+        else if (picUrl != null)
         {
             DownloadImageTask task = new DownloadImageTask(getCacheDir().getPath(), this);
             task.execute(picUrl);
@@ -150,7 +146,8 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.signOut();
 
-        stopService(new Intent(this, SmsMmsRadarService.class));
+//
+        SmsMmsRadar.stopSmsMmsRadarService(this);
 
         File file = new File(getCacheDir() + "/profilePic.jpg");
         if (file.exists())

@@ -28,6 +28,7 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
@@ -64,6 +65,8 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private String mVerificationId;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
+    String emailAddress;
+    private FirebaseUser emailCred;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -80,13 +83,14 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
             phone = bundle.getString("phone");
             email = bundle.getString("email");
             acct = (GoogleSignInAccount) bundle.get("acct");
+            emailCred = (FirebaseUser) bundle.get("emailCred");
         }
 
         confirmButton = findViewById(R.id.continue_button);
         nameField = findViewById(R.id.name_field);
         phoneField = findViewById(R.id.phone_field);
         emailField = findViewById(R.id.email_field);
-        verificationField = findViewById(R.id.verification_code);
+        verificationField = findViewById(R.id.verification_field);
 
         if (name != null && !name.isEmpty())
         {
@@ -149,6 +153,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
 
     public void confirmInfo(View view)
     {
+        emailAddress = emailField.getText().toString();
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         final FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
@@ -176,7 +181,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
     private void startPhoneNumberVerification(String phoneNumber)
     {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber,        // Phone number to verify
-                60,                 // Timeout duration
+                0,                 // Timeout duration
                 TimeUnit.SECONDS,   // Unit of timeout
                 this,               // Activity (for callback binding)
                 mCallbacks);        // OnVerificationStateChangedCallbacks
@@ -193,7 +198,8 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
             intent.putExtra("name", user.getDisplayName());
             intent.putExtra("email", user.getEmail());
             intent.putExtra("phone", user.getPhoneNumber());
-            intent.putExtra("pic", user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
+            if (user.getPhotoUrl() != null)
+                intent.putExtra("pic", user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
         }
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -234,6 +240,15 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                 public void onTextChanged(CharSequence s, int start, int before, int count)
                 {
                     confirmButton.setEnabled(verificationField.getText().toString().length() >= 6);
+                    if (verificationField.getText().toString().length() > 0)
+                    {
+                        verificationField.setBackground(getDrawable(R.drawable.edit_text_text));
+                    }
+                    else
+                    {
+                        verificationField.setBackground(getDrawable(R.drawable.edit_text_no_text));
+
+                    }
                     if (verificationField.getText().toString().length() >= 6)
                     {
                         verificationField.setError(null);
@@ -254,58 +269,142 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
             confirmButton.setOnClickListener(new View.OnClickListener()
             {
                 @Override
-                public void onClick(View v)
+                public void onClick(final View v)
                 {
-                    Snackbar.make(v, "Manual verification still needs implementation", Snackbar.LENGTH_LONG);
+//                    Snackbar.make(v, "Manual verification still needs implementation", Snackbar.LENGTH_LONG);
+                    confirmButton.setEnabled(false);
                     final PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.getCredential(s, verificationField.getText().toString());
-                    FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>()
+                    Log.d("UID2", emailCred.getUid());
+                    Log.d("UID confirmationUser", user.getUid());
+                    if (user.getPhoneNumber() == null || !user.getPhoneNumber().equals(phoneField.getText().toString()))
                     {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task)
+                        emailCred.linkWithCredential(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>()
                         {
-                            user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(nameField.getText().toString()).build());
-                            user.updatePhoneNumber(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<Void>()
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task)
                             {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task)
+                                if (task.isSuccessful())
                                 {
-                                    if (task.isSuccessful())
+                                    Log.d("UID afterLink", emailCred.getUid());
+                                    FirebaseAuth.getInstance().signInWithCredential(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>()
                                     {
-                                        Log.d(TAG, "onComplete: Phone number update successful");
-                                        ApolloClient client = ApolloClient.builder().serverUrl(LoginActivity.SERVER_URL).build();
-
-
-                                        client.mutate(SignupMutation.builder().email(user.getEmail())
-                                                .name(user.getDisplayName()).phone(user.getPhoneNumber())
-                                                .uid(user.getUid()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()
+                                        @Override
+                                        public void onComplete(@NonNull Task<AuthResult> task)
                                         {
-                                            @Override
-                                            public void onResponse(@Nonnull Response<SignupMutation.Data> response)
+
+                                            if (task.isSuccessful())
                                             {
-                                                if (!response.hasErrors())
+                                                Log.d("UID afterPhoneSignIN", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                                user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(nameField.getText().toString()).build());
+                                                user.updatePhoneNumber(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<Void>()
                                                 {
-                                                    if (response.data() != null)
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task)
                                                     {
-                                                        ClientCommunicator.setAuthToken(response.data().signup().token());
+                                                        if (task.isSuccessful())
+                                                        {
+                                                            Log.d(TAG, "onComplete: Phone number update successful");
+                                                            ApolloClient client = ApolloClient.builder().serverUrl(LoginActivity.SERVER_URL).build();
+
+
+                                                            client.mutate(SignupMutation.builder().email(user.getEmail())
+                                                                    .name(user.getDisplayName()).phone(user.getPhoneNumber())
+                                                                    .uid(FirebaseAuth.getInstance().getCurrentUser().getUid()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()
+                                                            {
+                                                                @Override
+                                                                public void onResponse(@Nonnull Response<SignupMutation.Data> response)
+                                                                {
+                                                                    if (!response.hasErrors())
+                                                                    {
+                                                                        if (response.data() != null)
+                                                                        {
+                                                                            ClientCommunicator.setAuthToken(response.data().signup().token());
+                                                                        }
+                                                                        if (!new File(getCacheDir() + "/profilePic.jpg").exists())
+                                                                        {
+                                                                            new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(), ConfirmationActivity.this).execute(user.getPhotoUrl() != null ? user.getPhotoUrl().toString().replace("s96-c", "s960-c") : "");
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                @Override
+                                                                public void onFailure(@Nonnull ApolloException e)
+                                                                {
+                                                                    Snackbar.make(findViewById(R.id.confirmation_root), "Unable to connect with Slyncy servers. Please try again later", Snackbar.LENGTH_SHORT).show();
+                                                                }
+                                                            });
+                                                        }
+                                                        else
+                                                        {
+                                                            confirmButton.setEnabled(true);
+                                                            verificationField.setError("Authentication error. Please report to support@get-slyncy.com");
+                                                        }
                                                     }
-                                                    if (!new File(getCacheDir() + "/profilePic.jpg").exists())
-                                                    {
-                                                        new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(), ConfirmationActivity.this).execute(user.getPhotoUrl() != null ? user.getPhotoUrl().toString().replace("s96-c", "s960-c") : "");
-                                                    }
+                                                });
+                                            }
+                                            else
+                                            {
+                                                confirmButton.setEnabled(true);
+                                                verificationField.setError("Verification code was incorrect. Please Try again");
+                                            }
+                                        }
+                                    });
+                                }
+                                else
+                                {
+                                    confirmButton.setEnabled(true);
+                                    verificationField.setError("Verification code was incorrect. Please Try again");
+                                }
+                            }
+                        });
+
+                    }
+                    else
+                    {
+                        user.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(nameField.getText().toString()).build());
+                        user.updatePhoneNumber(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<Void>()
+                        {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task)
+                            {
+                                if (task.isSuccessful())
+                                {
+                                    Log.d(TAG, "onComplete: Phone number update successful");
+                                    ApolloClient client = ApolloClient.builder().serverUrl(LoginActivity.SERVER_URL).build();
+
+
+                                    client.mutate(SignupMutation.builder().email(user.getEmail() == null ? "thisShouldn'tShowUp.Ever." : user.getEmail())
+                                            .name(user.getDisplayName() == null ? "" : user.getDisplayName())
+                                            .phone(user.getPhoneNumber() == null ? "" : user.getPhoneNumber())
+                                            .uid(user.getUid()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()
+                                    {
+                                        @Override
+                                        public void onResponse(@Nonnull Response<SignupMutation.Data> response)
+                                        {
+                                            if (!response.hasErrors())
+                                            {
+                                                if (response.data() != null)
+                                                {
+                                                    ClientCommunicator.setAuthToken(response.data().signup().token());
+                                                }
+                                                if (!new File(getCacheDir() + "/profilePic.jpg").exists())
+                                                {
+                                                    new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(), ConfirmationActivity.this).execute(user.getPhotoUrl() != null ? user.getPhotoUrl().toString().replace("s96-c", "s960-c") : "");
                                                 }
                                             }
+                                        }
 
-                                            @Override
-                                            public void onFailure(@Nonnull ApolloException e)
-                                            {
-
-                                            }
-                                        });
-                                    }
+                                        @Override
+                                        public void onFailure(@Nonnull ApolloException e)
+                                        {
+                                            Snackbar.make(findViewById(R.id.confirmation_root), "Unable to connect with Slyncy servers. Please try again later", Snackbar.LENGTH_LONG).show();
+                                        }
+                                    });
                                 }
-                            });
-                        }
-                    });
+                            }
+                        });
+                    }
+                    confirmButton.setEnabled(true);
                 }
             });
         }
@@ -338,29 +437,29 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                         client.mutate(SignupMutation.builder().email(user.getEmail()).name(user.getDisplayName())
                                 .phone(user.getPhoneNumber()).uid(user.getUid()).build())
                                 .enqueue(new ApolloCall.Callback<SignupMutation.Data>()
-                        {
-                            @Override
-                            public void onResponse(@Nonnull Response<SignupMutation.Data> response)
-                            {
-                                if (!response.hasErrors())
                                 {
-                                    if (response.data() != null)
+                                    @Override
+                                    public void onResponse(@Nonnull Response<SignupMutation.Data> response)
                                     {
-                                        ClientCommunicator.setAuthToken(response.data().signup().token());
+                                        if (!response.hasErrors())
+                                        {
+                                            if (response.data() != null)
+                                            {
+                                                ClientCommunicator.setAuthToken(response.data().signup().token());
+                                            }
+                                            if (!new File(getCacheDir() + "/profilePic.jpg").exists())
+                                            {
+                                                new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(), ConfirmationActivity.this).execute(user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
+                                            }
+                                        }
                                     }
-                                    if (!new File(getCacheDir() + "/profilePic.jpg").exists())
+
+                                    @Override
+                                    public void onFailure(@Nonnull ApolloException e)
                                     {
-                                        new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(), ConfirmationActivity.this).execute(user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
+
                                     }
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(@Nonnull ApolloException e)
-                            {
-
-                            }
-                        });
+                                });
                     }
                 }
             });
@@ -383,7 +482,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
             else if (e instanceof FirebaseTooManyRequestsException)
             {
                 // The SMS quota for the project has been exceeded
-                Snackbar.make(findViewById(android.R.id.content), "Quota exceeded.", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(android.R.id.content), "Quota exceeded.", Snackbar.LENGTH_LONG).show();
 
             }
         }
@@ -439,7 +538,6 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                 hasNoTextBG = false;
             }
 
-
         }
 
         @Override
@@ -472,8 +570,8 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                 }
             }
             if (!nameField.getText().toString().isEmpty() && !phoneField.getText().toString().isEmpty()
-                && phoneField.getError() == null && !emailField.getText().toString().isEmpty()
-                && emailField.getError() == null)
+                    && phoneField.getError() == null && !emailField.getText().toString().isEmpty()
+                    && emailField.getError() == null)
             {
                 confirmButton.setEnabled(true);
             }

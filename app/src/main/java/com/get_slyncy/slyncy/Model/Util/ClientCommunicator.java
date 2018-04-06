@@ -1,6 +1,8 @@
 package com.get_slyncy.slyncy.Model.Util;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
@@ -130,9 +132,31 @@ public class ClientCommunicator
         return stringBuilder.toString();
     }
 
+    @SuppressLint("ApplySharedPref")
+    public static void persistAuthToken(String authToken, Context context)
+    {
+        SharedPreferences.Editor editor = context.getSharedPreferences("authorization", Context.MODE_PRIVATE).edit();
+        editor.putString("token", authToken);
+        editor.commit();
+        ClientCommunicator.authToken = authToken;
+    }
+
+    public static void setAuthToken(Context context)
+    {
+        ClientCommunicator.authToken = context.getSharedPreferences("authorization", Context.MODE_PRIVATE).getString("token", "");
+    }
+
     public static void setAuthToken(String authToken)
     {
         ClientCommunicator.authToken = authToken;
+    }
+
+    @SuppressLint("ApplySharedPref")
+    public static void clearAuthToken(Context context)
+    {
+        SharedPreferences.Editor editor = context.getSharedPreferences("authorization", Context.MODE_PRIVATE).edit();
+        editor.remove("token");
+        editor.commit();
     }
 
     public static boolean bulkMessageUpload()
@@ -281,6 +305,8 @@ public class ClientCommunicator
 
     public static boolean markThreadAsRead(int threadId)
     {
+        final boolean[] val = new boolean[]{true};
+        final Semaphore mutex = new Semaphore(0, true);
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
         {
             @Override
@@ -303,16 +329,24 @@ public class ClientCommunicator
             public void onResponse(@Nonnull com.apollographql.apollo.api.Response<MarkThreadAsReadMutation.Data> response)
             {
                 if (!response.hasErrors())
-                    Log.d("MARKEd AS READ", "onResponse: ");
+                {
+                    Log.d("MARKED AS READ", "onResponse: ");
+                    val[0] = false;
+                }
+                mutex.release();
+
             }
 
             @Override
             public void onFailure(@Nonnull ApolloException e)
             {
                 Log.d("FAIL", "onFailure: FAIL");
+                val[0] = false;
+                mutex.release();
             }
         });
-        return true;
+        mutex.acquireUninterruptibly();
+        return val[0];
     }
 
     public static boolean uploadSingleMessage(SlyncyMessage message, Context context)
@@ -366,28 +400,7 @@ public class ClientCommunicator
             builder.files(files);
         }
 
-//        client.subscribe(PendingMessagesSubscription.builder().build()).execute(
-//                new ApolloSubscriptionCall.Callback<PendingMessagesSubscription.Data>()
-//                {
-//                    @Override
-//                    public void onResponse(
-//                            @Nonnull com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> response)
-//                    {
 //
-//                    }
-//
-//                    @Override
-//                    public void onFailure(@Nonnull ApolloException e)
-//                    {
-//
-//                    }
-//
-//                    @Override
-//                    public void onCompleted()
-//                    {
-//
-//                    }
-//                });
         client.mutate(builder.build()).enqueue(new ApolloCall.Callback<CreateMessageMutation.Data>()
         {
             @Override
@@ -464,6 +477,7 @@ public class ClientCommunicator
 
     public static void subscribeToNewMessages(final Context context)
     {
+        final boolean[] result = new boolean[]{true};
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
         {
             @Override
@@ -481,68 +495,62 @@ public class ClientCommunicator
                 .subscriptionTransportFactory(factory).build();
 
 
-        ApolloSubscriptionCall<PendingMessagesSubscription.Data> subscription = client
-                .subscribe(PendingMessagesSubscription.builder().token(authToken).build());
-        disposables.add(Rx2Apollo.from(subscription).subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.newThread()).subscribeWith(
-                        new DisposableSubscriber<com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data>>()
+        client.subscribe(PendingMessagesSubscription.builder().token(authToken).build()).execute(new ApolloSubscriptionCall.Callback<PendingMessagesSubscription.Data>()
+        {
+            @Override
+            public void onResponse(@Nonnull com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> response)
+            {
+                if (response.data() != null)
+                {
+                    PendingMessagesSubscription.PendingMessages messages = response.data().pendingMessages();
+                    if (messages != null)
+                    {
+                        final String address = messages.address();
+                        final String body = messages.body();
+                        PendingMessagesSubscription.File file = messages.file();
+                        if (file != null)
                         {
-                            @Override
-                            public void onNext(
-                                    com.apollographql.apollo.api.Response<PendingMessagesSubscription.Data> dataResponse)
+                            if (file.uploaded() != null && file.uploaded())
                             {
-                                Log.d("OnNext", "subscription");
-                                if (dataResponse.data() != null)
-                                {
-                                    PendingMessagesSubscription.PendingMessages messages = dataResponse.data().pendingMessages();
-                                    if (messages != null)
-                                    {
-                                        final String address = messages.address();
-                                        final String body = messages.body();
-                                        PendingMessagesSubscription.File file = messages.file();
-                                        if (file != null)
+                                new ImageDownloadThread(file.content(),
+                                        context.getCacheDir().getAbsolutePath(),
+                                        new ImageDownloadThread.CallBack()
                                         {
-                                            if (file.uploaded() != null && file.uploaded())
+                                            @Override
+                                            public void callBack(String path)
                                             {
-                                                new ImageDownloadThread(file.content(),
-                                                        context.getCacheDir().getAbsolutePath(),
-                                                        new ImageDownloadThread.CallBack()
-                                                        {
-                                                            @Override
-                                                            public void callBack(String path)
-                                                            {
-                                                                CellMessage message = CellMessage
-                                                                        .newCellMessage(body, address.trim().split(" "),
-                                                                                BitmapFactory.decodeFile(path));
-                                                                SmsMmsRadar.sendMessage(message, context);
-                                                            }
-                                                        }).start();
-
+                                                CellMessage message = CellMessage
+                                                        .newCellMessage(body, address.trim().split(" "),
+                                                                BitmapFactory.decodeFile(path));
+                                                SmsMmsRadar.sendMessage(message, context);
                                             }
-                                        }
-                                        else
-                                        {
-                                            CellMessage message = CellMessage
-                                                    .newCellMessage(body, address.trim().split(" "));
-                                            SmsMmsRadar.sendMessage(message, context);
-                                        }
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onError(Throwable t)
-                            {
-                                Log.d("error", "subscription");
+                                        }).start();
 
                             }
+                        }
+                        else
+                        {
+                            CellMessage message = CellMessage
+                                    .newCellMessage(body, address.trim().split(" "));
+                            SmsMmsRadar.sendMessage(message, context);
+                        }
+                    }
+                }
+            }
 
-                            @Override
-                            public void onComplete()
-                            {
-                                Log.d("complete", "subscription");
-                            }
-                        }));
+            @Override
+            public void onFailure(@Nonnull ApolloException e)
+            {
+                e.printStackTrace();
+//                new ResubJob(this, client);
+            }
+
+            @Override
+            public void onCompleted()
+            {
+//                new ResubJob(this, client);
+            }
+        });
     }
 
     private static class ImageDownloadThread extends Thread

@@ -38,7 +38,7 @@ import java.util.Date;
  * or outgoing.
  * <p/>
  * SmsObserver will analyze the mms inbox and sent content providers to get the mms information and will notify
- * SmsListener.
+ * smsListener.
  * <p/>
  * The content observer will be called each time the mms content provider be updated. This means that all
  * the mms state changes will be notified. For example, when the mms state change from SENDING to SENT state.
@@ -115,14 +115,11 @@ public class MmsObserver extends ContentObserver
                         int threadId = cursor.getInt(cursor.getColumnIndex("thread_id"));
                         if (MmsCursorParser.shouldParseMms(msgId, new Date(date * 1000)))
                         {
-                            if (ClientCommunicator.markThreadAsRead(threadId))
+                            if (!ClientCommunicator.markThreadAsRead(threadId))
                             {
-                                MmsCursorParser.updateLastMmsRead(msgId);
+//                                new MarkReadJob(threadId);
                             }
-                            else
-                            {
-                                MmsCursorParser.updateLastMmsRead(msgId);
-                            }
+                            MmsCursorParser.updateLastMmsRead(msgId);
                         }
                     }
                 }

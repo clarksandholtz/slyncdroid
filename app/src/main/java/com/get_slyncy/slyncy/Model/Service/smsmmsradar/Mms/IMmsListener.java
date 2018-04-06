@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.tuenti.smsmmsradar.Mms;
+package com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms;
 
+import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 /**
  * This interface has to be implemented to be notified when an sms be received or sent.
  *
  * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
  * @author Manuel Peinado <mpeinado@tuenti.com>
  */
-public interface MmsListener
+public interface IMmsListener
 {
 
 	/**
@@ -29,7 +30,7 @@ public interface MmsListener
 	 *
 	 * @param mms intercepted.
 	 */
-	public void onMmsSent(Mms mms);
+	public void onMmsSent(SlyncyMessage mms);
 
 	/**
 	 * Invoked when an outgoing sms is intercepted.
@@ -37,6 +38,6 @@ public interface MmsListener
 	 * @param mms
 	 */
 
-	public void onMmsReceived(Mms mms);
+	public void onMmsReceived(SlyncyMessage mms);
 
 }

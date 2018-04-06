@@ -1,43 +1,39 @@
-/*
- * Copyright (c) Tuenti Technologies S.L. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms;
 
+import android.content.Context;
+
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
+import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 /**
- * This interface has to be implemented to be notified when an sms be received or sent.
- *
- * @author Pedro Vcente Gómez Sánchez <pgomez@tuenti.com>
- * @author Manuel Peinado <mpeinado@tuenti.com>
+ * Created by nsshurtz on 4/5/18.
  */
-public interface MmsListener
+
+public class MmsListener implements IMmsListener
 {
+    Context context;
 
-	/**
-	 * Invoked when an incoming sms is intercepted.
-	 *
-	 * @param mms intercepted.
-	 */
-	public void onMmsSent(SlyncyMessage mms);
+    public MmsListener(Context context)
+    {
+        this.context = context;
+    }
 
-	/**
-	 * Invoked when an outgoing sms is intercepted.
-	 *
-	 * @param mms
-	 */
+    @Override
+    public void onMmsSent(SlyncyMessage mms)
+    {
+        if (mms != null)
+        {
+//                    showSmsSToast(mms);
+            ClientCommunicator.uploadSingleMessage(mms, context);
+        }
+    }
 
-	public void onMmsReceived(SlyncyMessage mms);
-
+    @Override
+    public void onMmsReceived(SlyncyMessage mms)
+    {
+        if (mms != null)
+        {
+//                    showSmsRToast(mms);
+            ClientCommunicator.uploadSingleMessage(mms, context);
+        }
+    }
 }

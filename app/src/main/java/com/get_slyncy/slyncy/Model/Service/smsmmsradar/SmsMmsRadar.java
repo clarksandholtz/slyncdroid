@@ -20,9 +20,9 @@ import android.content.Intent;
 
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageSender;
 import com.get_slyncy.slyncy.Model.DTO.CellMessage;
-import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
-import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsListener;
-import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsListener;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.IMmsListener;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.ISmsListener;
+import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 
 
 /**
@@ -34,8 +34,8 @@ import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsListener;
 public class SmsMmsRadar
 {
 
-	public static SmsListener smsListener;
-	public static MmsListener mmsListener;
+	public static ISmsListener smsListener;
+	public static IMmsListener mmsListener;
 
 	/**
 	 * Starts the service and store the listener to be notified when a new incoming or outgoing sms be processed
@@ -44,23 +44,23 @@ public class SmsMmsRadar
 	 * @param context used to start the service
 	 * @param smsListener to notify when the sms content provider gets a new sms
 	 */
-	public static void initializeSmsRadarService(Context context, SmsListener smsListener, MmsListener mmsListener) {
+	public static void initializeSmsRadarService(Context context, ISmsListener smsListener, IMmsListener mmsListener) {
 		SmsMmsRadar.smsListener = smsListener;
 		SmsMmsRadar.mmsListener = mmsListener;
 		Intent intent = new Intent(context, SmsMmsRadarService.class);
 		context.startService(intent);
 	}
 
-
 	/**
-	 * Stops the service and remove the SmsListener added when the SmsMmsRadar was initialized
+	 * Stops the service and remove the smsListener added when the SmsMmsRadar was initialized
 	 *
 	 * @param context used to stop the service
 	 */
-	public static void stopSmsRadarService(Context context) {
+	public static void stopSmsMmsRadarService(Context context) {
 		SmsMmsRadar.smsListener = null;
 		SmsMmsRadar.mmsListener = null;
 		Intent intent = new Intent(context, SmsMmsRadarService.class);
+		ClientCommunicator.clearAuthToken(context);
 		context.stopService(intent);
 	}
 

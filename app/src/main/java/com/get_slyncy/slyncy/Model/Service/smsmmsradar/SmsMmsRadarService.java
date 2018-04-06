@@ -36,14 +36,14 @@ import android.provider.Telephony;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.apollographql.apollo.ApolloClient;
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.IMmsListener;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsListener;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.ISmsListener;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsListener;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.R;
-import com.get_slyncy.slyncy.View.LoginActivity;
 import com.get_slyncy.slyncy.View.PersistentNotifActivity;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsCursorParser;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsObserver;
@@ -53,13 +53,6 @@ import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SharedPreferencesSmsS
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsCursorParser;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsObserver;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsStorage;
-
-import java.io.IOException;
-
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 
 /**
@@ -154,49 +147,7 @@ public class SmsMmsRadarService extends Service
         registerSmsContentObserver();
         registerMmsContentObserver();
         ClientCommunicator.subscribeToNewMessages(getApplicationContext());
-        SmsMmsRadar.initializeSmsRadarService(this, new SmsListener()
-        {
-            @Override
-            public void onSmsSent(SlyncyMessage sms)
-            {
-                if (sms != null)
-                {
-                    showSmsSToast(sms);
-                    ClientCommunicator.uploadSingleMessage(sms, getApplicationContext());
-                }
-            }
-
-            @Override
-            public void onSmsReceived(SlyncyMessage sms)
-            {
-                if (sms != null)
-                {
-                    showSmsRToast(sms);
-                    ClientCommunicator.uploadSingleMessage(sms, getApplicationContext());
-                }
-            }
-        }, new MmsListener()
-        {
-            @Override
-            public void onMmsSent(SlyncyMessage mms)
-            {
-                if (mms != null)
-                {
-                    showSmsSToast(mms);
-                    ClientCommunicator.uploadSingleMessage(mms, getApplicationContext());
-                }
-            }
-
-            @Override
-            public void onMmsReceived(SlyncyMessage mms)
-            {
-                if (mms != null)
-                {
-                    showSmsRToast(mms);
-                    ClientCommunicator.uploadSingleMessage(mms, getApplicationContext());
-                }
-            }
-        });
+        SmsMmsRadar.initializeSmsRadarService(this, new SmsListener(getApplicationContext()), new MmsListener(getApplicationContext()));
     }
 
     private void initializeDependencies()
@@ -307,36 +258,7 @@ public class SmsMmsRadarService extends Service
 
     private String getSmsToastText(SlyncyMessage sms, String type)
     {
-//        ApolloClient.builder().
-//        CustomTypeAdapter<Date> customTypeAdapter = new CustomTypeAdapter<Date>()
-//        {
-//            @Override
-//            public Date decode(@Nonnull String value)
-//            {
-//                return new Date(Long.parseLong(value) * 1000);
-//            }
-//
-//            @Nonnull
-//            @Override
-//            public String encode(@Nonnull Date value)
-//            {
-//                return String.valueOf(value.getTime());
-//            }
-//        };
-//        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
-//        {
-//            @Override
-//            public Response intercept(Chain chain) throws IOException
-//            {
-//                Request orig = chain.request();
-//                Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
-//                builder.header("Authorization",
-//                        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjamV0NmdqY2wwMDFiMDEzOXl6ZjJmam83IiwiaWF0IjoxNTIxMTU4NDg1fQ.-pAAuNQCGkcLUX-WcQbXmXNg1xsYQtivMOCoNP7eMlY");
-//                return chain.proceed(builder.build());
-//            }
-//        }).build();
-//        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
-//                .build();
+
         StringBuilder stringBuilder = new StringBuilder();
         switch (type)
         {

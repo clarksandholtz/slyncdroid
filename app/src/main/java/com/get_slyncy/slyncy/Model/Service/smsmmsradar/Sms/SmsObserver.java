@@ -16,6 +16,7 @@
 package com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms;
 
 
+import android.app.job.JobInfo;
 import android.content.ContentResolver;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -27,8 +28,6 @@ import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 
-import java.util.Date;
-
 
 /**
  * ContentObserver created to handle the sms content provider changes. This entity will be called each time the
@@ -38,7 +37,7 @@ import java.util.Date;
  * or outgoing.
  * <p/>
  * SmsObserver will analyze the sms inbox and sent content providers to get the sms information and will notify
- * SmsListener.
+ * smsListener.
  * <p/>
  * The content observer will be called each time the sms content provider be updated. This means that all
  * the sms state changes will be notified. For example, when the sms state change from SENDING to SENT state.
@@ -114,14 +113,12 @@ public class SmsObserver extends ContentObserver
                         int threadId = cursor.getInt(cursor.getColumnIndex("thread_id"));
                         if (SmsCursorParser.shouldParseReadSms(msgId))
                         {
-                            if (ClientCommunicator.markThreadAsRead(threadId))
+                            if (!ClientCommunicator.markThreadAsRead(threadId))
                             {
-                                SmsCursorParser.updateLastSmsRead(msgId);
+//                                JobInfo ji =
+//                                new MarkReadJob(threadId);
                             }
-                            else
-                            {
-                                SmsCursorParser.updateLastSmsRead(msgId);
-                            }
+                            SmsCursorParser.updateLastSmsRead(msgId);
                         }
                     }
                 }
