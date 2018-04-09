@@ -24,9 +24,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 
-import com.get_slyncy.slyncy.View.Test.TestActivity;
 
-public class PermissionActivity extends Activity {
+public class PermissionActivity extends Activity
+{
 
     private static final String[] PERMISSIONS_TO_REQUEST = new String[]{
 
@@ -44,20 +44,16 @@ public class PermissionActivity extends Activity {
 
     private static final int NOT_GRANTED = -1;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        requestPermissions(PERMISSIONS_TO_REQUEST, 0);
-    }
-
-    public static boolean needPermissionRequest(Context context) {
+    public static boolean needPermissionRequest(Context context)
+    {
 
         // iterate through all the needed permissions.
         // if one needs to be requested, return true.
-        for (String permissionNeeded : PERMISSIONS_TO_REQUEST) {
+        for (String permissionNeeded : PERMISSIONS_TO_REQUEST)
+        {
             int permissionStatus = ContextCompat.checkSelfPermission(context, permissionNeeded);
-            if (permissionStatus == NOT_GRANTED) {
+            if (permissionStatus == NOT_GRANTED)
+            {
                 return true;
             }
         }
@@ -66,12 +62,21 @@ public class PermissionActivity extends Activity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        requestPermissions(PERMISSIONS_TO_REQUEST, 0);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+    {
         PreferenceManager.getDefaultSharedPreferences(this).edit()
                 .putBoolean("request_permissions", false)
                 .apply();
 
-        startActivity(new Intent(this, TestActivity.class));
+        startActivity(new Intent(this, LoginActivity.class));
         finish();
     }
 

@@ -23,10 +23,12 @@ import android.os.IBinder;
 /**
  * Needed to make default sms app for testing
  */
-public class HeadlessSmsSendService extends Service {
+public class HeadlessSmsSendService extends Service
+{
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(Intent intent)
+    {
         return null;
     }
 

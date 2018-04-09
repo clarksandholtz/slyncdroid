@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.get_slyncy.slyncy">
+
+    <application>
+
+        <activity
+            android:name=".View.Test.TestActivity"
+            android:label="Debugging Activity"
+            android:theme="@style/Base.Theme.AppCompat.Light"
+            android:taskAffinity="com.get_slyncy.slyncy.debug">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <action android:name="android.intent.action.SENDTO"/>
+
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <content android:scheme="sms"/>
+                <content android:scheme="smsto"/>
+                <content android:scheme="mms"/>
+                <content android:scheme="mmsto"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".View.MainActivity"
+            android:label="Debugging activity"
+            android:taskAffinity="com.get_slyncy.slyncy.debug">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

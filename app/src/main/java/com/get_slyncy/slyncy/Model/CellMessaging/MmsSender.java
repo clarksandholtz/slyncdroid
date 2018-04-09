@@ -42,27 +42,25 @@ import java.util.Random;
 
 public class MmsSender
 {
+    public static final String EXTRA_NOTIFICATION_URL = "notification_url";
     private static final String TAG = "MmsSender";
     private static final String TEXT_PART_FILENAME = "text_0.txt";
-
-    public static final String EXTRA_NOTIFICATION_URL = "notification_url";
-
     private static final String ACTION_MMS_SENT = "com.example.android.apis.os.MMS_SENT_ACTION";
     private static final String ACTION_MMS_RECEIVED = "com.example.android.apis.os.MMS_RECEIVED_ACTION";
     private static final String sSmilText =
             "<smil>" +
-                    "<head>" +
-                    "<layout>" +
-                    "<root-layout/>" +
-                    "<region height=\"100%%\" id=\"Text\" left=\"0%%\" top=\"0%%\" width=\"100%%\"/>" +
-                    "</layout>" +
-                    "</head>" +
-                    "<body>" +
-                    "<par dur=\"8000ms\">" +
-                    "<text src=\"%s\" region=\"Text\"/>" +
-                    "</par>" +
-                    "</body>" +
-                    "</smil>";
+            "<head>" +
+            "<layout>" +
+            "<root-layout/>" +
+            "<region height=\"100%%\" id=\"Text\" left=\"0%%\" top=\"0%%\" width=\"100%%\"/>" +
+            "</layout>" +
+            "</head>" +
+            "<body>" +
+            "<par dur=\"8000ms\">" +
+            "<text src=\"%s\" region=\"Text\"/>" +
+            "</par>" +
+            "</body>" +
+            "</smil>";
 
 
     private static File mSendFile;
@@ -143,10 +141,12 @@ public class MmsSender
         });
     }
 
-    private static List<MMSPart> buildMmsParts(List<Message.Part> parts, Bitmap[] images, String text) {
+    private static List<MMSPart> buildMmsParts(List<Message.Part> parts, Bitmap[] images, String text)
+    {
         ArrayList<MMSPart> data = new ArrayList<>();
 
-        for (Bitmap image : images) {
+        for (Bitmap image : images)
+        {
             // turn bitmap into byte array to be stored
             byte[] imageBytes = ImageUtility.bitmapToByteArray(image);
             // TODO: Fix image compression. Message size should be under 300kb.
@@ -161,12 +161,17 @@ public class MmsSender
 
         // add any extra media according to their mimeType set in the message
         //      eg. videos, audio, contact cards, location maybe?
-        if (parts != null) {
-            for (Message.Part p : parts) {
+        if (parts != null)
+        {
+            for (Message.Part p : parts)
+            {
                 MMSPart part = new MMSPart();
-                if (p.getName() != null) {
+                if (p.getName() != null)
+                {
                     part.Name = p.getName();
-                } else {
+                }
+                else
+                {
                     part.Name = p.getContentType().split("/")[0];
                 }
                 part.MimeType = p.getContentType();
@@ -175,7 +180,8 @@ public class MmsSender
             }
         }
 
-        if (text != null && !text.equals("")) {
+        if (text != null && !text.equals(""))
+        {
             // add text to the end of the part and send
             MMSPart part = new MMSPart();
             part.Name = "text";
@@ -187,28 +193,35 @@ public class MmsSender
         return data;
     }
 
-    private static byte[] getBytes(Context context, String[] recipients, String subject, List<MMSPart> parts) {
+    private static byte[] getBytes(Context context, String[] recipients, String subject, List<MMSPart> parts)
+    {
 
         final SendReq sendRequest = new SendReq();
 
         // create send request addresses
-        for (String recipient : recipients) {
+        for (String recipient : recipients)
+        {
             final EncodedStringValue[] phoneNumbers = EncodedStringValue.extract(recipient);
 
-            if (phoneNumbers != null && phoneNumbers.length > 0) {
+            if (phoneNumbers != null && phoneNumbers.length > 0)
+            {
                 sendRequest.addTo(phoneNumbers[0]);
             }
         }
 
-        if (subject != null) {
+        if (subject != null)
+        {
             sendRequest.setSubject(new EncodedStringValue(subject));
         }
 
         sendRequest.setDate(Calendar.getInstance().getTimeInMillis() / 1000L);
 
-        try {
+        try
+        {
             sendRequest.setFrom(new EncodedStringValue(Utils.getMyPhoneNumber(context)));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             Log.e(TAG, "error getting from address", e);
         }
 
@@ -216,16 +229,21 @@ public class MmsSender
 
         // assign parts to the pdu body which contains sending data
         long size = 0;
-        if (parts != null) {
-            for (int i = 0; i < parts.size(); i++) {
+        if (parts != null)
+        {
+            for (int i = 0; i < parts.size(); i++)
+            {
                 MMSPart part = parts.get(i);
-                if (part != null) {
-                    try {
+                if (part != null)
+                {
+                    try
+                    {
                         PduPart partPdu = new PduPart();
                         partPdu.setName(part.Name.getBytes());
                         partPdu.setContentType(part.MimeType.getBytes());
 
-                        if (part.MimeType.startsWith("text")) {
+                        if (part.MimeType.startsWith("text"))
+                        {
                             partPdu.setCharset(CharacterSets.UTF_8);
                         }
                         // Set Content-Location.
@@ -237,8 +255,11 @@ public class MmsSender
                         partPdu.setData(part.Data);
 
                         pduBody.addPart(partPdu);
-                        size += ((2 * part.Name.getBytes().length) + part.MimeType.getBytes().length + part.Data.length + contentId.getBytes().length);
-                    } catch (Exception e) {
+                        size += ((2 * part.Name.getBytes().length) + part.MimeType
+                                .getBytes().length + part.Data.length + contentId.getBytes().length);
+                    }
+                    catch (Exception e)
+                    {
                         e.printStackTrace();
                     }
                 }
@@ -270,9 +291,12 @@ public class MmsSender
         final PduComposer composer = new PduComposer(context, sendRequest);
         byte[] bytesToSend = null;
 
-        try {
+        try
+        {
             bytesToSend = composer.make();
-        } catch (OutOfMemoryError e) {
+        }
+        catch (OutOfMemoryError e)
+        {
             e.printStackTrace();
         }
 

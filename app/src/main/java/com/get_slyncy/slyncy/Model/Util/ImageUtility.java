@@ -16,27 +16,38 @@ import java.io.IOException;
  * Created by tylerbowers on 2/10/18.
  */
 
-public class ImageUtility {
+public class ImageUtility
+{
 
-    public static byte[] bitmapToByteArray(Bitmap image) {
+    public static byte[] bitmapToByteArray(Bitmap image)
+    {
         byte[] output = new byte[0];
-        if (image == null) {
+        if (image == null)
+        {
             Log.d("Message", "image is null, returning byte array of size 0");
             return output;
         }
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        try {
+        try
+        {
             image.compress(Bitmap.CompressFormat.JPEG, 90, stream);
             output = stream.toByteArray();
-        } finally {
-            try {
+        }
+        finally
+        {
+            try
+            {
                 stream.close();
-            } catch (IOException e) {}
+            }
+            catch (IOException e)
+            {
+            }
         }
         return output;
     }
 
-    public static byte[] compressImage(Bitmap original) {
+    public static byte[] compressImage(Bitmap original)
+    {
 
         Bitmap scaledBitmap = null;
 
@@ -59,12 +70,22 @@ public class ImageUtility {
 
 //      width and height values are set maintaining the aspect ratio of the image
 
-        if (actualHeight > maxHeight || actualWidth > maxWidth) {
-            if (imgRatio < maxRatio) {               imgRatio = maxHeight / actualHeight;                actualWidth = (int) (imgRatio * actualWidth);               actualHeight = (int) maxHeight;             } else if (imgRatio > maxRatio) {
+        if (actualHeight > maxHeight || actualWidth > maxWidth)
+        {
+            if (imgRatio < maxRatio)
+            {
+                imgRatio = maxHeight / actualHeight;
+                actualWidth = (int) (imgRatio * actualWidth);
+                actualHeight = (int) maxHeight;
+            }
+            else if (imgRatio > maxRatio)
+            {
                 imgRatio = maxWidth / actualWidth;
                 actualHeight = (int) (imgRatio * actualHeight);
                 actualWidth = (int) maxWidth;
-            } else {
+            }
+            else
+            {
                 actualHeight = (int) maxHeight;
                 actualWidth = (int) maxWidth;
 
@@ -83,9 +104,12 @@ public class ImageUtility {
         options.inInputShareable = true;
         options.inTempStorage = new byte[16 * 1024];
 
-        try {
-            scaledBitmap = Bitmap.createBitmap(actualWidth, actualHeight,Bitmap.Config.ARGB_8888);
-        } catch (OutOfMemoryError exception) {
+        try
+        {
+            scaledBitmap = Bitmap.createBitmap(actualWidth, actualHeight, Bitmap.Config.ARGB_8888);
+        }
+        catch (OutOfMemoryError exception)
+        {
             exception.printStackTrace();
         }
 
@@ -99,7 +123,8 @@ public class ImageUtility {
 
         Canvas canvas = new Canvas(scaledBitmap);
         canvas.setMatrix(scaleMatrix);
-        canvas.drawBitmap(bmp, middleX - bmp.getWidth() / 2, middleY - bmp.getHeight() / 2, new Paint(Paint.FILTER_BITMAP_FLAG));
+        canvas.drawBitmap(bmp, middleX - bmp.getWidth() / 2, middleY - bmp.getHeight() / 2,
+                new Paint(Paint.FILTER_BITMAP_FLAG));
 
 //      check the rotation of the image and display it properly
 //        ExifInterface exif;
@@ -142,15 +167,22 @@ public class ImageUtility {
         return Message.bitmapToByteArray(scaledBitmap);
     }
 
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight)
+    {
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
 
-        if (height > reqHeight || width > reqWidth) {
-            final int heightRatio = Math.round((float) height/ (float) reqHeight);
+        if (height > reqHeight || width > reqWidth)
+        {
+            final int heightRatio = Math.round((float) height / (float) reqHeight);
             final int widthRatio = Math.round((float) width / (float) reqWidth);
-            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;      }       final float totalPixels = width * height;       final float totalReqPixelsCap = reqWidth * reqHeight * 2;       while (totalPixels / (inSampleSize * inSampleSize) > totalReqPixelsCap) {
+            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+        }
+        final float totalPixels = width * height;
+        final float totalReqPixelsCap = reqWidth * reqHeight * 2;
+        while (totalPixels / (inSampleSize * inSampleSize) > totalReqPixelsCap)
+        {
             inSampleSize++;
         }
 
