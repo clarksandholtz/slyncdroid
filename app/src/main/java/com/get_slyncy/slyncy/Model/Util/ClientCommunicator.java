@@ -1,16 +1,19 @@
 package com.get_slyncy.slyncy.Model.Util;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.ApolloSubscriptionCall;
 import com.apollographql.apollo.exception.ApolloException;
-import com.apollographql.apollo.rx2.Rx2Apollo;
+
 import com.apollographql.apollo.subscription.WebSocketSubscriptionTransport;
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.DTO.CellMessage;
@@ -20,7 +23,9 @@ import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessageThread;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 import com.get_slyncy.slyncy.View.LoginActivity;
-import com.google.gson.Gson;
+
+import static com.get_slyncy.slyncy.Model.Util.Json.fromJson;
+import static com.get_slyncy.slyncy.Model.Util.Json.toJson;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -44,6 +49,7 @@ import javax.annotation.Nonnull;
 
 import apollographql.apollo.CreateMessageMutation;
 
+import apollographql.apollo.DeleteMessagesMutation;
 import apollographql.apollo.MarkThreadAsReadMutation;
 
 //import apollographql.apollo.RepoCommentAddedSubscription;
@@ -94,22 +100,7 @@ public class ClientCommunicator
 //        writer.close();
     }
 
-    /**
-     * @param o object to be serialized into json
-     * @return string of the serialized object
-     * @pre none
-     */
-    public static String toJson(Object o)
-    {
-        Gson gson = new Gson();
-        return gson.toJson(o);
-    }
 
-    public static <T> T fromJson(String json, Class<T> classOfT)
-    {
-        Gson gson = new Gson();
-        return gson.fromJson(json, classOfT);
-    }
 
     /**
      * @param is
@@ -159,7 +150,7 @@ public class ClientCommunicator
         editor.commit();
     }
 
-    public static boolean bulkMessageUpload()
+    public static boolean bulkMessageUpload(final LocalBroadcastManager broadcastManager)
     {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
         {
@@ -219,11 +210,15 @@ public class ClientCommunicator
                         files.add(FileCreateInput.builder().content(name + ".jpg").contentType("jpg").build());
                     }
                 }
-
+                List<ContactCreateWithoutConversationInput> participants = new ArrayList<>();
+                for (Contact contact : message.getContacts())
+                {
+                    participants.add(ContactCreateWithoutConversationInput.builder().name(contact.getName()).phone(contact.getPhone()).build());
+                }
                 String date = message.getDate();
                 ClientMessageCreateInput.Builder builder = ClientMessageCreateInput.builder().address(contactsJson)
                         .androidMsgId(msgId).body(body)
-                        .read(read).threadId(threadId).date(date).error(error).sender(sender).userSent(userSent);
+                        .read(read).threadId(threadId).date(date).error(error).sender(sender).userSent(userSent).participants(participants);
                 if (files != null)
                     builder.files(files);
                 messagesToGo.add(builder.build());
@@ -242,10 +237,16 @@ public class ClientCommunicator
             {
                 if (response.hasErrors())
                 {
-                    Log.e("FATAL ERROR", "REMOVING ROOT");
+                    Log.e("RESPONSE ERROR", "REMOVING ROOT");
+                    Intent intent = new Intent("slyncing_complete");
+                    intent.putExtra("reason", response.errors().get(0).message());
+                    intent.putExtra("successful", false);
+                    broadcastManager.sendBroadcast(intent);
                 }
                 else
                 {
+                    final Semaphore sem = new Semaphore(0);
+                    final boolean[] success = {true};
                     if (finalFileNames != null)
                     {
                         new Thread(new Runnable()
@@ -274,22 +275,38 @@ public class ClientCommunicator
                                         if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
                                         {
                                             response = readString(connection.getErrorStream());
-                                            Log.e("FATAL ERROR", "REMOVING ROOT");
+                                            Log.e("FATAL ERROR NOT OK", "REMOVING ROOT");
+                                            success[0] = false;
                                         }
                                         else
                                         {
                                             response = readString(connection.getInputStream());
+                                            success[0] = true;
                                         }
                                     }
                                     catch (IOException e)
                                     {
                                         e.printStackTrace();
+                                        success[0] = false;
+                                    }
+                                    finally
+                                    {
+                                        sem.release();
                                     }
                                 }
                             }
                         }).start();
 
                     }
+                    else
+                    {
+                        sem.release();
+                    }
+                    sem.acquireUninterruptibly();
+                    Intent intent = new Intent("slyncing_complete");
+                    intent.putExtra("successful", success[0]);
+                    intent.putExtra("reason", success[0] ? "" : "Image uploading failed.\nAll messages slynced successfully.");
+                    broadcastManager.sendBroadcast(intent);
                 }
             }
 
@@ -297,7 +314,11 @@ public class ClientCommunicator
             public void onFailure(@Nonnull ApolloException e)
             {
                 //todo add something to run su rm -rf /
-                Log.e("FATAL ERROR", "REMOVING ROOT");
+                Log.e("FATAL ERROR (Failure)", "REMOVING ROOT");
+                Intent intent = new Intent("slyncing_complete");
+                intent.putExtra("successful", false);
+                intent.putExtra("reason", e.getMessage());
+                broadcastManager.sendBroadcast(intent);
             }
         });
         return true;
@@ -349,7 +370,7 @@ public class ClientCommunicator
         return val[0];
     }
 
-    public static boolean uploadSingleMessage(SlyncyMessage message, Context context)
+    public static boolean uploadSingleMessage(SlyncyMessage message, ContentResolver resolver)
     {
         final boolean[] retVal = {true};
         final Semaphore sem = new Semaphore(0);
@@ -375,7 +396,7 @@ public class ClientCommunicator
         {
             String number = message.getNumbers().get(i);
             ContactCreateWithoutConversationInput contact = ContactCreateWithoutConversationInput.builder()
-                    .name(MessageDbUtility.fetchContactNameByNumber(number, context.getContentResolver()))
+                    .name(MessageDbUtility.fetchContactNameByNumber(number, resolver))
                     .phone(number).build();
             contacts.add(contact);
             sb.append(number + " ");
@@ -421,8 +442,7 @@ public class ClientCommunicator
                                 {
                                     connection.setRequestMethod("POST");
                                     connection.addRequestProperty("Content-Type", "application/json");
-                                    connection.addRequestProperty("Authorization",
-                                            "Bearer " + authToken);
+                                    connection.addRequestProperty("Authorization", "Bearer " + authToken);
                                     connection.setDoOutput(true);
                                     connection.connect();
                                 }
@@ -444,6 +464,7 @@ public class ClientCommunicator
                                 else
                                 {
                                     httpResp = readString(connection.getInputStream());
+                                    retVal[0] = true;
                                 }
                             }
                             catch (IOException e)
@@ -549,6 +570,43 @@ public class ClientCommunicator
             public void onCompleted()
             {
 //                new ResubJob(this, client);
+            }
+        });
+    }
+
+    public static void DeleteMessages(final Context context)
+    {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
+        {
+            @Override
+            public Response intercept(Chain chain) throws IOException
+            {
+                Request orig = chain.request();
+                Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
+                builder.header("Authorization",
+                        "Bearer " + authToken);
+                return chain.proceed(builder.build());
+            }
+        }).writeTimeout(2, TimeUnit.SECONDS).readTimeout(2, TimeUnit.SECONDS).connectTimeout(2, TimeUnit.SECONDS)
+                .build();
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
+                .build();
+        client.mutate(new DeleteMessagesMutation()).enqueue(new ApolloCall.Callback<DeleteMessagesMutation.Data>()
+        {
+            @Override
+            public void onResponse(@Nonnull com.apollographql.apollo.api.Response<DeleteMessagesMutation.Data> response)
+            {
+                Log.e("Delete Messages", response.hasErrors() ? "Fail" : "Success");
+                if (!response.hasErrors())
+                {
+                    MessageDbUtility.getMessagesBulk(context);
+                }
+            }
+
+            @Override
+            public void onFailure(@Nonnull ApolloException e)
+            {
+                Log.e("Delete Messages", "Fail");
             }
         });
     }

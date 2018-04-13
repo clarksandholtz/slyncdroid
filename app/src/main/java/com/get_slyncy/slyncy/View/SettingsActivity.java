@@ -1,19 +1,31 @@
 package com.get_slyncy.slyncy.View;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
+import android.os.Build;
 import android.os.Bundle;
-import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadarService;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
@@ -60,7 +72,7 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
         accountProfile = findViewById(R.id.account_profile);
         ImageView syncIcon = findViewById(R.id.sync_icon);
         ImageView groupIcon = findViewById(R.id.group_message_icon);
-        ImageView notificationIcon = findViewById(R.id.notification_icon);
+        final ImageView notificationIcon = findViewById(R.id.notification_icon);
         ImageView logoutIcon = findViewById(R.id.logout_icon);
         ImageView notificationArrow = findViewById(R.id.notification_arrow);
 //        syncEntry = findViewById(R.id.sync_entry_title);
@@ -76,13 +88,66 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
             accountEmail.setText(bundle.getString("email", ""));
             accountPhone.setText(bundle.getString("phone", ""));
             picUrl = bundle.getString("pic");
-            if (bundle.containsKey("sync"))
+
+//                    ClientCommunicator.bulkMessageUpload();
+
+        }
+        final NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        Notification.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager != null)
+        {
+            NotificationChannel channel = new NotificationChannel(getPackageName() + "_slyncing", "Slyncing Progress", NotificationManager.IMPORTANCE_DEFAULT);
+            channel.enableLights(true);
+            channel.setLightColor(getColor(R.color.colorPrimary));
+            channel.setShowBadge(true);
+            channel.enableVibration(true);
+            notificationManager.createNotificationChannel(channel);
+            builder = new Notification.Builder(this, getPackageName() + "_slyncing");
+        }
+        else
+        {
+            builder = new Notification.Builder(this);
+        }
+        builder.setContentTitle("Slyncing...").setContentText("Slyncy is currently slyncing.").setOngoing(true).setSmallIcon(Icon.createWithResource(this, R.drawable.notification_logo)).setColor(getColor(R.color.colorPrimary));
+        final Notification notification = builder.build();
+        if (notificationManager != null) notificationManager.notify(60, notification);
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(getApplicationContext());
+        manager.registerReceiver(new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
             {
-                if (bundle.getBoolean("sync"))
+                if (notificationManager != null)
                 {
-                    ClientCommunicator.bulkMessageUpload();
+                    notificationManager.cancel(60);
+                    Notification.Builder builder;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+                    {
+                        builder = new Notification.Builder(getApplicationContext(), getPackageName() + "_slyncing");
+                    }
+                    else
+                    {
+                        builder = new Notification.Builder(getApplicationContext());
+                    }
+                    builder.setOngoing(false).setVibrate(new long[]{0L, 250L, 250L, 250L}).setSmallIcon(Icon.createWithResource(getApplicationContext(), R.drawable.notification_logo)).setColor(getColor(R.color.colorPrimary));
+                    if (!intent.getBooleanExtra("successful", false))
+                    {
+                        builder.setContentTitle("Error").setContentText(intent.getStringExtra("reason"));
+                    }
+                    else
+                    {
+                        builder.setContentTitle("Slynced").setContentText("Slyncing complete");
+                    }
+                    notificationManager.notify(60, builder.build());
                 }
+
             }
+        }, new IntentFilter("slyncing_complete"));
+
+        if (getSharedPreferences("authorization", MODE_PRIVATE).contains("synced"))
+        {
+            if (!getSharedPreferences("authorization", MODE_PRIVATE).getBoolean("synced", true))
+                MessageDbUtility.getMessagesBulk(this);
         }
 
 //        accountProfile.setImageDrawable(getDrawable(R.drawable.ic_account_circle_black_24dp));
@@ -171,21 +236,42 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
         }
         FirebaseAuth.getInstance().signOut();
         // Google sign out
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
         GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        mGoogleSignInClient.signOut().addOnCompleteListener(this,
-                new OnCompleteListener<Void>()
-                {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task)
-                    {
-                        Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }
-                });
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>()
+        {
+            @Override
+            public void onComplete(@NonNull Task<Void> task)
+            {
+                Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+    }
+
+    public void resync(View view)
+    {
+        AlertDialog alertDialog = new AlertDialog.Builder(this).setIcon(getDrawable(R.drawable.ic_warn)).setTitle("Warning!").setMessage("This will erase all messages on the Slyncy servers.\nIt is irreversible").setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dialog.dismiss();
+            }
+        }).setPositiveButton("Proceed", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                ClientCommunicator.DeleteMessages(getApplicationContext());
+            }
+        }).create();
+        Drawable icon = getDrawable(R.drawable.ic_warn);
+//        icon.setColorFilter(getColor(R.color.colorPrimaryDark), PorterDuff.Mode.OVERLAY);
+        alertDialog.show();
+        alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(getColor(R.color.colorFontDark));
+        alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getColor(R.color.colorFontDark));
+        alertDialog.setIcon(icon);
     }
 }

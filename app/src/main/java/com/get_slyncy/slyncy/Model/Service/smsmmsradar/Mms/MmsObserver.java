@@ -16,14 +16,22 @@
 package com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms;
 
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.app.job.JobWorkItem;
+import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.provider.Telephony;
 
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.MarkReadJobService;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 
@@ -57,12 +65,16 @@ public class MmsObserver extends ContentObserver
 
     private ContentResolver contentResolver;
     private MmsCursorParser mmsCursorParser;
+    private JobScheduler jobScheduler;
+    private String packageName;
 
-    public MmsObserver(ContentResolver contentResolver, Handler handler, MmsCursorParser mmsCursorParser)
+    public MmsObserver(ContentResolver contentResolver, Handler handler, MmsCursorParser mmsCursorParser, JobScheduler jobScheduler, String packageName)
     {
         super(handler);
         this.contentResolver = contentResolver;
         this.mmsCursorParser = mmsCursorParser;
+        this.jobScheduler = jobScheduler;
+        this.packageName = packageName;
     }
 
 
@@ -117,9 +129,20 @@ public class MmsObserver extends ContentObserver
                         {
                             if (!ClientCommunicator.markThreadAsRead(threadId))
                             {
-//                                new MarkReadJob(threadId);
-                            }
-                            MmsCursorParser.updateLastMmsRead(msgId);
+                                if (jobScheduler != null)
+                                {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                                    {
+                                        jobScheduler.enqueue(new JobInfo.Builder("slyncy_sync_read_service".hashCode(), new ComponentName(packageName, MarkReadJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).build(), new JobWorkItem(new Intent().putExtra("threadId", threadId)));
+                                    }
+                                    else
+                                    {
+                                        PersistableBundle bundle = new PersistableBundle();
+                                        bundle.putInt("threadId", threadId);
+                                        jobScheduler.schedule(new JobInfo.Builder("slyncy_sync_read_service".hashCode(), new ComponentName(packageName, MarkReadJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setExtras(bundle).build());
+                                    }
+                                }
+                            } MmsCursorParser.updateLastMmsRead(msgId);
                         }
                     }
                 }

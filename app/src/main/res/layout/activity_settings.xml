@@ -93,7 +93,8 @@
             android:paddingEnd="?android:attr/scrollbarSize"
             android:paddingLeft="12dip"
             android:paddingRight="?android:attr/scrollbarSize"
-            android:paddingStart="12dip">
+            android:paddingStart="12dip"
+            android:onClick="resync">
 
             <ImageView
                 android:id="@+id/sync_icon"

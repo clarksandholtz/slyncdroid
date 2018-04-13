@@ -38,9 +38,7 @@ import android.widget.Toast;
 
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
-import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.IMmsListener;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsListener;
-import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.ISmsListener;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsListener;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.R;
@@ -118,7 +116,7 @@ public class SmsMmsRadarService extends Service
         PendingIntent pendingIntent = PendingIntent
                 .getActivity(this, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
-        Icon icon = Icon.createWithResource(this, R.drawable.ic_stat_name);
+        Icon icon = Icon.createWithResource(this, R.drawable.notification_logo);
         icon.setTint(getColor(R.color.colorPrimary));
         startForeground(getPackageName().hashCode(), builder.setSmallIcon(icon).setColor(getColor(R.color.colorPrimary))
                 .setContentText("Slyncy ForegroundService").setContentTitle("SLYNCY FOREGROUND SERVICE").build());

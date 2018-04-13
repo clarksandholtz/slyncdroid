@@ -326,13 +326,14 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                                                                             editor.putString("phone", user.getPhoneNumber());
                                                                             editor.putString("name", user.getDisplayName());
                                                                             editor.putString("pic", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
+                                                                            editor.putBoolean("synced", false);
                                                                             editor.commit();
                                                                             ClientCommunicator.persistAuthToken(response.data().signup().token(), getApplicationContext());
                                                                         }
-                                                                        if (!new File(getCacheDir() + "/profilePic.jpg").exists())
-                                                                        {
+//                                                                        if (!new File(getCacheDir() + "/profilePic.jpg").exists())
+//                                                                        {
                                                                             new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(), ConfirmationActivity.this).execute(user.getPhotoUrl() != null ? user.getPhotoUrl().toString().replace("s96-c", "s960-c") : "");
-                                                                        }
+//                                                                        }
                                                                     }
                                                                 }
 
@@ -394,12 +395,20 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                                             {
                                                 if (response.data() != null)
                                                 {
+                                                    SharedPreferences sharedPreferences = getSharedPreferences("authorization", MODE_PRIVATE);
+                                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                    editor.putString("email", user.getEmail());
+                                                    editor.putString("phone", user.getPhoneNumber());
+                                                    editor.putString("name", user.getDisplayName());
+                                                    editor.putString("pic", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
+                                                    editor.putBoolean("synced", false);
+                                                    editor.commit();
                                                     ClientCommunicator.setAuthToken(response.data().signup().token());
                                                 }
-                                                if (!new File(getCacheDir() + "/profilePic.jpg").exists())
-                                                {
+//                                                if (!new File(getCacheDir() + "/profilePic.jpg").exists())
+//                                                {
                                                     new DownloadImageTask(ConfirmationActivity.this.getCacheDir().getPath(), ConfirmationActivity.this).execute(user.getPhotoUrl() != null ? user.getPhotoUrl().toString().replace("s96-c", "s960-c") : "");
-                                                }
+//                                                }
                                             }
                                         }
 

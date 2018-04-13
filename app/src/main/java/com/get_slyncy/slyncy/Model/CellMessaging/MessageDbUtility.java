@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.get_slyncy.slyncy.Model.DTO.Contact;
@@ -73,7 +74,7 @@ public class MessageDbUtility
         }, "MessageDbUtility.init").start();
     }
 
-    public static void getMessagesBulk(Context context)
+    public static void getMessagesBulk(final Context context)
     {
         instance = getInstance();
 
@@ -86,7 +87,7 @@ public class MessageDbUtility
                 instance.getMessagesBulk();
                 instance.mThreadList = new HashMap<>();
 
-                ClientCommunicator.bulkMessageUpload();
+                ClientCommunicator.bulkMessageUpload(LocalBroadcastManager.getInstance(context));
             }
         }, "MessageDbUtility.init").start();
     }

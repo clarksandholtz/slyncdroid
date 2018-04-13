@@ -22,6 +22,7 @@ import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.RetryMessageJobService;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.Model.Util.Data;
 import com.get_slyncy.slyncy.Model.Util.DownloadImageTask;
@@ -49,7 +50,7 @@ import apollographql.apollo.LoginMutation;
 public class LoginActivity extends Activity implements DownloadImageTask.PostExecCallBack
 {
 
-    public static final String SERVER_URL = "http://192.168.254.171:4000/";
+    public static final String SERVER_URL = "http://10.24./";
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
     private FirebaseAuth mAuth;
@@ -60,6 +61,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        new RetryMessageJobService(getContentResolver());
         setContentView(R.layout.activity_login);
         FirebaseApp.initializeApp(getApplicationContext());
 
@@ -88,6 +90,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
         if (getSharedPreferences("authorization", MODE_PRIVATE).contains("token"))
         {
             //need to keep the email name and phone number around.
+            ClientCommunicator.persistAuthToken(getSharedPreferences("authorization", MODE_PRIVATE).getString("token", null), this);
             SharedPreferences prefs = getSharedPreferences("authorization", MODE_PRIVATE);
             String email = prefs.getString("email", "");
             String name = prefs.getString("name", "");
@@ -241,6 +244,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                             editor.putString("phone", user.getPhoneNumber());
                             editor.putString("name", user.getDisplayName());
                             editor.putString("pic", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
+                            editor.putBoolean("synced", response.data().login().user().syncComplete() == null ? true : response.data().login().user().syncComplete());
                             editor.commit();
                             if (response.data() != null)
                             {
@@ -260,18 +264,18 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                                 Snackbar.LENGTH_SHORT).show();
 
 
-                        Intent intent = new Intent(LoginActivity.this, ConfirmationActivity.class);
-                        intent.putExtra("name", user.getDisplayName());
-                        intent.putExtra("email", user.getEmail());
-                        intent.putExtra("phone", user.getPhoneNumber());
-                        intent.putExtra("acct", acct);
-                        intent.putExtra("emailCred", user);
-                        intent.putExtra("pic", user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
+//                        Intent intent = new Intent(LoginActivity.this, ConfirmationActivity.class);
+//                        intent.putExtra("name", user.getDisplayName());
+//                        intent.putExtra("email", user.getEmail());
+//                        intent.putExtra("phone", user.getPhoneNumber());
+//                        intent.putExtra("acct", acct);
+//                        intent.putExtra("emailCred", user);
+//                        intent.putExtra("pic", user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
+//
+//                        Log.d("UID:", user.getUid());
+//                        mAuth.signOut();
 
-                        Log.d("UID:", user.getUid());
-                        mAuth.signOut();
-
-                        startActivity(intent);
+//                        startActivity(intent);
 /**     code below will allow you into settings without connecting to slyncy's server */
                         /**
                         new DownloadImageTask(LoginActivity.this.getCacheDir().getPath(),
