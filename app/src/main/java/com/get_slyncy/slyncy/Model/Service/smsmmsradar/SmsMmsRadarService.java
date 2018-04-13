@@ -22,6 +22,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.job.JobScheduler;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -145,7 +146,8 @@ public class SmsMmsRadarService extends Service
         registerSmsContentObserver();
         registerMmsContentObserver();
         ClientCommunicator.subscribeToNewMessages(getApplicationContext());
-        SmsMmsRadar.initializeSmsRadarService(this, new SmsListener(getApplicationContext()), new MmsListener(getApplicationContext()));
+        SmsMmsRadar.initializeSmsRadarService(this, new SmsListener(getContentResolver(), getSystemService(JobScheduler.class), getPackageName()),
+                new MmsListener(getContentResolver(), getSystemService(JobScheduler.class), getPackageName()));
     }
 
     private void initializeDependencies()
@@ -167,7 +169,7 @@ public class SmsMmsRadarService extends Service
     {
         Handler handler = new Handler();
         SmsCursorParser smsCursorParser = initializeSmsCursorParser();
-        this.smsObserver = new SmsObserver(contentResolver, handler, smsCursorParser);
+        this.smsObserver = new SmsObserver(contentResolver, handler, smsCursorParser, getSystemService(JobScheduler.class), getPackageName());
 
     }
 
@@ -175,7 +177,7 @@ public class SmsMmsRadarService extends Service
     {
         Handler handler = new Handler();
         MmsCursorParser mmsCursorParser = initializeMmsCursorParser();
-        this.mmsObserver = new MmsObserver(contentResolver, handler, mmsCursorParser);
+        this.mmsObserver = new MmsObserver(contentResolver, handler, mmsCursorParser, getSystemService(JobScheduler.class), getPackageName());
     }
 
     private SmsCursorParser initializeSmsCursorParser()

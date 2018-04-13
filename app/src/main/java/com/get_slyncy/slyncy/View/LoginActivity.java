@@ -50,7 +50,7 @@ import apollographql.apollo.LoginMutation;
 public class LoginActivity extends Activity implements DownloadImageTask.PostExecCallBack
 {
 
-    public static final String SERVER_URL = "http://10.24./";
+    public static final String SERVER_URL = "http://10.24.217.241:4000/";
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
     private FirebaseAuth mAuth;
@@ -183,6 +183,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
     private void firebaseAuthWithGoogle(final GoogleSignInAccount acct)
     {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        acct.getId();
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
@@ -214,7 +215,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
     {
         ApolloClient client = ApolloClient.builder().serverUrl(SERVER_URL).build();
 
-        client.mutate(LoginMutation.builder().email(user.getEmail()).uid(user.getUid()).build())
+        client.mutate(LoginMutation.builder().email(user.getEmail()).uid(acct.getId()).build())
                 .enqueue(new ApolloCall.Callback<LoginMutation.Data>()
                 {
                     @Override

@@ -142,7 +142,8 @@ public class MmsObserver extends ContentObserver
                                         jobScheduler.schedule(new JobInfo.Builder("slyncy_sync_read_service".hashCode(), new ComponentName(packageName, MarkReadJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setExtras(bundle).build());
                                     }
                                 }
-                            } MmsCursorParser.updateLastMmsRead(msgId);
+                            }
+                            MmsCursorParser.updateLastMmsRead(msgId);
                         }
                     }
                 }

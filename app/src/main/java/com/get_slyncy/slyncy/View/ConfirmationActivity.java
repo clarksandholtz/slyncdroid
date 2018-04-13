@@ -277,7 +277,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                     confirmButton.setEnabled(false);
                     final PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.getCredential(s, verificationField.getText().toString());
                     Log.d("UID2", emailCred.getUid());
-                    Log.d("UID confirmationUser", user.getUid());
+                    Log.d("UID confirmationUser", acct.getId());
                     if (user.getPhoneNumber() == null || !user.getPhoneNumber().equals(phoneField.getText().toString()))
                     {
                         emailCred.linkWithCredential(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>()
@@ -311,7 +311,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
 
                                                             client.mutate(SignupMutation.builder().email(user.getEmail() == null ? "ThisShouldn'tShowUp.Ever." : user.getEmail())
                                                                     .name(user.getDisplayName() == null ? "" : user.getDisplayName()).phone(user.getPhoneNumber())
-                                                                    .uid(user.getUid()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()
+                                                                    .uid(acct.getId()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()
                                                             {
                                                                 @Override
                                                                 public void onResponse(@Nonnull Response<SignupMutation.Data> response)
@@ -386,7 +386,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                                     client.mutate(SignupMutation.builder().email(user.getEmail() == null ? "thisShouldn'tShowUp.Ever." : user.getEmail())
                                             .name(user.getDisplayName() == null ? "" : user.getDisplayName())
                                             .phone(user.getPhoneNumber() == null ? "" : user.getPhoneNumber())
-                                            .uid(user.getUid()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()
+                                            .uid(acct.getId()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()
                                     {
                                         @Override
                                         public void onResponse(@Nonnull Response<SignupMutation.Data> response)
