@@ -494,8 +494,6 @@ public class ClientCommunicator
         return retVal[0];
     }
 
-    private static final CompositeDisposable disposables = new CompositeDisposable();
-
     public static void subscribeToNewMessages(final Context context)
     {
         final boolean[] result = new boolean[]{true};
