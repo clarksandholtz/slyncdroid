@@ -37,15 +37,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-
-        <provider
-            android:name=".Model.CellMessaging.MmsProvider"
-            android:authorities="com.get_slyncy.slyncy.MmsFileProvider"
-            android:enabled="true"
-            android:grantUriPermissions="true"
-            android:readPermission="true"
-            android:writePermission="true"/>
-
         <service android:name="com.android.mms.transaction.TransactionService"/>
 
         <!--<receiver-->
