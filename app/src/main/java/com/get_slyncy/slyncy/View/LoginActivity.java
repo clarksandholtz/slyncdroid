@@ -42,20 +42,25 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
 
 import apollographql.apollo.LoginMutation;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 
 public class LoginActivity extends Activity implements DownloadImageTask.PostExecCallBack
 {
 
-    public static final String SERVER_URL = "http://10.24.217.241:4000/";
+    public static final String SERVER_URL = "http://10.0.0.5:4000/";
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -108,9 +113,6 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
         }
         ImageView logo = findViewById(R.id.slyncy_logo);
         logo.setImageDrawable(getDrawable(R.drawable.ic_logo_white));
-//        logo.getLayoutParams().width = 1000;
-
-
 
         Button button = findViewById(R.id.sign_in_button);
         button.setOnClickListener(new View.OnClickListener()
@@ -129,16 +131,6 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         mAuth = FirebaseAuth.getInstance();
-    }
-
-
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-//        FirebaseUser currentUser = mAuth.getCurrentUser();
-//        updateUI(currentUser);
     }
 
     @Override
@@ -213,9 +205,21 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
 
     private void tryLogin(final FirebaseUser user, final GoogleSignInAccount acct)
     {
-        ApolloClient client = ApolloClient.builder().serverUrl(SERVER_URL).build();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
+        {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException
+            {
+                Request orig = chain.request();
+                Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
+                builder.addHeader("Cache-Control", "no-cache");
+                return chain.proceed(builder.build());
+            }
+        }).writeTimeout(2, TimeUnit.MINUTES).readTimeout(2, TimeUnit.MINUTES).connectTimeout(2, TimeUnit.MINUTES)
+                .build();
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(SERVER_URL).build();
 
-        client.mutate(LoginMutation.builder().email(user.getEmail()).uid(acct.getId()).build())
+        client.mutate(LoginMutation.builder().email(acct.getEmail()).uid(acct.getId()).build())
                 .enqueue(new ApolloCall.Callback<LoginMutation.Data>()
                 {
                     @Override
@@ -263,26 +267,6 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                         Log.e("Apollo error:", e.getMessage());
                         Snackbar.make(findViewById(R.id.main_layout), "Unable to reach Slyncy Servers. Please try again later.",
                                 Snackbar.LENGTH_SHORT).show();
-
-
-//                        Intent intent = new Intent(LoginActivity.this, ConfirmationActivity.class);
-//                        intent.putExtra("name", user.getDisplayName());
-//                        intent.putExtra("email", user.getEmail());
-//                        intent.putExtra("phone", user.getPhoneNumber());
-//                        intent.putExtra("acct", acct);
-//                        intent.putExtra("emailCred", user);
-//                        intent.putExtra("pic", user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
-//
-//                        Log.d("UID:", user.getUid());
-//                        mAuth.signOut();
-
-//                        startActivity(intent);
-/**     code below will allow you into settings without connecting to slyncy's server */
-                        /**
-                        new DownloadImageTask(LoginActivity.this.getCacheDir().getPath(),
-                                LoginActivity.this).execute(user.getPhotoUrl().toString()
-                                .replace("s96-c", "s960-c"));
-                                //*/
                     }
                 });
     }

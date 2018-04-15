@@ -126,19 +126,19 @@ public class SmsObserver extends ContentObserver
                         {
                             if (!ClientCommunicator.markThreadAsRead(threadId))
                             {
-                               if (jobScheduler != null)
-                                {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                                    {
-                                        jobScheduler.enqueue(new JobInfo.Builder("slyncy_sync_read_service".hashCode(), new ComponentName(packageName, MarkReadJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).build(), new JobWorkItem(new Intent().putExtra("threadId", threadId)));
-                                    }
-                                    else
-                                    {
-                                        PersistableBundle bundle = new PersistableBundle();
-                                        bundle.putInt("threadId", threadId);
-                                        jobScheduler.schedule(new JobInfo.Builder("slyncy_sync_read_service".hashCode(), new ComponentName(packageName, MarkReadJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setExtras(bundle).build());
-                                    }
-                                }
+//                               if (jobScheduler != null)
+//                                {
+//                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+//                                    {
+//                                        jobScheduler.enqueue(new JobInfo.Builder("slyncy_sync_read_service".hashCode(), new ComponentName(packageName, MarkReadJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).build(), new JobWorkItem(new Intent().putExtra("threadId", threadId)));
+//                                    }
+//                                    else
+//                                    {
+//                                        PersistableBundle bundle = new PersistableBundle();
+//                                        bundle.putInt("threadId", threadId);
+//                                        jobScheduler.schedule(new JobInfo.Builder("slyncy_sync_read_service".hashCode(), new ComponentName(packageName, MarkReadJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setExtras(bundle).build());
+//                                    }
+//                                }
                             }
                             SmsCursorParser.updateLastSmsRead(msgId);
                         }

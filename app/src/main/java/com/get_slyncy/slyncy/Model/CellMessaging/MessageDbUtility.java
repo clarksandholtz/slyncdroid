@@ -33,9 +33,9 @@ public class MessageDbUtility
 {
 
     private static final String TAG = "MessageDbUtility";
-    private static final int MAX_MESSAGES_PER_THREAD = 100;
-    private static final int MAX_THREADS = 30;
-    private static final int ADDTL_MMS_THREADS = 10;
+    private static final int MAX_MESSAGES_PER_THREAD = 5;
+    private static final int MAX_THREADS = 10;
+    private static final int ADDTL_MMS_THREADS = 5;
     private static final int MAX_IMGS_PER_THREAD = 5;
     private static final String MSG_ID = "_id";
     private static final String THREAD_ID = "thread_id";

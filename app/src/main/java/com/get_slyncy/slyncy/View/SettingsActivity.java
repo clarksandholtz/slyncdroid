@@ -25,7 +25,6 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadarService;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
@@ -52,6 +51,7 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
 
     private ImageView accountProfile;
     private Switch groupMessageSwitch;
+    private static boolean synced = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -93,24 +93,7 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
 
         }
         final NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        Notification.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager != null)
-        {
-            NotificationChannel channel = new NotificationChannel(getPackageName() + "_slyncing", "Slyncing Progress", NotificationManager.IMPORTANCE_DEFAULT);
-            channel.enableLights(true);
-            channel.setLightColor(getColor(R.color.colorPrimary));
-            channel.setShowBadge(true);
-            channel.enableVibration(true);
-            notificationManager.createNotificationChannel(channel);
-            builder = new Notification.Builder(this, getPackageName() + "_slyncing");
-        }
-        else
-        {
-            builder = new Notification.Builder(this);
-        }
-        builder.setContentTitle("Slyncing...").setContentText("Slyncy is currently slyncing.").setOngoing(true).setSmallIcon(Icon.createWithResource(this, R.drawable.notification_logo)).setColor(getColor(R.color.colorPrimary));
-        final Notification notification = builder.build();
-        if (notificationManager != null) notificationManager.notify(60, notification);
+
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(getApplicationContext());
         manager.registerReceiver(new BroadcastReceiver()
         {
@@ -136,8 +119,9 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
                     }
                     else
                     {
-                        builder.setContentTitle("Slynced").setContentText("Slyncing complete");
+                        builder.setContentTitle("slynced").setContentText("slyncing complete");
                     }
+                    getSharedPreferences("authorization", MODE_PRIVATE).edit().putBoolean("synced", true).commit();
                     notificationManager.notify(60, builder.build());
                 }
 
@@ -147,7 +131,27 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
         if (getSharedPreferences("authorization", MODE_PRIVATE).contains("synced"))
         {
             if (!getSharedPreferences("authorization", MODE_PRIVATE).getBoolean("synced", true))
-                MessageDbUtility.getMessagesBulk(this);
+            {
+//                ClientCommunicator.deleteMessages(this);
+                Notification.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager != null)
+                {
+                    NotificationChannel channel = new NotificationChannel(getPackageName() + "_slyncing", "slyncing Progress", NotificationManager.IMPORTANCE_DEFAULT);
+                    channel.enableLights(true);
+                    channel.setLightColor(getColor(R.color.colorPrimary));
+                    channel.setShowBadge(true);
+                    channel.enableVibration(true);
+                    notificationManager.createNotificationChannel(channel);
+                    builder = new Notification.Builder(this, getPackageName() + "_slyncing");
+                }
+                else
+                {
+                    builder = new Notification.Builder(this);
+                }
+                builder.setContentTitle("slyncing...").setContentText("slyncy is currently slyncing.").setOngoing(true).setSmallIcon(Icon.createWithResource(this, R.drawable.notification_logo)).setColor(getColor(R.color.colorPrimary));
+                final Notification notification = builder.build();
+                if (notificationManager != null) notificationManager.notify(60, notification);
+            }
         }
 
 //        accountProfile.setImageDrawable(getDrawable(R.drawable.ic_account_circle_black_24dp));
@@ -264,7 +268,7 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                ClientCommunicator.DeleteMessages(getApplicationContext());
+                ClientCommunicator.deleteMessages(getApplicationContext());
             }
         }).create();
         Drawable icon = getDrawable(R.drawable.ic_warn);

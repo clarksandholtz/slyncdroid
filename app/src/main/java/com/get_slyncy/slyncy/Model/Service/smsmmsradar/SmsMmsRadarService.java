@@ -100,6 +100,8 @@ public class SmsMmsRadarService extends Service
             NotificationChannel channel = new NotificationChannel(getPackageName() + "_persistent", "Persistent",
                     NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(false);
+            channel.enableVibration(false);
+            channel.setImportance(NotificationManager.IMPORTANCE_LOW);
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             if (notificationManager != null && !notificationManager.getNotificationChannels().contains(channel))
             {
@@ -117,6 +119,7 @@ public class SmsMmsRadarService extends Service
         PendingIntent pendingIntent = PendingIntent
                 .getActivity(this, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
+        builder.setVibrate(new long[]{0,0}).setPriority(Notification.PRIORITY_MIN);
         Icon icon = Icon.createWithResource(this, R.drawable.notification_logo);
         icon.setTint(getColor(R.color.colorPrimary));
         startForeground(getPackageName().hashCode(), builder.setSmallIcon(icon).setColor(getColor(R.color.colorPrimary))

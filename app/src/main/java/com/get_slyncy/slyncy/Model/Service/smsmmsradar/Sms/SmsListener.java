@@ -39,19 +39,19 @@ public class SmsListener implements ISmsListener
         {
             if (!ClientCommunicator.uploadSingleMessage(sms, resolver))
             {
-                if (jobScheduler != null)
-                {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    {
-                        jobScheduler.enqueue(new JobInfo.Builder("slyncy_sync_send_service".hashCode(), new ComponentName(packageName, RetryMessageJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).build(), new JobWorkItem(new Intent().putExtra("message", toJson(sms))));
-                    }
-                    else
-                    {
-                        PersistableBundle bundle = new PersistableBundle();
-                        bundle.putString("message", toJson(sms));
-                        jobScheduler.schedule(new JobInfo.Builder("slyncy_sync_send_service".hashCode(), new ComponentName(packageName, RetryMessageJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setExtras(bundle).build());
-                    }
-                }
+//                if (jobScheduler != null)
+//                {
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+//                    {
+//                        jobScheduler.enqueue(new JobInfo.Builder("slyncy_sync_send_service".hashCode(), new ComponentName(packageName, RetryMessageJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).build(), new JobWorkItem(new Intent().putExtra("message", toJson(sms))));
+//                    }
+//                    else
+//                    {
+//                        PersistableBundle bundle = new PersistableBundle();
+//                        bundle.putString("message", toJson(sms));
+//                        jobScheduler.schedule(new JobInfo.Builder("slyncy_sync_send_service".hashCode(), new ComponentName(packageName, RetryMessageJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setExtras(bundle).build());
+//                    }
+//                }
             }
         }
     }
@@ -63,19 +63,19 @@ public class SmsListener implements ISmsListener
         {
             if (!ClientCommunicator.uploadSingleMessage(sms, resolver))
             {
-                if (jobScheduler != null)
-                {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    {
-                        jobScheduler.enqueue(new JobInfo.Builder("slyncy_sync_send_service".hashCode(), new ComponentName(packageName, RetryMessageJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).build(), new JobWorkItem(new Intent().putExtra("message", toJson(sms))));
-                    }
-                    else
-                    {
-                        PersistableBundle bundle = new PersistableBundle();
-                        bundle.putString("message", toJson(sms));
-                        jobScheduler.schedule(new JobInfo.Builder("slyncy_sync_send_service".hashCode(), new ComponentName(packageName, RetryMessageJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setExtras(bundle).build());
-                    }
-                }
+//                if (jobScheduler != null)
+//                {
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+//                    {
+//                        jobScheduler.enqueue(new JobInfo.Builder("slyncy_sync_send_service".hashCode(), new ComponentName(packageName, RetryMessageJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).build(), new JobWorkItem(new Intent().putExtra("message", toJson(sms))));
+//                    }
+//                    else
+//                    {
+//                        PersistableBundle bundle = new PersistableBundle();
+//                        bundle.putString("message", toJson(sms));
+//                        jobScheduler.schedule(new JobInfo.Builder("slyncy_sync_send_service".hashCode(), new ComponentName(packageName, RetryMessageJobService.class.toString())).setPersisted(true).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setExtras(bundle).build());
+//                    }
+//                }
             }
         }
     }

@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <!--<uses-permission android:name="android.permission.WRITE_SETTINGS"/>-->
     <uses-permission android:name="android.permission.MMS_SEND_OUTBOX_MSG"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
@@ -48,22 +48,22 @@
 
         <service android:name="com.android.mms.transaction.TransactionService"/>
 
-        <receiver
-            android:name=".Model.CellMessaging.SmsReceiver"
-            android:permission="android.permission.BROADCAST_SMS">
-            <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_DELIVER"/>
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".Model.CellMessaging.MmsReceiver"
-            android:permission="android.permission.BROADCAST_WAP_PUSH">
-            <intent-filter>
-                <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER"/>
+        <!--<receiver-->
+            <!--android:name=".Model.CellMessaging.SmsReceiver"-->
+            <!--android:permission="android.permission.BROADCAST_SMS">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.provider.Telephony.SMS_DELIVER"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
+        <!--<receiver-->
+            <!--android:name=".Model.CellMessaging.MmsReceiver"-->
+            <!--android:permission="android.permission.BROADCAST_WAP_PUSH">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.provider.Telephony.WAP_PUSH_DELIVER"/>-->
 
-                <content android:mimeType="application/vnd.wap.mms-message"/>
-            </intent-filter>
-        </receiver>
+                <!--<content android:mimeType="application/vnd.wap.mms-message"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
         <receiver android:name=".Model.Service.AutoStart">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -77,28 +77,28 @@
         <!--android:name=".Model.Service.MessagesMonitoringService"-->
         <!--android:enabled="true"/>-->
 
-        <receiver
-            android:name="com.klinker.android.send_message.MmsSentReceiver"
-            android:taskAffinity="com.klinker.android.messaging.MMS_SENT"/>
-        <receiver
-            android:name="com.klinker.android.send_message.MmsReceivedReceiver"
-            android:taskAffinity="com.klinker.android.messaging.MMS_RECEIVED"/>
+        <!--<receiver-->
+            <!--android:name="com.klinker.android.send_message.MmsSentReceiver"-->
+            <!--android:taskAffinity="com.klinker.android.messaging.MMS_SENT"/>-->
+        <!--<receiver-->
+            <!--android:name="com.klinker.android.send_message.MmsReceivedReceiver"-->
+            <!--android:taskAffinity="com.klinker.android.messaging.MMS_RECEIVED"/>-->
 
-        <service
-            android:name=".Model.Service.HeadlessSmsSendService"
-            android:exported="true"
-            android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
-            <intent-filter>
-                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE"/>
+        <!--<service-->
+            <!--android:name=".Model.Service.HeadlessSmsSendService"-->
+            <!--android:exported="true"-->
+            <!--android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.RESPOND_VIA_MESSAGE"/>-->
 
-                <category android:name="android.intent.category.DEFAULT"/>
+                <!--<category android:name="android.intent.category.DEFAULT"/>-->
 
-                <content android:scheme="sms"/>
-                <content android:scheme="smsto"/>
-                <content android:scheme="mms"/>
-                <content android:scheme="mmsto"/>
-            </intent-filter>
-        </service>
+                <!--<content android:scheme="sms"/>-->
+                <!--<content android:scheme="smsto"/>-->
+                <!--<content android:scheme="mms"/>-->
+                <!--<content android:scheme="mmsto"/>-->
+            <!--</intent-filter>-->
+        <!--</service>-->
         <!--<service-->
         <!--android:name="com.tuenti.smsmmsradar.SmsMmsRadarService"-->
         <!--android:exported="false"-->
@@ -106,15 +106,22 @@
         <service
             android:name=".Model.Service.smsmmsradar.SmsMmsRadarService"
             android:exported="false"
-            android:label="@string/app_name"/>
+            android:label="MessageService"/>
         <service android:name=".Model.Service.smsmmsradar.MarkReadJobService"
-                 android:permission="android.permission.BIND_JOB_SERVICE"/>
-        <service android:name=".Model.Service.smsmmsradar.RetryMessageJobService"/>
+                 android:permission="android.permission.BIND_JOB_SERVICE"
+                 android:label="ReadMessageService"/>
+        <service android:name=".Model.Service.smsmmsradar.RetryMessageJobService"
+                 android:permission="android.permission.BIND_JOB_SERVICE"
+                 android:label="RetryMessageService"/>
 
-        <activity android:name=".View.PermissionActivity"/>
-        <activity android:name=".View.SettingsActivity"/>
-        <activity android:name=".View.NotificationFilterActivity"/>
-        <activity android:name=".View.LoginActivity">
+        <activity android:name=".View.PermissionActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".View.SettingsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".View.NotificationFilterActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".View.LoginActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -122,13 +129,16 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <activity android:name=".View.ConfirmationActivity"/>
-        <activity android:name=".View.Test.SmsRadar"/>
+        <activity android:name=".View.ConfirmationActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".View.Test.SmsRadar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".View.PersistentNotifActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
-            android:taskAffinity="">
+            android:taskAffinity=""
+            android:screenOrientation="portrait">
         </activity>
     </application>
 
