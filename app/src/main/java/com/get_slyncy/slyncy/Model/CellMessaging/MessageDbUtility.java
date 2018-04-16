@@ -50,7 +50,7 @@ public class MessageDbUtility
     private static MessageDbUtility instance;
     private static boolean isGettingMessages;
     private Context mContext;
-//    private static ContentResolver mResolver;
+    //    private static ContentResolver mResolver;
     private Map<Integer, SlyncyMessageThread> mThreadList;
 
     private MessageDbUtility()
@@ -102,8 +102,7 @@ public class MessageDbUtility
         return instance;
     }
 
-    public static void parseMmsParts(SlyncyMessage message, ContentResolver resolver,
-                                     Map<Integer, SlyncyMessageThread> threadList)
+    public static void parseMmsParts(SlyncyMessage message, ContentResolver resolver, Map<Integer, SlyncyMessageThread> threadList)
     {
         if (threadList == null)
         {
@@ -134,8 +133,7 @@ public class MessageDbUtility
                 if (threadList.get(message.getThreadId()).getImageCount() < MAX_IMGS_PER_THREAD)
                 {
                     SlyncyImage image = getMmsImg(pid, resolver);
-                    if (image != null)
-                        message.addImage(image);
+                    if (image != null) message.addImage(image);
                     threadList.get(message.getThreadId()).incrementImageCount();
                 }
                 else
@@ -166,8 +164,7 @@ public class MessageDbUtility
                 os.write(buf, 0, len);
             }
             bytes = os.toByteArray();
-            if (in != null)
-                in.close();
+            if (in != null) in.close();
         }
         catch (IOException e)
         {
@@ -186,11 +183,13 @@ public class MessageDbUtility
             }
             else
             {
-                type = "." + fullName.split("\\.")[1];
+                if (fullName.contains("."))
+                    type = "." + fullName.split("\\.")[1];
+                else
+                    type = ".jpg";
             }
             cursor.close();
-            return new SlyncyImage(UUID.randomUUID().toString() + type,
-                    android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT).replace("\n", ""));
+            return new SlyncyImage(UUID.randomUUID().toString() + type, android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT).replace("\n", ""));
         }
         return null;
 
@@ -227,30 +226,21 @@ public class MessageDbUtility
     {
         Map<String, String> contactMap = new HashMap<>();
 
-        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI,
-                null, null, null, null);
+        Cursor cur = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 
         if ((cur != null ? cur.getCount() : 0) > 0)
         {
             while (cur != null && cur.moveToNext())
             {
-                String id = cur.getString(
-                        cur.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cur.getString(cur.getColumnIndex(
-                        ContactsContract.Contacts.DISPLAY_NAME));
+                String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
-                if (cur.getInt(cur.getColumnIndex(
-                        ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0)
+                if (cur.getInt(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0)
                 {
-                    Cursor pCur = cr.query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null,
-                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                            new String[]{id}, null);
+                    Cursor pCur = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
                     while (pCur.moveToNext())
                     {
-                        String phoneNo = pCur.getString(pCur.getColumnIndex(
-                                ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        String phoneNo = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 //                        Log.i(TAG, "Name: " + name);
 //                        Log.i(TAG, "Phone Number: " + phoneNo);
                         contactMap.put(phoneNo, name);
@@ -272,9 +262,7 @@ public class MessageDbUtility
         String name = null;
 
         // define the columns I want the query to return
-        String[] projection = new String[]{
-                ContactsContract.PhoneLookup.DISPLAY_NAME,
-                ContactsContract.PhoneLookup._ID};
+        String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup._ID};
 
         // encode the phone number and build the filter URI
         Uri contactUri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
@@ -350,8 +338,7 @@ public class MessageDbUtility
 
                     makeMessage = true;
                 }
-                else if (mThreadList.get(threadId) != null
-                         && mThreadList.get(threadId).getMessageCount() < MAX_MESSAGES_PER_THREAD + ADDTL_MMS_THREADS)
+                else if (mThreadList.get(threadId) != null && mThreadList.get(threadId).getMessageCount() < MAX_MESSAGES_PER_THREAD + ADDTL_MMS_THREADS)
                 {
                     makeMessage = true;
                 }
@@ -424,8 +411,7 @@ public class MessageDbUtility
 
                     makeMessage = true;
                 }
-                else if (mThreadList.get(threadId) != null
-                         && mThreadList.get(threadId).getMessageCount() < MAX_MESSAGES_PER_THREAD)
+                else if (mThreadList.get(threadId) != null && mThreadList.get(threadId).getMessageCount() < MAX_MESSAGES_PER_THREAD)
                 {
                     makeMessage = true;
                 }
@@ -497,8 +483,7 @@ public class MessageDbUtility
             {
 
                 // don't add your own phone number
-                if (number.substring(2).equals(Data.getInstance().getSettings().getmMyPhoneNumber())
-                    || number.equals(Data.getInstance().getSettings().getmMyPhoneNumber()))
+                if (number.substring(2).equals(Data.getInstance().getSettings().getmMyPhoneNumber()) || number.equals(Data.getInstance().getSettings().getmMyPhoneNumber()))
                 {
                     continue;
                 }

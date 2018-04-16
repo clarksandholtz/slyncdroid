@@ -77,6 +77,10 @@ public class MainActivity extends AppCompatActivity
     {
         EditText ipField = findViewById(R.id.ip_field);
         String ip = ipField.getText().toString();
+//        if (!ip.contains(":4000"))
+//        {
+//            ip = ip.lastIndexOf("/") > 9 ? ip.substring(0, ip.length() - 1).concat(":4000") : ip.concat(":4000");
+//        }
         getSharedPreferences("IP", MODE_PRIVATE).edit().putString("ip", ip).commit();
     }
 }
