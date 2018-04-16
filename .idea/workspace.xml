@@ -10,16 +10,33 @@
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0fb3689c-fc20-43ae-a777-7e8657fd116d" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/.gradle/4.1/fileHashes/fileHashes.bin" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.gradle/4.1/fileHashes/fileHashes.lock" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.gradle/4.1/taskHistory/fileSnapshots.bin" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.bin" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.lock" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/local.properties" />
+    <list default="true" id="0fb3689c-fc20-43ae-a777-7e8657fd116d" name="Default" comment="Added feature to debugging activity to allow us to change the IP.&#10;Syncs if not already synced&#10;Syncing notification only appears if actually syncying&#10;Syncing notification appears on resync">
+      <change beforePath="$PROJECT_DIR$/.gradle/4.1/fileHashes/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/4.1/fileHashes/fileHashes.bin" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.1/fileHashes/fileHashes.lock" afterPath="$PROJECT_DIR$/.gradle/4.1/fileHashes/fileHashes.lock" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.1/taskHistory/fileSnapshots.bin" afterPath="$PROJECT_DIR$/.gradle/4.1/taskHistory/fileSnapshots.bin" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.bin" />
+      <change beforePath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.lock" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/app/src/debug/java/com/get_slyncy/slyncy/View/MainActivity.java" afterPath="$PROJECT_DIR$/app/src/debug/java/com/get_slyncy/slyncy/View/MainActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/debug/java/com/get_slyncy/slyncy/View/Test/SmsRadar.java" afterPath="$PROJECT_DIR$/app/src/debug/java/com/get_slyncy/slyncy/View/Test/SmsRadar.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/debug/res/layout/activity_main.xml" afterPath="$PROJECT_DIR$/app/src/debug/res/layout/activity_main.xml" />
       <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Util/StringsHelper.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/MessageDbUtility.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/MessageDbUtility.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/SmsReceiver.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/SmsReceiver.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/AutoStart.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/AutoStart.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/MarkReadJobService.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/MarkReadJobService.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Mms/MmsListener.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Mms/MmsListener.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Mms/MmsObserver.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Mms/MmsObserver.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/RetryMessageJobService.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/RetryMessageJobService.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsListener.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsListener.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsObserver.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsObserver.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/SmsMmsRadar.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/SmsMmsRadar.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/SmsMmsRadarService.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/SmsMmsRadarService.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/ClientCommunicator.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/ClientCommunicator.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/SettingsDb.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/SettingsDb.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/ConfirmationActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/ConfirmationActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/LoginActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/LoginActivity.java" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/SettingsActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/SettingsActivity.java" />
     </list>
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/classes/" />
@@ -71,8 +88,8 @@
       <file leaf-file-name="SmsMmsRadarService.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/SmsMmsRadarService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1156">
-              <caret line="120" column="48" lean-forward="false" selection-start-line="120" selection-start-column="48" selection-end-line="120" selection-end-column="48" />
+            <state relative-caret-position="4080">
+              <caret line="316" column="0" lean-forward="false" selection-start-line="316" selection-start-column="0" selection-end-line="316" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -84,144 +101,91 @@
             <state />
           </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="38" column="8" lean-forward="false" selection-start-line="38" selection-start-column="8" selection-end-line="38" selection-end-column="8" />
-              <folding>
-                <element signature="e#1912#1930#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="NotificationListenerService.java" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Android/Sdk/sources/android-27/android/service/notification/NotificationListenerService.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="459">
-              <caret line="84" column="22" lean-forward="false" selection-start-line="84" selection-start-column="22" selection-end-line="84" selection-end-column="22" />
+            <state relative-caret-position="165">
+              <caret line="93" column="37" lean-forward="false" selection-start-line="93" selection-start-column="37" selection-end-line="93" selection-end-column="37" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MmsProvider.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/MmsProvider.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="16" column="13" lean-forward="false" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TransactionService.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/android-smsmms-4.3.0.aar/4dd7d8e1d5c3fd0ec61ac06fe6050640/jars/classes.jar!/com/android/mms/transaction/TransactionService.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="50" column="13" lean-forward="false" selection-start-line="50" selection-start-column="13" selection-end-line="50" selection-end-column="13" />
-              <folding>
-                <marker date="1523306699765" expanded="false" signature="0:104" ph="/.../" />
-                <marker date="1523306699765" expanded="false" signature="151:1740" ph="..." />
-                <marker date="1523306699765" expanded="true" signature="3345:3920" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="3394:3914" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="3955:3962" ph="{}" />
-                <marker date="1523306699765" expanded="true" signature="3991:4592" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="4632:4876" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="4947:5297" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="5340:5784" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="5844:14847" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="14894:15249" ph="{...}" />
-                <marker date="1523306699765" expanded="false" signature="15306:15317" ph=" { " />
-                <marker date="1523306699765" expanded="false" signature="15346:15352" ph=" }" />
-                <marker date="1523306699765" expanded="true" signature="15402:15672" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="15772:16296" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="16372:16836" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="16866:17514" ph="{...}" />
-                <marker date="1523306699765" expanded="false" signature="17556:17567" ph=" { " />
-                <marker date="1523306699765" expanded="false" signature="17579:17585" ph=" }" />
-                <marker date="1523306699765" expanded="true" signature="17633:20469" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="20518:20773" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="20810:20896" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="20933:21103" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="21165:22003" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="22045:22446" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="22488:22591" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="22667:25773" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="22717:22728" ph="{}" />
-                <marker date="1523306699765" expanded="true" signature="22792:25767" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="25830:40000" ph="{...}" />
-                <marker date="1523306699765" expanded="false" signature="25876:25891" ph=" { " />
-                <marker date="1523306699765" expanded="false" signature="25905:25915" ph=" }" />
-                <marker date="1523306699765" expanded="true" signature="25967:26463" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="26531:26950" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="26999:34301" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="34360:35355" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="35458:37269" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="37358:39994" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SmsReceiver.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/SmsReceiver.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="544">
-              <caret line="32" column="15" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="107" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MmsReceiver.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/MmsReceiver.java">
+      <file leaf-file-name="LoginActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/LoginActivity.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="153">
-              <caret line="23" column="13" lean-forward="false" selection-start-line="23" selection-start-column="13" selection-end-line="23" selection-end-column="13" />
+              <caret line="60" column="55" lean-forward="false" selection-start-line="60" selection-start-column="55" selection-end-line="60" selection-end-column="55" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MmsReceivedReceiver.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/android-smsmms-4.3.0.aar/4dd7d8e1d5c3fd0ec61ac06fe6050640/jars/classes.jar!/com/klinker/android/send_message/MmsReceivedReceiver.class">
+      <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/debug/java/com/get_slyncy/slyncy/View/MainActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="44" column="13" lean-forward="false" selection-start-line="44" selection-start-column="13" selection-end-line="44" selection-end-column="13" />
-              <folding>
-                <marker date="1523306699765" expanded="false" signature="0:104" ph="/.../" />
-                <marker date="1523306699765" expanded="false" signature="156:1665" ph="..." />
-                <marker date="1523306699765" expanded="true" signature="2367:2374" ph="{}" />
-                <marker date="1523306699765" expanded="false" signature="2451:2462" ph=" { " />
-                <marker date="1523306699765" expanded="false" signature="2474:2480" ph=" }" />
-                <marker date="1523306699765" expanded="true" signature="2540:5094" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="5149:5156" ph="{}" />
-                <marker date="1523306699765" expanded="true" signature="5199:5206" ph="{}" />
-                <marker date="1523306699765" expanded="true" signature="5273:5623" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="5731:5870" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="5995:7663" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="7705:7990" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="7859:7984" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="8080:9668" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="8245:8336" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="8392:9662" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="9754:10702" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="9847:9901" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="9957:10696" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="10790:12459" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="11080:11293" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="11379:11442" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="11512:11606" ph="{...}" />
-                <marker date="1523306699765" expanded="true" signature="11712:12453" ph="{...}" />
-              </folding>
+            <state relative-caret-position="528">
+              <caret line="78" column="49" lean-forward="false" selection-start-line="78" selection-start-column="49" selection-end-line="78" selection-end-column="49" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RetryMessageJobService.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/RetryMessageJobService.java">
+      <file leaf-file-name="activity_main.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/debug/res/layout/activity_main.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="25" column="11" lean-forward="false" selection-start-line="25" selection-start-column="11" selection-end-line="25" selection-end-column="11" />
+            <state relative-caret-position="799">
+              <caret line="47" column="26" lean-forward="false" selection-start-line="47" selection-start-column="26" selection-end-line="47" selection-end-column="26" />
+              <folding />
+            </state>
+          </provider>
+          <provider editor-type-id="android-designer2">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ConfirmationActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/ConfirmationActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="939">
+              <caret line="439" column="27" lean-forward="false" selection-start-line="439" selection-start-column="27" selection-end-line="439" selection-end-column="27" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MmsListener.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Mms/MmsListener.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="185">
+              <caret line="68" column="0" lean-forward="false" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SmsObserver.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsObserver.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="185">
+              <caret line="126" column="0" lean-forward="false" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SmsRadar.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/debug/java/com/get_slyncy/slyncy/View/Test/SmsRadar.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="510">
+              <caret line="43" column="87" lean-forward="false" selection-start-line="43" selection-start-column="87" selection-end-line="43" selection-end-column="87" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SmsListener.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsListener.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-428">
+              <caret line="32" column="31" lean-forward="false" selection-start-line="32" selection-start-column="31" selection-end-line="32" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -240,8 +204,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>ConversationCreateOneWithoutMessagesInput</find>
-      <find>{</find>
       <find>Parse</find>
       <find>NewSms</find>
       <find>sms</find>
@@ -263,13 +225,15 @@
       <find>new Download</find>
       <find>markThread</find>
       <find>del</find>
-      <find>user.getEmail</find>
       <find>getmessage</find>
       <find>client</find>
       <find>getmess</find>
       <find>acct</find>
       <find>.uid(</find>
       <find>subsc</find>
+      <find>user.getEmail</find>
+      <find>LoginActivity.Server_url</find>
+      <find>LoginActivity.SERVER_URL</find>
     </findStrings>
     <replaceStrings>
       <replace>mContext.getContentResolver</replace>
@@ -2618,9 +2582,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/Test/smsmmsradar/Mms/Mms.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/Test/smsmmsradar/SmsType.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/Test/smsmmsradar/TimeProvider.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/Test/smsmmsradar/Sms/SharedPreferencesSmsStorage.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/Test/smsmmsradar/Sms/SmsStorage.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/Test/smsmmsradar/Mms/SharedPreferencesMmsStorage.java" />
@@ -2642,8 +2603,6 @@
         <option value="/usr/share/byucs-android-sdk/platforms/android-27/android.jar!/android/app/Activity.class" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Presenter/CellMessagesPresenter.java" />
         <option value="$PROJECT_DIR$/smsmonitor/src/main/java/com/tuenti/smsmmsradar/Mms/SharedPreferencesMmsStorage.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/AutoStart.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/SmsMmsRadar.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_confirmation.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_settings.xml" />
         <option value="$PROJECT_DIR$/app/src/main/graphql/apollographql/apollo/queries.graphql" />
@@ -2652,22 +2611,27 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/MarkReadJobManager.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/ReadMessages.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/Json.java" />
-        <option value="$PROJECT_DIR$/app/src/debug/java/com/get_slyncy/slyncy/View/Test/SmsRadar.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/MarkReadJobService.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/RetryMessageJobService.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/MessagesMonitoringService.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/NotificationService.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/SmsReceiver.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/SettingsActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/SmsMmsRadar.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/AutoStart.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/SettingsDb.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/ClientCommunicator.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/MessageDbUtility.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/ConfirmationActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsObserver.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsListener.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/RetryMessageJobService.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/MarkReadJobService.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Mms/MmsObserver.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Mms/MmsListener.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/ClientCommunicator.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/LoginActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/SettingsActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsObserver.java" />
+        <option value="$PROJECT_DIR$/app/src/debug/java/com/get_slyncy/slyncy/View/Test/SmsRadar.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsListener.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/SmsMmsRadarService.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/SmsReceiver.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/NotificationService.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/ConfirmationActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/LoginActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/debug/res/layout/activity_main.xml" />
+        <option value="$PROJECT_DIR$/app/src/debug/java/com/get_slyncy/slyncy/View/MainActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
       </list>
     </option>
@@ -2699,6 +2663,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -2722,14 +2689,14 @@
               <item name="slyncdroid" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="debug" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="slyncdroid" type="b2602c69:ProjectViewProjectNode" />
               <item name="slyncdroid" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="debug" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -2737,19 +2704,19 @@
               <item name="slyncdroid" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="slyncy" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="slyncdroid" type="b2602c69:ProjectViewProjectNode" />
-              <item name="slyncdroid" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="debug" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="slyncy" type="462c0819:PsiDirectoryNode" />
-              <item name="Model" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="slyncdroid" type="b2602c69:ProjectViewProjectNode" />
+              <item name="slyncdroid" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="debug" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="slyncy" type="462c0819:PsiDirectoryNode" />
+              <item name="View" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="slyncdroid" type="b2602c69:ProjectViewProjectNode" />
@@ -2757,21 +2724,6 @@
               <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="slyncy" type="462c0819:PsiDirectoryNode" />
-              <item name="Model" type="462c0819:PsiDirectoryNode" />
-              <item name="Service" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="slyncdroid" type="b2602c69:ProjectViewProjectNode" />
-              <item name="slyncdroid" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="slyncy" type="462c0819:PsiDirectoryNode" />
-              <item name="Model" type="462c0819:PsiDirectoryNode" />
-              <item name="Util" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="slyncdroid" type="b2602c69:ProjectViewProjectNode" />
@@ -2782,14 +2734,11 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="Scratches" />
-      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="device.picker.selection" value="HT74V0205676" />
+    <property name="device.picker.selection" value="10.37.29.128:5555" />
     <property name="add_unversioned_files" value="$PROJECT_DIR$/app/build/generated/source/apollo/apollographql/apollo/LoginMutation.java" />
     <property name="DEBUGGABLE_DEVICE" value="google-pixel_2_xl-192.168.1.133:5555" />
     <property name="DEBUGGABLE_PROCESS" value="com.get_slyncy.slyncy" />
@@ -2805,7 +2754,7 @@
     <property name="last_opened_file_path" value="/usr/share/byucs-android-sdk/platforms/android-26/android.jar!/android/provider" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1523775509565" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1523896086855" />
     <property name="show.do.not.ask.upgrade.gradle.plugin" value="3.0.1" />
   </component>
   <component name="RecentsManager">
@@ -3268,7 +3217,14 @@
       <option name="project" value="LOCAL" />
       <updated>1523774755165</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="fixed subscriptions, only makes slyncing notification if needs to be slynced&#10;should be good for syncing on first sign up.&#10;removed somethings from the manifest (commented out for now) might break things.">
+      <created>1523775705112</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1523775705112</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -3287,23 +3243,24 @@
     <frame x="134" y="0" width="1920" height="1044" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.42105263" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="DB Execution Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.42105263" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="DB Execution Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31721035" sideWeight="0.50533617" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3464567" sideWeight="0.49403343" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31721035" sideWeight="0.49466383" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40044993" sideWeight="0.49403343" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296433" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40044993" sideWeight="0.49403343" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299435" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="DB Browser" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35040745" sideWeight="0.4813047" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34983128" sideWeight="0.4813047" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32845894" sideWeight="0.4984089" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32733408" sideWeight="0.49786553" order="12" side_tool="false" content_ui="tabs" />
@@ -3328,7 +3285,6 @@
       <window_info id="Android Model" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32986537" sideWeight="0.5040745" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32828686" sideWeight="0.5015911" order="13" side_tool="true" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -3408,7 +3364,8 @@
     <MESSAGE value="builds" />
     <MESSAGE value="removed extraneous fields" />
     <MESSAGE value="fixed subscriptions, only makes slyncing notification if needs to be slynced&#10;should be good for syncing on first sign up.&#10;removed somethings from the manifest (commented out for now) might break things." />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed subscriptions, only makes slyncing notification if needs to be slynced&#10;should be good for syncing on first sign up.&#10;removed somethings from the manifest (commented out for now) might break things." />
+    <MESSAGE value="Added feature to debugging activity to allow us to change the IP.&#10;Syncs if not already synced&#10;Syncing notification only appears if actually syncying&#10;Syncing notification appears on resync" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added feature to debugging activity to allow us to change the IP.&#10;Syncs if not already synced&#10;Syncing notification only appears if actually syncying&#10;Syncing notification appears on resync" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -3433,13 +3390,13 @@
         </line-breakpoint>
         <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsObserver.java</url>
-          <line>87</line>
+          <line>88</line>
           <properties />
           <option name="timeStamp" value="328" />
         </line-breakpoint>
         <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsObserver.java</url>
-          <line>94</line>
+          <line>95</line>
           <properties />
           <option name="timeStamp" value="338" />
         </line-breakpoint>
@@ -3491,58 +3448,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/MessageSender.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="629">
-          <caret line="42" column="23" lean-forward="false" selection-start-line="42" selection-start-column="23" selection-end-line="42" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/ReadMessages.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/play-services-auth-12.0.1.aar/cbae8387df7f98613060b34a9cf3b2d5/jars/classes.jar!/com/google/android/gms/auth/api/signin/GoogleSignInClient.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-255">
-          <caret line="21" column="13" lean-forward="false" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Android/Sdk/sources/android-27/android/content/Context.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="287">
-          <caret line="2739" column="34" lean-forward="false" selection-start-line="2739" selection-start-column="34" selection-end-line="2739" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/AutoStart.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="25" column="49" lean-forward="false" selection-start-line="25" selection-start-column="49" selection-end-line="25" selection-end-column="49" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/SmsMmsRadar.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="33" column="13" lean-forward="false" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable-hdpi/notification_logo.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/debug/java/com/get_slyncy/slyncy/View/Test/SmsRadar.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="74" column="82" lean-forward="false" selection-start-line="74" selection-start-column="82" selection-end-line="74" selection-end-column="82" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/DownloadImageTask.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="221">
@@ -3563,7 +3468,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
           <caret line="6" column="13" lean-forward="false" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3590,14 +3494,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/MarkReadJobService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1768">
-          <caret line="120" column="39" lean-forward="false" selection-start-line="120" selection-start-column="39" selection-end-line="120" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/build/generated/source/apollo/apollographql/apollo/LoginMutation.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="193">
@@ -3617,10 +3513,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="123" column="29" lean-forward="false" selection-start-line="123" selection-start-column="29" selection-end-line="123" selection-end-column="29" />
-          <folding>
-            <element signature="e#2266#2267#0" expanded="false" />
-            <element signature="e#2295#2296#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -3628,46 +3520,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="223">
           <caret line="32" column="16" lean-forward="false" selection-start-line="32" selection-start-column="16" selection-end-line="32" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/ConfirmationActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1070">
-          <caret line="324" column="276" lean-forward="false" selection-start-line="324" selection-start-column="271" selection-end-line="324" selection-end-column="276" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Mms/MmsObserver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="486">
-          <caret line="143" column="35" lean-forward="false" selection-start-line="131" selection-start-column="33" selection-end-line="143" selection-end-column="35" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="77" column="19" lean-forward="false" selection-start-line="65" selection-start-column="18" selection-end-line="77" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsObserver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2448">
-          <caret line="178" column="0" lean-forward="false" selection-start-line="178" selection-start-column="0" selection-end-line="178" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/MessageDbUtility.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7735">
-          <caret line="484" column="0" lean-forward="false" selection-start-line="484" selection-start-column="0" selection-end-line="484" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3679,19 +3531,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Mms/MmsListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="493">
-          <caret line="44" column="43" lean-forward="false" selection-start-line="44" selection-start-column="43" selection-end-line="44" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.apollographql.apollo/apollo-runtime/0.4.4/f6f47733d1f3a738832542559cee3d5c4d06abfb/apollo-runtime-0.4.4-sources.jar!/com/apollographql/apollo/ApolloSubscriptionCall.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="952">
           <caret line="62" column="9" lean-forward="false" selection-start-line="62" selection-start-column="9" selection-end-line="62" selection-end-column="9" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3710,7 +3553,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1615">
           <caret line="150" column="31" lean-forward="false" selection-start-line="150" selection-start-column="31" selection-end-line="150" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3718,7 +3560,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="391">
           <caret line="39" column="34" lean-forward="false" selection-start-line="39" selection-start-column="34" selection-end-line="39" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3726,7 +3567,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
           <caret line="8" column="11" lean-forward="false" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="11" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3734,7 +3574,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="193">
           <caret line="425" column="38" lean-forward="false" selection-start-line="425" selection-start-column="38" selection-end-line="425" selection-end-column="38" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3742,7 +3581,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-4131">
           <caret line="131" column="9" lean-forward="false" selection-start-line="131" selection-start-column="9" selection-end-line="131" selection-end-column="9" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3750,7 +3588,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="321">
           <caret line="140" column="4" lean-forward="false" selection-start-line="140" selection-start-column="4" selection-end-line="140" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3770,30 +3607,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/ClientCommunicator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="388">
-          <caret line="577" column="21" lean-forward="false" selection-start-line="577" selection-start-column="21" selection-end-line="577" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/LoginActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="58" column="60" lean-forward="false" selection-start-line="58" selection-start-column="60" selection-end-line="58" selection-end-column="60" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/SettingsActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1314">
-          <caret line="190" column="50" lean-forward="false" selection-start-line="190" selection-start-column="50" selection-end-line="190" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Android/Sdk/sources/android-27/android/app/Notification.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="262">
@@ -3802,22 +3615,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/MessagesMonitoringService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="672">
-          <caret line="151" column="33" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="173" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/SmsMmsRadarService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1156">
-          <caret line="120" column="48" lean-forward="false" selection-start-line="120" selection-start-column="48" selection-end-line="120" selection-end-column="48" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/MessagesMonitoringService.java" />
     <entry file="file://$USER_HOME$/Android/Sdk/sources/android-27/android/service/notification/NotificationListenerService.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="459">
@@ -3881,14 +3679,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/SmsReceiver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="32" column="15" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="107" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/MmsReceiver.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
@@ -3930,20 +3720,187 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/RetryMessageJobService.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/NotificationService.java" />
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/SmsReceiver.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="25" column="11" lean-forward="false" selection-start-line="25" selection-start-column="11" selection-end-line="25" selection-end-column="11" />
+        <state relative-caret-position="495">
+          <caret line="32" column="13" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="107" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#3672#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/SettingsActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="719">
+          <caret line="259" column="10" lean-forward="false" selection-start-line="259" selection-start-column="10" selection-end-line="259" selection-end-column="10" />
+          <folding>
+            <element signature="e#3845#5282#0" expanded="false" />
+            <element signature="e#5281#5282#0" expanded="false" />
+            <element signature="e#11637#13196#0" expanded="false" />
+            <element signature="e#13195#13196#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Android/Sdk/sources/android-27/android/content/Context.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="287">
+          <caret line="2739" column="34" lean-forward="false" selection-start-line="2739" selection-start-column="34" selection-end-line="2739" selection-end-column="34" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/NotificationService.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/SmsMmsRadar.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="227">
-          <caret line="15" column="15" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="116" selection-end-column="0" />
+        <state relative-caret-position="279">
+          <caret line="49" column="50" lean-forward="false" selection-start-line="49" selection-start-column="50" selection-end-line="49" selection-end-column="50" />
           <folding />
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/Settings.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="22" column="13" lean-forward="false" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/AutoStart.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="37" column="9" lean-forward="false" selection-start-line="37" selection-start-column="9" selection-end-line="37" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/SettingsDb.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="49" column="17" lean-forward="false" selection-start-line="49" selection-start-column="17" selection-end-line="49" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Util/ClientCommunicator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="986">
+          <caret line="606" column="59" lean-forward="false" selection-start-line="606" selection-start-column="59" selection-end-line="606" selection-end-column="59" />
+          <folding>
+            <element signature="e#26534#27331#0" expanded="false" />
+            <element signature="e#27330#27331#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/CellMessaging/MessageDbUtility.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="193">
+          <caret line="89" column="105" lean-forward="false" selection-start-line="89" selection-start-column="105" selection-end-line="89" selection-end-column="105" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/RetryMessageJobService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-261">
+          <caret line="51" column="126" lean-forward="false" selection-start-line="51" selection-start-column="126" selection-end-line="51" selection-end-column="126" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/MarkReadJobService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="120" column="0" lean-forward="false" selection-start-line="120" selection-start-column="0" selection-end-line="120" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Mms/MmsObserver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="129" column="0" lean-forward="false" selection-start-line="129" selection-start-column="0" selection-end-line="129" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Mms/MmsListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="68" column="0" lean-forward="false" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsObserver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="126" column="0" lean-forward="false" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/debug/java/com/get_slyncy/slyncy/View/Test/SmsRadar.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="43" column="87" lean-forward="false" selection-start-line="43" selection-start-column="87" selection-end-line="43" selection-end-column="87" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/Sms/SmsListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-428">
+          <caret line="32" column="31" lean-forward="false" selection-start-line="32" selection-start-column="31" selection-end-line="32" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/Model/Service/smsmmsradar/SmsMmsRadarService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4080">
+          <caret line="316" column="0" lean-forward="false" selection-start-line="316" selection-start-column="0" selection-end-line="316" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/ConfirmationActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="939">
+          <caret line="439" column="27" lean-forward="false" selection-start-line="439" selection-start-column="27" selection-end-line="439" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/get_slyncy/slyncy/View/LoginActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="60" column="55" lean-forward="false" selection-start-line="60" selection-start-column="55" selection-end-line="60" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/debug/java/com/get_slyncy/slyncy/View/MainActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="528">
+          <caret line="78" column="49" lean-forward="false" selection-start-line="78" selection-start-column="49" selection-end-line="78" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/debug/res/layout/activity_main.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="799">
+          <caret line="47" column="26" lean-forward="false" selection-start-line="47" selection-start-column="26" selection-end-line="47" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
@@ -3951,11 +3908,9 @@
         <state />
       </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="38" column="8" lean-forward="false" selection-start-line="38" selection-start-column="8" selection-end-line="38" selection-end-column="8" />
-          <folding>
-            <element signature="e#1912#1930#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="165">
+          <caret line="93" column="37" lean-forward="false" selection-start-line="93" selection-start-column="37" selection-end-line="93" selection-end-column="37" />
+          <folding />
         </state>
       </provider>
     </entry>

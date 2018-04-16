@@ -33,7 +33,7 @@ public class SmsRadar extends Activity
 //        Intent serviceIntent = new Intent(this, SmsMmsRadar.class);
 //        startService(serviceIntent);
 //        ClientCommunicator.subscribeToNewMessages();
-        SmsMmsRadar.initializeSmsRadarService(this, new ISmsListener()
+        SmsMmsRadar.initializeSmsRadarServiceAndStart(this, new ISmsListener()
         {
             @Override
             public void onSmsSent(SlyncyMessage sms)
@@ -41,7 +41,7 @@ public class SmsRadar extends Activity
                 if (sms != null)
                 {
                     showSmsSToast(sms);
-                    ClientCommunicator.uploadSingleMessage(sms, getContentResolver());
+                    ClientCommunicator.uploadSingleMessage(sms, getApplicationContext());
                 }
             }
 
@@ -51,7 +51,7 @@ public class SmsRadar extends Activity
                 if (sms != null)
                 {
                     showSmsRToast(sms);
-                    ClientCommunicator.uploadSingleMessage(sms, getContentResolver());
+                    ClientCommunicator.uploadSingleMessage(sms, getApplicationContext());
                 }
             }
         }, new IMmsListener()
@@ -62,7 +62,7 @@ public class SmsRadar extends Activity
                 if (mms != null)
                 {
                     showSmsSToast(mms);
-                    ClientCommunicator.uploadSingleMessage(mms, getContentResolver());
+                    ClientCommunicator.uploadSingleMessage(mms, getApplicationContext());
                 }
             }
 
@@ -72,7 +72,7 @@ public class SmsRadar extends Activity
                 if (mms != null)
                 {
                     showSmsRToast(mms);
-                    ClientCommunicator.uploadSingleMessage(mms, getContentResolver());
+                    ClientCommunicator.uploadSingleMessage(mms, getApplicationContext());
                 }
             }
         });

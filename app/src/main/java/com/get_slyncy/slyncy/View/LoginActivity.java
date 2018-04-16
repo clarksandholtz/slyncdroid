@@ -26,6 +26,7 @@ import com.get_slyncy.slyncy.Model.Service.smsmmsradar.RetryMessageJobService;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.Model.Util.Data;
 import com.get_slyncy.slyncy.Model.Util.DownloadImageTask;
+import com.get_slyncy.slyncy.Model.Util.SettingsDb;
 import com.get_slyncy.slyncy.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -56,12 +57,12 @@ import okhttp3.Request;
 public class LoginActivity extends Activity implements DownloadImageTask.PostExecCallBack
 {
 
-    public static final String SERVER_URL = "http://10.0.0.5:4000/";
+//    public static final String SERVER_URL = "http://45.56.24.120:4000/";
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
-
+    private GoogleSignInAccount acct;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -147,6 +148,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
+                acct = account;
             }
             catch (ApiException e)
             {
@@ -163,7 +165,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
         if (user != null)
         {
             intent.putExtra("name", user.getDisplayName());
-            intent.putExtra("email", user.getEmail());
+            intent.putExtra("email", acct.getEmail());
             intent.putExtra("phone", user.getPhoneNumber());
             intent.putExtra("pic", user.getPhotoUrl().toString());
             intent.putExtra("sync", true);
@@ -196,7 +198,6 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.",
                                     Snackbar.LENGTH_SHORT).show();
-                            updateUI(null);
                         }
                     }
                 });
@@ -217,7 +218,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
             }
         }).writeTimeout(2, TimeUnit.MINUTES).readTimeout(2, TimeUnit.MINUTES).connectTimeout(2, TimeUnit.MINUTES)
                 .build();
-        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(SERVER_URL).build();
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(SettingsDb.getServerIP(getApplicationContext())).build();
 
         client.mutate(LoginMutation.builder().email(acct.getEmail()).uid(acct.getId()).build())
                 .enqueue(new ApolloCall.Callback<LoginMutation.Data>()
@@ -229,7 +230,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                         {
                             Intent intent = new Intent(LoginActivity.this, ConfirmationActivity.class);
                             intent.putExtra("name", user.getDisplayName());
-                            intent.putExtra("email", user.getEmail());
+                            intent.putExtra("email", acct.getEmail());
                             intent.putExtra("phone", user.getPhoneNumber());
                             intent.putExtra("acct", acct);
                             intent.putExtra("emailCred", user);
@@ -245,7 +246,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
 
                             SharedPreferences sharedPreferences = getSharedPreferences("authorization", MODE_PRIVATE);
                             SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString("email", user.getEmail());
+                            editor.putString("email", acct.getEmail());
                             editor.putString("phone", user.getPhoneNumber());
                             editor.putString("name", user.getDisplayName());
                             editor.putString("pic", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
@@ -277,29 +278,5 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         signInIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NO_USER_ACTION);
         startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    private void updateUI(FirebaseUser user)
-    {
-        if (user != null)
-        {
-            String name = user.getDisplayName();
-            String email = user.getEmail();
-            String photo = user.getPhotoUrl().toString().replace("s96-c", "s960-c");
-            String phone = user.getPhoneNumber();
-            Log.d("name", name);
-            Log.d("email", email);
-            Log.d("phone", phone == null || phone.equals("") ? " " : phone);
-            Log.d("photo", photo);
-            Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
-            intent.putExtra("name", user.getDisplayName());
-            intent.putExtra("email", user.getEmail());
-            intent.putExtra("phone", user.getPhoneNumber());
-            intent.putExtra("pic", user.getPhotoUrl().toString().replace("s96-c", "s960-c"));
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            | Intent.FLAG_ACTIVITY_NEW_TASK
-                            | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivity(intent);
-        }
     }
 }

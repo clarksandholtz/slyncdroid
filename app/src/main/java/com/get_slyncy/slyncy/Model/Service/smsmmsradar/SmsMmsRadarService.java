@@ -149,8 +149,8 @@ public class SmsMmsRadarService extends Service
         registerSmsContentObserver();
         registerMmsContentObserver();
         ClientCommunicator.subscribeToNewMessages(getApplicationContext());
-        SmsMmsRadar.initializeSmsRadarService(this, new SmsListener(getContentResolver(), getSystemService(JobScheduler.class), getPackageName()),
-                new MmsListener(getContentResolver(), getSystemService(JobScheduler.class), getPackageName()));
+        SmsMmsRadar.initializeSmsRadarServiceAndStart(this, new SmsListener(getApplicationContext(), getSystemService(JobScheduler.class), getPackageName()),
+                new MmsListener(getApplicationContext(), getSystemService(JobScheduler.class), getPackageName()));
     }
 
     private void initializeDependencies()
@@ -172,7 +172,7 @@ public class SmsMmsRadarService extends Service
     {
         Handler handler = new Handler();
         SmsCursorParser smsCursorParser = initializeSmsCursorParser();
-        this.smsObserver = new SmsObserver(contentResolver, handler, smsCursorParser, getSystemService(JobScheduler.class), getPackageName());
+        this.smsObserver = new SmsObserver(getApplicationContext(), handler, smsCursorParser, getSystemService(JobScheduler.class), getPackageName());
 
     }
 
@@ -180,7 +180,7 @@ public class SmsMmsRadarService extends Service
     {
         Handler handler = new Handler();
         MmsCursorParser mmsCursorParser = initializeMmsCursorParser();
-        this.mmsObserver = new MmsObserver(contentResolver, handler, mmsCursorParser, getSystemService(JobScheduler.class), getPackageName());
+        this.mmsObserver = new MmsObserver(getApplicationContext(), handler, mmsCursorParser, getSystemService(JobScheduler.class), getPackageName());
     }
 
     private SmsCursorParser initializeSmsCursorParser()

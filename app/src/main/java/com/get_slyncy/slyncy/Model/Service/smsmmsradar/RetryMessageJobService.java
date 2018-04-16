@@ -5,6 +5,7 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.app.job.JobWorkItem;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -48,7 +49,7 @@ public class RetryMessageJobService extends JobService
                     SlyncyMessage message = fromJson(bundle.getString("message"), SlyncyMessage.class);
                     if (message != null)
                     {
-                        PendingMessageTask task = new PendingMessageTask(UUID.randomUUID().toString());
+                        PendingMessageTask task = new PendingMessageTask(UUID.randomUUID().toString(), getApplicationContext());
                         tasks.add(task);
                         task.execute(message);
                     }
@@ -61,7 +62,7 @@ public class RetryMessageJobService extends JobService
             SlyncyMessage message = fromJson(bundle.getString("message"), SlyncyMessage.class);
             if (message != null)
             {
-                PendingMessageTask task = new PendingMessageTask(UUID.randomUUID().toString());
+                PendingMessageTask task = new PendingMessageTask(UUID.randomUUID().toString(), getApplicationContext());
                 tasks.add(task);
                 task.execute(message);
             }
@@ -78,10 +79,12 @@ public class RetryMessageJobService extends JobService
     private static class PendingMessageTask extends AsyncTask<SlyncyMessage,Void,Void>
     {
         String id;
+        Context context;
 
-        PendingMessageTask(String id)
+        PendingMessageTask(String id, Context context)
         {
             this.id = id;
+            this.context = context;
         }
 
         @Override
@@ -89,7 +92,7 @@ public class RetryMessageJobService extends JobService
         {
             for (SlyncyMessage slyncyMessage : slyncyMessages)
             {
-                ClientCommunicator.uploadSingleMessage(slyncyMessage, resolver);
+                ClientCommunicator.uploadSingleMessage(slyncyMessage, context);
             }
             return null;
         }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.EditText;
 
 import com.get_slyncy.slyncy.Model.Service.SlyncyService;
 import com.get_slyncy.slyncy.Model.Util.Data;
@@ -70,6 +71,13 @@ public class MainActivity extends AppCompatActivity
     {
         Intent intent = new Intent(this, SmsRadar.class);
         startActivity(intent);
+    }
+
+    public void applyIpChange(View view)
+    {
+        EditText ipField = findViewById(R.id.ip_field);
+        String ip = ipField.getText().toString();
+        getSharedPreferences("IP", MODE_PRIVATE).edit().putString("ip", ip).commit();
     }
 }
 

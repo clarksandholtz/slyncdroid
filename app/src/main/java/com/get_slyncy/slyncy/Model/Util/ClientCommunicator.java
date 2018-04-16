@@ -165,7 +165,7 @@ public class ClientCommunicator
         editor.commit();
     }
 
-    public static boolean bulkMessageUpload(final LocalBroadcastManager broadcastManager)
+    public static boolean bulkMessageUpload(final LocalBroadcastManager broadcastManager, final Context context)
     {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
         {
@@ -180,7 +180,7 @@ public class ClientCommunicator
             }
         }).writeTimeout(10, TimeUnit.MINUTES).readTimeout(10, TimeUnit.MINUTES).connectTimeout(10, TimeUnit.MINUTES)
                 .build();
-        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(SettingsDb.getServerIP(context))
                 .build();
         Map<Integer, SlyncyMessageThread> messages = Data.getInstance().getmMessages();
         List<ClientMessageCreateInput> messagesToGo = new ArrayList<>();
@@ -274,7 +274,7 @@ public class ClientCommunicator
                                         .get(i) + "\"}";
                                 try
                                 {
-                                    URL url = new URL(LoginActivity.SERVER_URL + "upload/image");
+                                    URL url = new URL(SettingsDb.getServerIP(context) + "upload/image");
                                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                                     connection.setRequestMethod("POST");
                                     connection.addRequestProperty("Content-Type", "application/json");
@@ -332,7 +332,7 @@ public class ClientCommunicator
         return true;
     }
 
-    public static boolean markThreadAsRead(int threadId)
+    public static boolean markThreadAsRead(int threadId, Context context)
     {
         final boolean[] val = new boolean[]{true};
         final Semaphore mutex = new Semaphore(0, true);
@@ -348,7 +348,7 @@ public class ClientCommunicator
             }
         }).build();
 
-        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(SettingsDb.getServerIP(context))
                 .build();
 
         MarkThreadAsReadMutation mutation = MarkThreadAsReadMutation.builder().threadId(threadId).build();
@@ -378,7 +378,7 @@ public class ClientCommunicator
         return val[0];
     }
 
-    public static boolean uploadSingleMessage(SlyncyMessage message, ContentResolver resolver)
+    public static boolean uploadSingleMessage(SlyncyMessage message, final Context context)
     {
         Log.i("SingleMessage", message.getBody());
         final boolean[] retVal = {true};
@@ -396,7 +396,7 @@ public class ClientCommunicator
             }
         }).writeTimeout(2, TimeUnit.SECONDS).readTimeout(2, TimeUnit.SECONDS).connectTimeout(2, TimeUnit.SECONDS)
                 .build();
-        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(SettingsDb.getServerIP(context))
                 .build();
         List<ContactCreateWithoutConversationInput> contacts = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
@@ -405,7 +405,7 @@ public class ClientCommunicator
         {
             String number = message.getNumbers().get(i);
             ContactCreateWithoutConversationInput contact = ContactCreateWithoutConversationInput.builder()
-                    .name(MessageDbUtility.fetchContactNameByNumber(number, resolver))
+                    .name(MessageDbUtility.fetchContactNameByNumber(number, context.getContentResolver()))
                     .phone(number).build();
             contacts.add(contact);
             sb.append(number + " ");
@@ -445,7 +445,7 @@ public class ClientCommunicator
                             URL url = null;
                             try
                             {
-                                url = new URL(LoginActivity.SERVER_URL + "upload/image");
+                                url = new URL(SettingsDb.getServerIP(context) + "upload/image");
                                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                                 try
                                 {
@@ -554,14 +554,14 @@ public class ClientCommunicator
                 Socket socket = new Socket();
                 socket.setKeepAlive(true);
                 socket.bind(new InetSocketAddress(localAddress, port));
-        SubscriptionManager subscriptionManager = new RealSubscriptionManager(new ScalarTypeAdapters(new HashMap<ScalarType, CustomTypeAdapter>()), new WebSocketSubscriptionTransport.Factory(LoginActivity.SERVER_URL, okhtt))
+        SubscriptionManager subscriptionManager = new RealSubscriptionManager(new ScalarTypeAdapters(new HashMap<ScalarType, CustomTypeAdapter>()), new WebSocketSubscriptionTransport.Factory(SettingsDb.getServerIP(), okhtt))
                 socket.connect(new InetSocketAddress(address, port));
                 return socket;
             }
         })*/.build();
         WebSocketSubscriptionTransport.Factory factory = new WebSocketSubscriptionTransport.Factory(
-                LoginActivity.SERVER_URL.replace("http:", "ws:"), okHttpClient);
-        final ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL.replace(":4000", ":5000"))
+                SettingsDb.getServerIP(context).replace("http:", "ws:"), okHttpClient);
+        final ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(SettingsDb.getServerIP(context).replace(":4000", ":5000"))
                 .subscriptionTransportFactory(factory).build();
 
 
@@ -604,7 +604,7 @@ public class ClientCommunicator
                                                                         BitmapFactory.decodeFile(path));
                                                         SmsMmsRadar.sendMessage(message, context);
                                                     }
-                                                }).start();
+                                                }, context).start();
 
                                     }
                                 }
@@ -728,7 +728,7 @@ public class ClientCommunicator
             }
         }).writeTimeout(2, TimeUnit.SECONDS).readTimeout(2, TimeUnit.SECONDS).connectTimeout(2, TimeUnit.SECONDS)
                 .build();
-        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL)
+        ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(SettingsDb.getServerIP(context))
                 .build();
         client.mutate(new DeleteMessagesMutation()).enqueue(new ApolloCall.Callback<DeleteMessagesMutation.Data>()
         {
@@ -755,12 +755,14 @@ public class ClientCommunicator
         String fileName;
         CallBack callBack;
         String cacheDir;
+        Context context;
 
-        ImageDownloadThread(String fileName, String cacheDir, CallBack callBack)
+        ImageDownloadThread(String fileName, String cacheDir, CallBack callBack, Context context)
         {
             this.fileName = fileName;
             this.cacheDir = cacheDir;
             this.callBack = callBack;
+            this.context = context;
         }
 
         @Override
@@ -768,7 +770,7 @@ public class ClientCommunicator
         {
             try
             {
-                URL url2 = new URL(LoginActivity.SERVER_URL + "download/image?name=" + fileName);
+                URL url2 = new URL(SettingsDb.getServerIP(context) + "download/image?name=" + fileName);
                 HttpURLConnection connection = (HttpURLConnection) url2.openConnection();
                 try
                 {

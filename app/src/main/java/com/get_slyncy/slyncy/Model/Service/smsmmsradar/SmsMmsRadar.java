@@ -44,11 +44,17 @@ public class SmsMmsRadar
 	 * @param context used to start the service
 	 * @param smsListener to notify when the sms content provider gets a new sms
 	 */
-	public static void initializeSmsRadarService(Context context, ISmsListener smsListener, IMmsListener mmsListener) {
+	public static void initializeSmsRadarServiceAndStart(Context context, ISmsListener smsListener, IMmsListener mmsListener) {
 		SmsMmsRadar.smsListener = smsListener;
 		SmsMmsRadar.mmsListener = mmsListener;
 		Intent intent = new Intent(context, SmsMmsRadarService.class);
 		context.startService(intent);
+	}
+
+	public static void initializeSmsRadarService(Context context, ISmsListener smsListener, IMmsListener mmsListener)
+	{
+		SmsMmsRadar.smsListener = smsListener;
+		SmsMmsRadar.mmsListener = mmsListener;
 	}
 
 	/**

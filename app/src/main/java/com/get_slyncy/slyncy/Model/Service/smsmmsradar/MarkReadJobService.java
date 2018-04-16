@@ -3,6 +3,7 @@ package com.get_slyncy.slyncy.Model.Service.smsmmsradar;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.app.job.JobWorkItem;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -27,6 +28,7 @@ public class MarkReadJobService extends JobService
     @Override
     public boolean onStartJob(JobParameters params)
     {
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             JobWorkItem work;
@@ -41,7 +43,7 @@ public class MarkReadJobService extends JobService
                         ArrayList<Integer> threadIds = bundle.getIntegerArrayList("threadId");
                         if (threadIds != null)
                         {
-                            MarkReadTask task = new MarkReadTask(UUID.randomUUID().toString());
+                            MarkReadTask task = new MarkReadTask(UUID.randomUUID().toString(), getApplicationContext());
                             tasks.add(task);
                             task.execute(threadIds.toArray(new Integer[threadIds.size()]));
                         }
@@ -49,7 +51,7 @@ public class MarkReadJobService extends JobService
                     else
                     {
                         int threadId = bundle.getInt("threadId");
-                        MarkReadTask task = new MarkReadTask(UUID.randomUUID().toString());
+                        MarkReadTask task = new MarkReadTask(UUID.randomUUID().toString(), getApplicationContext());
                         tasks.add(task);
                         task.execute(threadId);
                     }
@@ -72,7 +74,7 @@ public class MarkReadJobService extends JobService
                     }
                     if (bundle.getIntArray("threadId").length > 0)
                     {
-                        MarkReadTask task = new MarkReadTask(UUID.randomUUID().toString());
+                        MarkReadTask task = new MarkReadTask(UUID.randomUUID().toString(), getApplicationContext());
                         tasks.add(task);
                         task.execute(threadIds.toArray(new Integer[threadIds.size()]));
                     }
@@ -81,7 +83,7 @@ public class MarkReadJobService extends JobService
             else
             {
                 int threadId = bundle.getInt("threadId");
-                MarkReadTask task = new MarkReadTask(UUID.randomUUID().toString());
+                MarkReadTask task = new MarkReadTask(UUID.randomUUID().toString(), getApplicationContext());
                 tasks.add(task);
                 task.execute(threadId);
             }
@@ -104,10 +106,12 @@ public class MarkReadJobService extends JobService
     private static class MarkReadTask extends AsyncTask<Integer, Void, Void>
     {
         String id;
+        Context context;
 
-        MarkReadTask(String id)
+        MarkReadTask(String id, Context context)
         {
             this.id = id;
+            this.context = context;
         }
 
         @Override
@@ -118,7 +122,7 @@ public class MarkReadJobService extends JobService
             {
                 if (integer != null)
                 {
-                    ClientCommunicator.markThreadAsRead(integer);
+                    ClientCommunicator.markThreadAsRead(integer, context);
                 }
             }
             return null;

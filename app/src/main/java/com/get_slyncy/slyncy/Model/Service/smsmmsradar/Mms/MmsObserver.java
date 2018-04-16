@@ -21,6 +21,7 @@ import android.app.job.JobScheduler;
 import android.app.job.JobWorkItem;
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -63,15 +64,15 @@ public class MmsObserver extends ContentObserver
     private static final String PROTOCOL_COLUMN_NAME = "msg_box";
     private static final String SMS_ORDER = "date DESC";
 
-    private ContentResolver contentResolver;
     private MmsCursorParser mmsCursorParser;
     private JobScheduler jobScheduler;
     private String packageName;
+    private Context context;
 
-    public MmsObserver(ContentResolver contentResolver, Handler handler, MmsCursorParser mmsCursorParser, JobScheduler jobScheduler, String packageName)
+    public MmsObserver(Context context, Handler handler, MmsCursorParser mmsCursorParser, JobScheduler jobScheduler, String packageName)
     {
         super(handler);
-        this.contentResolver = contentResolver;
+        this.context = context;
         this.mmsCursorParser = mmsCursorParser;
         this.jobScheduler = jobScheduler;
         this.packageName = packageName;
@@ -119,7 +120,7 @@ public class MmsObserver extends ContentObserver
                 Cursor cursor = null;
                 try
                 {
-                    cursor = contentResolver.query(Telephony.Mms.Inbox.CONTENT_URI, new String[]{"*"}, "read = 1", null, "date desc");
+                    cursor = context.getContentResolver().query(Telephony.Mms.Inbox.CONTENT_URI, new String[]{"*"}, "read = 1", null, "date desc");
                     if (cursor != null && cursor.moveToFirst())
                     {
                         int msgId = cursor.getInt(cursor.getColumnIndex("_id"));
@@ -127,7 +128,7 @@ public class MmsObserver extends ContentObserver
                         int threadId = cursor.getInt(cursor.getColumnIndex("thread_id"));
                         if (MmsCursorParser.shouldParseMms(msgId, new Date(date * 1000)))
                         {
-                            if (!ClientCommunicator.markThreadAsRead(threadId))
+                            if (!ClientCommunicator.markThreadAsRead(threadId, context))
                             {
 //                                if (jobScheduler != null)
 //                                {
@@ -223,7 +224,7 @@ public class MmsObserver extends ContentObserver
         String selection = null;
         String[] selectionArgs = null;
         String sortOrder = null;
-        return contentResolver.query(MMS_URI, projection, selection, selectionArgs, sortOrder);
+        return context.getContentResolver().query(MMS_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     private boolean isProtocolForOutgoingMms(int protocol)
@@ -234,12 +235,12 @@ public class MmsObserver extends ContentObserver
     private Cursor getMmsDetailsCursor(Uri mmsUri)
     {
 
-        return mmsUri != null ? this.contentResolver.query(mmsUri, null, null, null, SMS_ORDER) : null;
+        return mmsUri != null ? context.getContentResolver().query(mmsUri, null, null, null, SMS_ORDER) : null;
     }
 
     private SlyncyMessage parseMms(Cursor cursor)
     {
-        return mmsCursorParser.parse(cursor, contentResolver);
+        return mmsCursorParser.parse(cursor, context.getContentResolver());
     }
 
     private void close(Cursor cursor)

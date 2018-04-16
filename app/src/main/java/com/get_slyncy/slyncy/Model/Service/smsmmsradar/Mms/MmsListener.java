@@ -23,16 +23,16 @@ import static com.get_slyncy.slyncy.Model.Util.Json.toJson;
 
 public class MmsListener implements IMmsListener
 {
-    private ContentResolver resolver;
+    private Context context;
     private String packageName;
     private JobScheduler jobScheduler;
 
 
-    public MmsListener(ContentResolver resolver, JobScheduler jobScheduler, String packageName)
+    public MmsListener(Context context, JobScheduler jobScheduler, String packageName)
     {
         this.packageName = packageName;
         this.jobScheduler = jobScheduler;
-        this.resolver = resolver;
+        this.context = context;
     }
 
 
@@ -42,7 +42,7 @@ public class MmsListener implements IMmsListener
     {
         if (mms != null)
         {
-            if (!ClientCommunicator.uploadSingleMessage(mms, resolver))
+            if (!ClientCommunicator.uploadSingleMessage(mms, context))
             {
 //                if (jobScheduler != null)
 //                {
@@ -66,7 +66,7 @@ public class MmsListener implements IMmsListener
     {
         if (mms != null)
         {
-            if (!ClientCommunicator.uploadSingleMessage(mms, resolver))
+            if (!ClientCommunicator.uploadSingleMessage(mms, context))
             {
 //                if (jobScheduler != null)
 //                {

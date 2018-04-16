@@ -7,6 +7,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
+import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadarService;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 
 //import com.get_slyncy.slyncy.View.Test.SmsMmsRadar;
@@ -23,7 +24,7 @@ public class AutoStart extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent arg1)
     {
-        Intent intent = new Intent(context, SmsMmsRadar.class);
+        Intent intent = new Intent(context, SmsMmsRadarService.class);
 
         if (context.getSharedPreferences("authorization", Context.MODE_PRIVATE).contains("token"))
         {
@@ -35,9 +36,5 @@ public class AutoStart extends BroadcastReceiver
                 context.startService(intent);
 
         }
-
-
-
-        // TODO: @Tyler: Hookup the MessagesMonitoringService
     }
 }

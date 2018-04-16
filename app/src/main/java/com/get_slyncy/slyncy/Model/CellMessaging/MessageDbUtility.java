@@ -87,7 +87,7 @@ public class MessageDbUtility
                 instance.getMessagesBulk();
                 instance.mThreadList = new HashMap<>();
 
-                ClientCommunicator.bulkMessageUpload(LocalBroadcastManager.getInstance(context));
+                ClientCommunicator.bulkMessageUpload(LocalBroadcastManager.getInstance(context), context);
             }
         }, "MessageDbUtility.init").start();
     }

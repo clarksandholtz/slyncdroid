@@ -120,8 +120,8 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
                     else
                     {
                         builder.setContentTitle("slynced").setContentText("slyncing complete");
+
                     }
-                    getSharedPreferences("authorization", MODE_PRIVATE).edit().putBoolean("synced", true).commit();
                     notificationManager.notify(60, builder.build());
                 }
 
@@ -132,7 +132,8 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
         {
             if (!getSharedPreferences("authorization", MODE_PRIVATE).getBoolean("synced", true))
             {
-//                ClientCommunicator.deleteMessages(this);
+                ClientCommunicator.deleteMessages(this);
+                getSharedPreferences("authorization", MODE_PRIVATE).edit().putBoolean("synced", true).commit();
                 Notification.Builder builder;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager != null)
                 {
@@ -256,6 +257,10 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
 
     public void resync(View view)
     {
+        final NotificationManager notificationManager = getSystemService(NotificationManager.class);
+
+
+
         AlertDialog alertDialog = new AlertDialog.Builder(this).setIcon(getDrawable(R.drawable.ic_warn)).setTitle("Warning!").setMessage("This will erase all messages on the Slyncy servers.\nIt is irreversible").setNegativeButton("Cancel", new DialogInterface.OnClickListener()
         {
             @Override
@@ -269,6 +274,24 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
             public void onClick(DialogInterface dialog, int which)
             {
                 ClientCommunicator.deleteMessages(getApplicationContext());
+                Notification.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager != null)
+                {
+                    NotificationChannel channel = new NotificationChannel(getPackageName() + "_slyncing", "slyncing Progress", NotificationManager.IMPORTANCE_DEFAULT);
+                    channel.enableLights(true);
+                    channel.setLightColor(getColor(R.color.colorPrimary));
+                    channel.setShowBadge(true);
+                    channel.enableVibration(true);
+                    notificationManager.createNotificationChannel(channel);
+                    builder = new Notification.Builder(SettingsActivity.this, getPackageName() + "_slyncing");
+                }
+                else
+                {
+                    builder = new Notification.Builder(SettingsActivity.this);
+                }
+                builder.setContentTitle("slyncing...").setContentText("slyncy is currently slyncing.").setOngoing(true).setSmallIcon(Icon.createWithResource(SettingsActivity.this, R.drawable.notification_logo)).setColor(getColor(R.color.colorPrimary));
+                final Notification notification = builder.build();
+                if (notificationManager != null) notificationManager.notify(60, notification);
             }
         }).create();
         Drawable icon = getDrawable(R.drawable.ic_warn);

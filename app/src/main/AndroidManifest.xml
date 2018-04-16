@@ -39,57 +39,57 @@
 
         <service android:name="com.android.mms.transaction.TransactionService"/>
 
-        <!--<receiver-->
-            <!--android:name=".Model.CellMessaging.SmsReceiver"-->
-            <!--android:permission="android.permission.BROADCAST_SMS">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.provider.Telephony.SMS_DELIVER"/>-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
-        <!--<receiver-->
-            <!--android:name=".Model.CellMessaging.MmsReceiver"-->
-            <!--android:permission="android.permission.BROADCAST_WAP_PUSH">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.provider.Telephony.WAP_PUSH_DELIVER"/>-->
+        <receiver
+            android:name=".Model.CellMessaging.SmsReceiver"
+            android:permission="android.permission.BROADCAST_SMS">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_DELIVER"/>
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".Model.CellMessaging.MmsReceiver"
+            android:permission="android.permission.BROADCAST_WAP_PUSH">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER"/>
 
-                <!--<content android:mimeType="application/vnd.wap.mms-message"/>-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
+                <content android:mimeType="application/vnd.wap.mms-message"/>
+            </intent-filter>
+        </receiver>
         <receiver android:name=".Model.Service.AutoStart">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 
-        <!--<service-->
-        <!--android:name=".Model.Service.SlyncyService"-->
-        <!--android:enabled="true"/>-->
+        <service
+        android:name=".Model.Service.SlyncyService"
+        android:enabled="true"/>
         <!--<service-->
         <!--android:name=".Model.Service.MessagesMonitoringService"-->
         <!--android:enabled="true"/>-->
 
-        <!--<receiver-->
-            <!--android:name="com.klinker.android.send_message.MmsSentReceiver"-->
-            <!--android:taskAffinity="com.klinker.android.messaging.MMS_SENT"/>-->
-        <!--<receiver-->
-            <!--android:name="com.klinker.android.send_message.MmsReceivedReceiver"-->
-            <!--android:taskAffinity="com.klinker.android.messaging.MMS_RECEIVED"/>-->
+        <receiver
+            android:name="com.klinker.android.send_message.MmsSentReceiver"
+            android:taskAffinity="com.klinker.android.messaging.MMS_SENT"/>
+        <receiver
+            android:name="com.klinker.android.send_message.MmsReceivedReceiver"
+            android:taskAffinity="com.klinker.android.messaging.MMS_RECEIVED"/>
 
-        <!--<service-->
-            <!--android:name=".Model.Service.HeadlessSmsSendService"-->
-            <!--android:exported="true"-->
-            <!--android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.RESPOND_VIA_MESSAGE"/>-->
+        <service
+            android:name=".Model.Service.HeadlessSmsSendService"
+            android:exported="true"
+            android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE"/>
 
-                <!--<category android:name="android.intent.category.DEFAULT"/>-->
+                <category android:name="android.intent.category.DEFAULT"/>
 
-                <!--<content android:scheme="sms"/>-->
-                <!--<content android:scheme="smsto"/>-->
-                <!--<content android:scheme="mms"/>-->
-                <!--<content android:scheme="mmsto"/>-->
-            <!--</intent-filter>-->
-        <!--</service>-->
+                <content android:scheme="sms"/>
+                <content android:scheme="smsto"/>
+                <content android:scheme="mms"/>
+                <content android:scheme="mmsto"/>
+            </intent-filter>
+        </service>
         <!--<service-->
         <!--android:name="com.tuenti.smsmmsradar.SmsMmsRadarService"-->
         <!--android:exported="false"-->

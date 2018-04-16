@@ -19,7 +19,7 @@ import java.util.Scanner;
 public class SettingsDb
 {
     static final private HashSet<String> disabledByDefault = new HashSet<>();
-    private static final String KEY_PACKAGE_NAME = "packageName";
+    private static final String KEY_PACKAGE_NAME = "com.get_slyncy.slyncy";
     private static final String KEY_IS_ENABLED = "isEnabled";
     private static final String DATABASE_NAME = "Applications";
     private static final String DATABASE_TABLE = "Applications";
@@ -40,6 +40,16 @@ public class SettingsDb
     public SettingsDb(Context c)
     {
         ourContext = c;
+    }
+
+    public static String getServerIP(Context c)
+    {
+        return c.getSharedPreferences("IP", Context.MODE_PRIVATE).getString("ip", "http://45.56.24.120:4000/");
+    }
+
+    public static void setServerIP(Context c, String ip)
+    {
+        c.getSharedPreferences("IP", Context.MODE_PRIVATE).edit().putString("ip", ip).commit();
     }
 
     public static boolean initGroupMessageSettings(File fileDir)

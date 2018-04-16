@@ -5,6 +5,7 @@ import android.app.job.JobScheduler;
 import android.app.job.JobWorkItem;
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.PersistableBundle;
@@ -21,15 +22,15 @@ import static com.get_slyncy.slyncy.Model.Util.Json.toJson;
 
 public class SmsListener implements ISmsListener
 {
-    private ContentResolver resolver;
+    private Context context;
     private String packageName;
     private JobScheduler jobScheduler;
 
-    public SmsListener(ContentResolver resolver, JobScheduler jobScheduler, String packageName)
+    public SmsListener(Context context, JobScheduler jobScheduler, String packageName)
     {
         this.packageName = packageName;
         this.jobScheduler = jobScheduler;
-        this.resolver = resolver;
+        this.context = context;
     }
 
     @Override
@@ -37,7 +38,7 @@ public class SmsListener implements ISmsListener
     {
         if (sms != null)
         {
-            if (!ClientCommunicator.uploadSingleMessage(sms, resolver))
+            if (!ClientCommunicator.uploadSingleMessage(sms, context))
             {
 //                if (jobScheduler != null)
 //                {
@@ -61,7 +62,7 @@ public class SmsListener implements ISmsListener
     {
         if (sms != null)
         {
-            if (!ClientCommunicator.uploadSingleMessage(sms, resolver))
+            if (!ClientCommunicator.uploadSingleMessage(sms, context))
             {
 //                if (jobScheduler != null)
 //                {

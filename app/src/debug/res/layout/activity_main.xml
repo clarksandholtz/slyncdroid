@@ -32,5 +32,20 @@
         android:text="SMS Radar"
         android:onClick="launchSmsRadar"/>
 
+    <EditText
+        android:id="@+id/ip_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="IP Address"
+        android:inputType="textPersonName"/>
+
+    <Button
+        android:id="@+id/apply_ip_change"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Apply"
+        android:onClick="applyIpChange"/>
+
 
 </LinearLayout>

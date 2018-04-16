@@ -21,6 +21,7 @@ import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.Model.Util.DownloadImageTask;
+import com.get_slyncy.slyncy.Model.Util.SettingsDb;
 import com.get_slyncy.slyncy.R;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -319,7 +320,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                                                                     return chain.proceed(builder.build());
                                                                 }
                                                             }).writeTimeout(2, TimeUnit.MINUTES).readTimeout(2, TimeUnit.MINUTES).connectTimeout(2, TimeUnit.MINUTES).build();
-                                                            ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL).build();
+                                                            ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(SettingsDb.getServerIP(getApplicationContext())).build();
 
 
                                                             client.mutate(SignupMutation.builder().email(acct.getEmail() == null ? "ThisShouldn'tShowUp.Ever." : acct.getEmail()).name(user.getDisplayName() == null ? "" : user.getDisplayName()).phone(user.getPhoneNumber()).uid(acct.getId()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()
@@ -399,7 +400,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                                             return chain.proceed(builder.build());
                                         }
                                     }).writeTimeout(2, TimeUnit.MINUTES).readTimeout(2, TimeUnit.MINUTES).connectTimeout(2, TimeUnit.MINUTES).build();
-                                    ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(LoginActivity.SERVER_URL).build();
+                                    ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(SettingsDb.getServerIP(getApplicationContext())).build();
 
 
                                     client.mutate(SignupMutation.builder().email(acct.getEmail() == null ? "thisShouldn'tShowUp.Ever." : acct.getEmail()).name(user.getDisplayName() == null ? "" : user.getDisplayName()).phone(user.getPhoneNumber() == null ? "" : user.getPhoneNumber()).uid(acct.getId()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()
@@ -465,7 +466,7 @@ public class ConfirmationActivity extends Activity implements DownloadImageTask.
                     if (task.isSuccessful())
                     {
                         Log.d(TAG, "onComplete: Phone number update successful");
-                        ApolloClient client = ApolloClient.builder().serverUrl(LoginActivity.SERVER_URL).build();
+                        ApolloClient client = ApolloClient.builder().serverUrl(SettingsDb.getServerIP(getApplicationContext())).build();
 
 
                         client.mutate(SignupMutation.builder().email(acct.getEmail()).name(user.getDisplayName()).phone(user.getPhoneNumber()).uid(acct.getId()).build()).enqueue(new ApolloCall.Callback<SignupMutation.Data>()

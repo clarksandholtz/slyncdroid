@@ -21,6 +21,7 @@ import android.app.job.JobScheduler;
 import android.app.job.JobWorkItem;
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -61,18 +62,18 @@ public class SmsObserver extends ContentObserver
     private static final String PROTOCOL_COLUM_NAME = "protocol";
     private static final String SMS_ORDER = "date DESC";
 
-    private ContentResolver contentResolver;
+    private Context context;
     private SmsCursorParser smsCursorParser;
     private JobScheduler jobScheduler;
     private String packageName;
 
-    public SmsObserver(ContentResolver contentResolver, Handler handler, SmsCursorParser smsCursorParser, JobScheduler jobScheduler, String packageName)
+    public SmsObserver(Context context, Handler handler, SmsCursorParser smsCursorParser, JobScheduler jobScheduler, String packageName)
     {
         super(handler);
         this.jobScheduler = jobScheduler;
         this.packageName = packageName;
-        this.contentResolver = contentResolver;
         this.smsCursorParser = smsCursorParser;
+        this.context = context;
     }
 
 
@@ -116,7 +117,7 @@ public class SmsObserver extends ContentObserver
                 Cursor cursor = null;
                 try
                 {
-                    cursor = contentResolver.query(Telephony.Sms.Inbox.CONTENT_URI, new String[]{"*"}, "read = 1", null, "date desc");
+                    cursor = context.getContentResolver().query(Telephony.Sms.Inbox.CONTENT_URI, new String[]{"*"}, "read = 1", null, "date desc");
                     if (cursor != null && cursor.moveToFirst())
                     {
                         int msgId = cursor.getInt(cursor.getColumnIndex("_id"));
@@ -124,7 +125,7 @@ public class SmsObserver extends ContentObserver
                         int threadId = cursor.getInt(cursor.getColumnIndex("thread_id"));
                         if (SmsCursorParser.shouldParseReadSms(msgId))
                         {
-                            if (!ClientCommunicator.markThreadAsRead(threadId))
+                            if (!ClientCommunicator.markThreadAsRead(threadId, context))
                             {
 //                               if (jobScheduler != null)
 //                                {
@@ -216,7 +217,7 @@ public class SmsObserver extends ContentObserver
         String selection = null;
         String[] selectionArgs = null;
         String sortOrder = null;
-        return contentResolver.query(SMS_URI, projection, selection, selectionArgs, sortOrder);
+        return context.getContentResolver().query(SMS_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     private boolean isProtocolForOutgoingSms(String protocol)
@@ -227,7 +228,7 @@ public class SmsObserver extends ContentObserver
     private Cursor getSmsDetailsCursor(Uri smsUri)
     {
 
-        return smsUri != null ? this.contentResolver.query(smsUri, null, null, null, SMS_ORDER) : null;
+        return smsUri != null ? context.getContentResolver().query(smsUri, null, null, null, SMS_ORDER) : null;
     }
 
     private SlyncyMessage parseSms(Cursor cursor)
