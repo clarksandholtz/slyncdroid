@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 
+import com.crashlytics.android.Crashlytics;
 import com.get_slyncy.slyncy.Model.Service.SlyncyService;
 import com.get_slyncy.slyncy.Model.Util.Data;
 import com.get_slyncy.slyncy.R;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity
 
     public void launchSmsRadar(View view)
     {
+//        Crashlytics.getInstance().crash();
         Intent intent = new Intent(this, SmsRadar.class);
         startActivity(intent);
     }
