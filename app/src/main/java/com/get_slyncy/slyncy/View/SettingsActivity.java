@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.get_slyncy.slyncy.Model.Service.Notification.NotificationListener;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadar;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.SmsMmsRadarService;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
@@ -178,17 +179,17 @@ public class SettingsActivity extends Activity implements DownloadImageTask.Post
             DownloadImageTask task = new DownloadImageTask(getCacheDir().getPath(), this);
             task.execute(picUrl);
         }
-        boolean groupMMSEnabled = SettingsDb.initGroupMessageSettings(getFilesDir());
+        boolean groupMMSEnabled = SettingsDb.getGroupMessageSettings(getApplicationContext());
         groupMessageSwitch.setChecked(groupMMSEnabled);
         groupMessageSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
         {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
-                SettingsDb.setGroupMessageSettings(getFilesDir(), isChecked);
+                SettingsDb.setGroupMessageSettings(getApplicationContext(), isChecked);
             }
         });
-
+        NotificationListener.start(getBaseContext());
         Intent intent = new Intent(this, SmsMmsRadarService.class);
         startService(intent);
     }

@@ -1,10 +1,14 @@
 package com.get_slyncy.slyncy.View;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -42,6 +46,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -74,9 +79,84 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
         // Check if permissions are needed
         if (PermissionActivity.needPermissionRequest(this))
         {
-            startActivity(new Intent(this, PermissionActivity.class));
+            AlertDialog alertDialog =  new AlertDialog.Builder(this).setPositiveButton("Continue", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    startActivity(new Intent(LoginActivity.this, PermissionActivity.class));
+
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    AlertDialog alertDialog1 = new AlertDialog.Builder(LoginActivity.this).setNegativeButton("Uninstall", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
+                            intent.setData(Uri.parse("package:" + getPackageName()));
+                            startActivity(intent);
+
+                        }
+                    }).setPositiveButton("Grant Permissions", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            startActivity(new Intent(LoginActivity.this, PermissionActivity.class));
+
+                        }
+                    }).setTitle("Uninstall?").setMessage("slyncy will not work without being granted Contacts, Phone, " +
+                                                         "SMS, and Storage\nslyncy does not collect any information " +
+                                                         "beyond that necessary for the full functionality of the " +
+                                                         "application and strives to keep your data secure\nIf you do " +
+                                                         "not want to accept these permissions, slyncy will be uninstalled")
+                            .create();
+                    alertDialog1.show();
+                }
+            }).setTitle("Permissions Request").setMessage("slyncy relies on the ability to get your phone number, read " +
+                                                          "and send SMS/MMS, read your contacts and read and write from " +
+                                                          "storage in order to function properly\n\nFor more information" +
+                                                          " please visit <insert link here>")
+                    .create();
+            alertDialog.show();
             finish();
             return;
+        }
+
+        if (PermissionActivity.needNotificationAccess(this) && allowedReprompt())
+        {
+            new AlertDialog.Builder(this).setTitle("Notification Access")
+                    .setMessage("Notification access is required to allow slyncy to send notifications to your computer" +
+                                "\nWithout this permission, only notification mirroring will not work, and you will " +
+                                "still receive notifications about new messages on your computer.\nClick the grant " +
+                                "access button, allow slyncy notification access, and then press back")
+                    .setPositiveButton("Grant Access", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    Intent intent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+                    startActivity(intent);
+                }
+            }).setNeutralButton("Continue without granting", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                }
+            }).setNegativeButton("Do not ask again", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    getSharedPreferences("notification", MODE_PRIVATE).edit().putBoolean("allow", false).apply();
+                }
+            }).create().show();
         }
 
         // Init settings
@@ -132,6 +212,11 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         mAuth = FirebaseAuth.getInstance();
+    }
+
+    private boolean allowedReprompt()
+    {
+        return getSharedPreferences("notification", MODE_PRIVATE).getBoolean("allow", true);
     }
 
     @Override
@@ -190,6 +275,7 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            Log.d("TOKEN", FirebaseInstanceId.getInstance().getToken());
                             tryLogin(user, acct);
                         }
                         else
@@ -216,10 +302,17 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                 builder.addHeader("Cache-Control", "no-cache");
                 return chain.proceed(builder.build());
             }
-        }).writeTimeout(2, TimeUnit.MINUTES).readTimeout(2, TimeUnit.MINUTES).connectTimeout(2, TimeUnit.MINUTES)
+        }).writeTimeout(2, TimeUnit.SECONDS).readTimeout(2, TimeUnit.SECONDS).connectTimeout(2, TimeUnit.SECONDS)
                 .build();
         ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(SettingsDb.getServerIP(getApplicationContext())).build();
-
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setTitle("slyncy");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setMessage("Logging in");
+        progressDialog.show();
         client.mutate(LoginMutation.builder().email(acct.getEmail()).uid(acct.getId()).build())
                 .enqueue(new ApolloCall.Callback<LoginMutation.Data>()
                 {
@@ -260,12 +353,21 @@ public class LoginActivity extends Activity implements DownloadImageTask.PostExe
                                     LoginActivity.this).execute(user.getPhotoUrl().toString()
                                     .replace("s96-c", "s960-c"));
                         }
+
+                        if(progressDialog.isShowing())
+                        {
+                            progressDialog.dismiss();
+                        }
                     }
 
                     @Override
                     public void onFailure(@Nonnull ApolloException e)
                     {
                         Log.e("Apollo error:", e.getMessage());
+                        if (progressDialog.isShowing())
+                        {
+                            progressDialog.dismiss();
+                        }
                         Snackbar.make(findViewById(R.id.main_layout), "Unable to reach Slyncy Servers. Please try again later.",
                                 Snackbar.LENGTH_SHORT).show();
                     }

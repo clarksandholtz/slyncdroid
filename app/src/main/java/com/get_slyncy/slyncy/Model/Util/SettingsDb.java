@@ -5,10 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.Telephony;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Scanner;
 
@@ -40,11 +43,21 @@ public class SettingsDb
     public SettingsDb(Context c)
     {
         ourContext = c;
+        disabledByDefault.add(Telephony.Sms.getDefaultSmsPackage(c));
     }
 
     public static String getServerIP(Context c)
     {
-        return c.getSharedPreferences("IP", Context.MODE_PRIVATE).getString("ip", "http://45.56.24.120:4000/");
+        String addr = c.getSharedPreferences("IP", Context.MODE_PRIVATE).getString("ip", "http://45.56.24.120:4000/");
+        try
+        {
+            URL url = new URL(addr);
+        }
+        catch (MalformedURLException e)
+        {
+            addr = "http://45.56.24.120:4000";
+        }
+        return addr;
     }
 
     public static void setServerIP(Context c, String ip)
@@ -52,61 +65,15 @@ public class SettingsDb
         c.getSharedPreferences("IP", Context.MODE_PRIVATE).edit().putString("ip", ip).commit();
     }
 
-    public static boolean initGroupMessageSettings(File fileDir)
+
+    public static boolean getGroupMessageSettings(Context context)
     {
-        File groupSettings = new File(fileDir, "groupSettings");
-        boolean newVal = true;
-        if (groupSettings.exists())
-        {
-            try (Scanner scanner = new Scanner(groupSettings))
-            {
-                newVal = Boolean.parseBoolean(scanner.nextLine());
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else
-        {
-            try (FileWriter writer = new FileWriter(groupSettings))
-            {
-                writer.write(String.valueOf(newVal));
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        return newVal;
+        return context.getSharedPreferences("groupMessage", Context.MODE_PRIVATE).getBoolean("groupMms", true);
     }
 
-    public static boolean getGroupMessageSettings(File fileDir)
+    public static void setGroupMessageSettings(Context context, boolean newVal)
     {
-        boolean newVal = true;
-        File groupSettings = new File(fileDir, "groupSettings");
-        try (Scanner scanner = new Scanner(groupSettings))
-        {
-            newVal = Boolean.parseBoolean(scanner.nextLine());
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return newVal;
-    }
-
-    public static void setGroupMessageSettings(File fileDir, boolean newVal)
-    {
-        File groupSettings = new File(fileDir, "groupSettings");
-        try (FileWriter writer = new FileWriter(groupSettings))
-        {
-            writer.write(String.valueOf(newVal));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        context.getSharedPreferences("groupMessage", Context.MODE_PRIVATE).edit().putBoolean("groupMms", newVal).commit();
     }
 
     public void open()

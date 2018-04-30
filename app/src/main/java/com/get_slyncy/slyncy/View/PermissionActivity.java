@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.content.ContextCompat;
 
 
@@ -59,6 +60,11 @@ public class PermissionActivity extends Activity
         }
 
         return false;
+    }
+
+    public static boolean needNotificationAccess(Context context)
+    {
+        return !Settings.Secure.getString(context.getContentResolver(),"enabled_notification_listeners").contains(context.getPackageName());
     }
 
     @Override

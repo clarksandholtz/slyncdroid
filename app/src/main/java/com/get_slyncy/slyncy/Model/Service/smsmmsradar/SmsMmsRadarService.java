@@ -39,6 +39,8 @@ import android.widget.Toast;
 
 import com.get_slyncy.slyncy.Model.CellMessaging.MessageDbUtility;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
+import com.get_slyncy.slyncy.Model.Service.Notification.NotificationListener;
+import com.get_slyncy.slyncy.Model.Service.Notification.NotificationReceiver;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms.MmsListener;
 import com.get_slyncy.slyncy.Model.Service.smsmmsradar.Sms.SmsListener;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
@@ -148,10 +150,16 @@ public class SmsMmsRadarService extends Service
         initializeDependencies();
         registerSmsContentObserver();
         registerMmsContentObserver();
-        ClientCommunicator.subscribeToNewMessages(getApplicationContext());
-        SmsMmsRadar.initializeSmsRadarServiceAndStart(this, new SmsListener(getApplicationContext(), getSystemService(JobScheduler.class), getPackageName()),
-                new MmsListener(getApplicationContext(), getSystemService(JobScheduler.class), getPackageName()));
+//        startNotificationService();
+        ClientCommunicator.subscribeToNewMessages(getBaseContext());
+        SmsMmsRadar.initializeSmsRadarServiceAndStart(this, new SmsListener(getBaseContext(), getSystemService(JobScheduler.class), getPackageName()),
+                new MmsListener(getBaseContext(), getSystemService(JobScheduler.class), getPackageName()));
     }
+
+//    private void startNotificationService()
+//    {
+//        NotificationListener.start(getBaseContext());
+//    }
 
     private void initializeDependencies()
     {
