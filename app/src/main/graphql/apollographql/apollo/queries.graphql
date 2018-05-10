@@ -40,6 +40,14 @@ mutation MarkThreadAsRead($threadId: Int!) {
   }
 }
 
+mutation SendNotification($id : String!, $appName : String!, $ticker : String!, $title : String!, $text : String!, $date : String!, $canReply : Boolean!)
+{
+    createNotification(androidId : $id appName : $appName ticker : $ticker title : $title text : $text date : $date canReply : $canReply)
+    {
+        id
+    }
+}
+
 subscription PendingMessages($token : String!){
     pendingMessages(token : $token){
         body

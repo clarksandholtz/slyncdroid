@@ -65,9 +65,10 @@ public class NotificationReceiver extends NotificationListenerService
     @Override
     public void onNotificationPosted(StatusBarNotification statusBarNotification)
     {
-        //Log.e("NotificationReceiver.onNotificationPosted","listeners: " + listeners.size());
+        Log.e("onNotificationPosted","listeners: " + listeners.size());
         for (NotificationListener listener : listeners)
         {
+            if (listener != null)
             listener.onNotificationPosted(statusBarNotification);
         }
     }

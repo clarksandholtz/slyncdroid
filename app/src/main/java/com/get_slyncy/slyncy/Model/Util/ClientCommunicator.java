@@ -750,6 +750,11 @@ public class ClientCommunicator
         });
     }
 
+    public static String getAuthToken()
+    {
+        return authToken;
+    }
+
     private static class ImageDownloadThread extends Thread
     {
         String fileName;

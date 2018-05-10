@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -13,9 +12,23 @@ import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
+import com.apollographql.apollo.ApolloClient;
+import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.Model.Util.SettingsDb;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
+import apollographql.apollo.SendNotificationMutation;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class NotificationListener implements NotificationReceiver.NotificationListener, NotificationReceiver.InstanceCallback
 {
@@ -44,7 +57,7 @@ public class NotificationListener implements NotificationReceiver.NotificationLi
     @Override
     public void onNotificationPosted(final StatusBarNotification statusBarNotification)
     {
-        new Thread(new Runnable()
+        Thread thread = new Thread(new Runnable()
         {
             @Override
             public void run()
@@ -134,9 +147,25 @@ public class NotificationListener implements NotificationReceiver.NotificationLi
                 Log.d("Notification title", getNotificationTitle(notification));
                 Log.d("Notification text", getNotificationText(notification));
                 Log.d("Notification time", Long.toString(statusBarNotification.getPostTime()));
-
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.US);
+                String date = df.format(new Date(statusBarNotification.getPostTime()));
+                OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor()
+                {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException
+                    {
+                        Request orig = chain.request();
+                        Request.Builder builder = orig.newBuilder().method(orig.method(), orig.body());
+                        builder.header("Authorization", "Bearer " + ClientCommunicator.getAuthToken()).addHeader("Cache-Control", "no-cache");
+                        return chain.proceed(builder.build());
+                    }
+                }).writeTimeout(2, TimeUnit.SECONDS).readTimeout(2, TimeUnit.SECONDS).connectTimeout(2, TimeUnit.SECONDS).build();
+                ApolloClient client = ApolloClient.builder().okHttpClient(okHttpClient).serverUrl(SettingsDb.getServerIP(context)).build();
+                client.mutate(new SendNotificationMutation(key, appName, getTickerText(notification), getNotificationTitle(notification), getNotificationText(notification), date, false)).enqueue(null);
             }
-        }).start();
+        });
+
+        thread.start();
 
 //        device.sendPackage(np);
 
@@ -286,19 +315,25 @@ public class NotificationListener implements NotificationReceiver.NotificationLi
         return ticker;
     }
 
-    private Bitmap drawableToBitmap (Drawable drawable) {
+    private Bitmap drawableToBitmap(Drawable drawable)
+    {
         Bitmap bitmap = null;
 
-        if (drawable instanceof BitmapDrawable) {
+        if (drawable instanceof BitmapDrawable)
+        {
             BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
-            if(bitmapDrawable.getBitmap() != null) {
+            if (bitmapDrawable.getBitmap() != null)
+            {
                 return bitmapDrawable.getBitmap();
             }
         }
 
-        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
+        if (drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0)
+        {
             bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
-        } else {
+        }
+        else
+        {
             bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         }
 
