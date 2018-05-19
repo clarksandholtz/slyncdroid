@@ -195,14 +195,14 @@ public class SmsMmsRadarService extends Service
     {
         SharedPreferences preferences = getSharedPreferences("sms_preferences", MODE_PRIVATE);
         SmsStorage smsStorage = new SharedPreferencesSmsStorage(preferences);
-        return new SmsCursorParser(smsStorage, getTimeProvider());
+        return new SmsCursorParser(smsStorage, getTimeProvider(), this);
     }
 
     private MmsCursorParser initializeMmsCursorParser()
     {
         SharedPreferences preferences = getSharedPreferences("mms_preferences", MODE_PRIVATE);
         MmsStorage mmsStorage = new SharedPreferencesMmsStorage(preferences);
-        return new MmsCursorParser(mmsStorage, getTimeProvider());
+        return new MmsCursorParser(mmsStorage, getTimeProvider(), this);
     }
 
     private void initializeContentResolver()

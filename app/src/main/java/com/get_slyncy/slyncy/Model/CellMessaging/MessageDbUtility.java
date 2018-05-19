@@ -15,6 +15,7 @@ import com.get_slyncy.slyncy.Model.DTO.SlyncyMessage;
 import com.get_slyncy.slyncy.Model.DTO.SlyncyMessageThread;
 import com.get_slyncy.slyncy.Model.Util.ClientCommunicator;
 import com.get_slyncy.slyncy.Model.Util.Data;
+import com.klinker.android.send_message.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -346,7 +347,7 @@ public class MessageDbUtility
                 if (makeMessage)
                 {
                     ///*
-                    SlyncyMessage message = getMmsMessage(c, mContext.getContentResolver());
+                    SlyncyMessage message = getMmsMessage(c, mContext.getContentResolver(), mContext);
                     /*new SlyncyMessage();
                     message.setId(c.getString(c.getColumnIndex(MSG_ID)));
                     message.setThreadId(threadId);
@@ -418,7 +419,7 @@ public class MessageDbUtility
 
                 if (makeMessage)
                 {
-                    SlyncyMessage message = getSmsMessage(c);
+                    SlyncyMessage message = getSmsMessage(c, mContext);
                     message.setThreadId(threadId);
                     mThreadList.get(threadId).addMessage(message);
                     mThreadList.get(threadId).setNumbers(message.getNumbers());
@@ -429,7 +430,7 @@ public class MessageDbUtility
         c.close();
     }
 
-    public static SlyncyMessage getMmsMessage(Cursor c, ContentResolver resolver)
+    public static SlyncyMessage getMmsMessage(Cursor c, ContentResolver resolver, Context context)
     {
         SlyncyMessage message = new SlyncyMessage();
         message.setId(c.getString(c.getColumnIndex(MSG_ID)));
@@ -451,7 +452,7 @@ public class MessageDbUtility
         return message;
     }
 
-    public static SlyncyMessage getSmsMessage(Cursor c)
+    public static SlyncyMessage getSmsMessage(Cursor c, Context context)
     {
         SlyncyMessage message = new SlyncyMessage();
         message.setThreadId(c.getInt(c.getColumnIndex("thread_id")));
@@ -465,7 +466,7 @@ public class MessageDbUtility
         numbers.add(number);
         message.setNumbers(numbers);
         int type = c.getInt(c.getColumnIndex(TYPE));
-        if (type == 2) message.setSender(Data.getInstance().getSettings().getmMyPhoneNumber());
+        if (type == 2) message.setSender(Utils.getMyPhoneNumber(context));
         if (type == 1) message.setSender(number);
         message.setUserSent(type == 2);
         return message;

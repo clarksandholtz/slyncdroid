@@ -22,6 +22,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import apollographql.apollo.SendNotificationMutation;
@@ -54,14 +55,19 @@ public class NotificationListener implements NotificationReceiver.NotificationLi
         service.addListener(this);
     }
 
+    private final int[] count = {0};
+
+
     @Override
     public void onNotificationPosted(final StatusBarNotification statusBarNotification)
     {
+
         Thread thread = new Thread(new Runnable()
         {
             @Override
             public void run()
             {
+                count[0]++;
 
                 Notification notification = statusBarNotification.getNotification();
                 if ((notification.flags & Notification.FLAG_FOREGROUND_SERVICE) != 0 || (notification.flags & Notification.FLAG_ONGOING_EVENT) != 0 || (notification.flags & Notification.FLAG_LOCAL_ONLY) != 0)

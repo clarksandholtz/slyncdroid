@@ -7,13 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.Telephony;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Scanner;
+import java.util.concurrent.Semaphore;
 
 /**
  * Created by nsshurtz on 2/15/18.
@@ -30,15 +27,16 @@ public class SettingsDb
 
     static
     {
-        disabledByDefault
-                .add("com.google.android.apps.messaging"); //We already have sms notifications in the telephony plugin
-        disabledByDefault
-                .add("com.google.android.googlequicksearchbox"); //Google Now notifications re-spawn every few minutes
+        disabledByDefault.add("com.google.android.apps.messaging"); //We already have sms notifications in the telephony plugin
+        disabledByDefault.add("com.google.android.googlequicksearchbox"); //Google Now notifications re-spawn every few minutes
     }
 
     private final Context ourContext;
     private SQLiteDatabase ourDatabase;
     private DbHelper ourHelper;
+
+    private static int count = 0;
+
 
     public SettingsDb(Context c)
     {
@@ -76,22 +74,35 @@ public class SettingsDb
         context.getSharedPreferences("groupMessage", Context.MODE_PRIVATE).edit().putBoolean("groupMms", newVal).commit();
     }
 
+    Semaphore sem = new Semaphore(1);
     public void open()
     {
-        ourHelper = new DbHelper(ourContext);
-        ourDatabase = ourHelper.getWritableDatabase();
+        sem.acquireUninterruptibly();
+
+        if (count == 0)
+        {
+            ourHelper = new DbHelper(ourContext);
+            ourDatabase = ourHelper.getWritableDatabase();
+        }
+        count++;
+        sem.release();
     }
 
     public void close()
     {
-        ourHelper.close();
+        sem.acquireUninterruptibly();
+        if (count == 1)
+        {
+            count--;
+            ourHelper.close();
+        }
+        sem.release();
     }
 
     public void setEnabled(String packageName, boolean isEnabled)
     {
         String[] columns = new String[]{KEY_IS_ENABLED};
-        Cursor res = ourDatabase
-                .query(DATABASE_TABLE, columns, KEY_PACKAGE_NAME + " =? ", new String[]{packageName}, null, null, null);
+        Cursor res = ourDatabase.query(DATABASE_TABLE, columns, KEY_PACKAGE_NAME + " =? ", new String[]{packageName}, null, null, null);
 
         ContentValues cv = new ContentValues();
         cv.put(KEY_IS_ENABLED, isEnabled ? "true" : "false");
@@ -110,8 +121,7 @@ public class SettingsDb
     public boolean isEnabled(String packageName)
     {
         String[] columns = new String[]{KEY_IS_ENABLED};
-        Cursor res = ourDatabase
-                .query(DATABASE_TABLE, columns, KEY_PACKAGE_NAME + " =? ", new String[]{packageName}, null, null, null);
+        Cursor res = ourDatabase.query(DATABASE_TABLE, columns, KEY_PACKAGE_NAME + " =? ", new String[]{packageName}, null, null, null);
         boolean result;
         if (res.getCount() > 0)
         {
@@ -122,6 +132,7 @@ public class SettingsDb
         {
             result = getDefaultStatus(packageName);
         }
+
         res.close();
         return result;
     }
@@ -142,8 +153,7 @@ public class SettingsDb
         @Override
         public void onCreate(SQLiteDatabase db)
         {
-            db.execSQL(
-                    "CREATE TABLE " + DATABASE_TABLE + "(" + KEY_PACKAGE_NAME + " TEXT PRIMARY KEY NOT NULL, " + KEY_IS_ENABLED + " TEXT NOT NULL); ");
+            db.execSQL("CREATE TABLE " + DATABASE_TABLE + "(" + KEY_PACKAGE_NAME + " TEXT PRIMARY KEY NOT NULL, " + KEY_IS_ENABLED + " TEXT NOT NULL); ");
         }
 
         @Override

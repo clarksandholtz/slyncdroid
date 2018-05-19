@@ -17,6 +17,7 @@ package com.get_slyncy.slyncy.Model.Service.smsmmsradar.Mms;
 
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 
 
@@ -56,11 +57,13 @@ public class MmsCursorParser
 
     private static MmsStorage mmsStorage;
     private static TimeProvider timeProvider;
+    private Context context;
 
-    public MmsCursorParser(MmsStorage mmsStorage, TimeProvider timeProvider)
+    public MmsCursorParser(MmsStorage mmsStorage, TimeProvider timeProvider, Context context)
     {
         MmsCursorParser.mmsStorage = mmsStorage;
         MmsCursorParser.timeProvider = timeProvider;
+        this.context = context;
     }
 
     SlyncyMessage parse(Cursor cursor, ContentResolver resolver)
@@ -136,7 +139,7 @@ public class MmsCursorParser
 //        String type = cursor.getString(cursor.getColumnIndex(TYPE_COLUMN_NAME));
 //        long threadId = cursor.getLong(cursor.getColumnIndex(THREAD_ID_COLUMN_NAME));
 //        return new Mms(address, date, msg, SmsType.fromValue(Integer.parseInt(type)), threadId)
-        return getMmsMessage(cursor, resolver);
+        return getMmsMessage(cursor, resolver, context);
     }
 
 
